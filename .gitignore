@@ -1,3 +1,29 @@
 node_modules
 
 *.env
+
+# dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+ml-service/venv/
+ml-service/__pycache__/
+
+# environment variables
+.env
+client/.env
+server/.env
+ml-service/.env
+
+# build output
+client/dist/
+client/build/
+
+# ML model artifacts (large files, usually not committed)
+ml-service/models/*.h5
+ml-service/models/*.pkl
+
+# OS/editor junk
+.DS_Store
+.vscode/
+*.log
