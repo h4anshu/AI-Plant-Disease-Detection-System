@@ -2,6 +2,8 @@ import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import connectDB from './config/db.js';
+import authRouter from './routes/auth.routes.js';
+import predictRouter from './routes/predict.routes.js';
 
 const app = express();
 
@@ -16,6 +18,9 @@ app.use(express.json());
 app.get('/',(req, res) => {
     res.send("Plant Disease Detection API is running");
 })
+
+app.use('/api/auth', authRouter);
+app.use('/api/predict', predictRouter);
 
 
 const PORT = process.env.PORT || 4000;
