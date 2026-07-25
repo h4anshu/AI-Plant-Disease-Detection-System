@@ -18,46 +18,51 @@ const ResultCard = ({ result }) => {
   } = result;
 
   return (
-    <div className="max-w-xl mx-auto mt-8 bg-white rounded-lg shadow p-6">
+    <div className="card-specimen max-w-xl mx-auto mt-10 p-6 relative">
+      <span
+        className={`stamp absolute -top-3 -right-3 ${stamp.border} ${stamp.text} bg-parchment text-xs px-3 py-1`}
+      >
+        {stamp.label}
+      </span>
+
       <img
         src={imageUrl}
         alt="Analyzed leaf"
-        className="w-full max-h-72 object-cover rounded-lg mb-4"
+        className="w-full max-h-72 object-cover mb-5 border border-ink/10"
       />
 
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xl font-bold text-gray-800">
-          {disease.replace(/_/g, ' ')}
-        </h3>
-        <span
-          className={`text-sm font-semibold px-3 py-1 rounded-full border ${severityColors[severity]}`}
-        >
-          {severity.toUpperCase()}
-        </span>
-      </div>
+      <span className="font-mono text-[10px] text-sage uppercase tracking-widest">
+        {crop} — specimen reading
+      </span>
+      <h3 className="font-display text-3xl text-ink mt-1 mb-4">
+        {disease.replace(/_/g, ' ')}
+      </h3>
 
-      <p className="text-sm text-gray-500 mb-1">Crop: <span className="font-medium capitalize">{crop}</span></p>
-
-      <div className="mb-4">
-        <p className="text-sm text-gray-500 mb-1">Confidence</p>
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
+      <div className="mb-5">
+        <div className="flex justify-between font-mono text-xs text-sage mb-1">
+          <span>Confidence</span>
+          <span>{(confidence * 100).toFixed(1)}%</span>
+        </div>
+        <div className="w-full bg-ink/10 h-1">
           <div
-            className="bg-green-600 h-2.5 rounded-full"
+            className="bg-field h-1"
             style={{ width: `${(confidence * 100).toFixed(0)}%` }}
           />
         </div>
-        <p className="text-xs text-gray-500 mt-1">{(confidence * 100).toFixed(1)}%</p>
       </div>
 
-      <div className="mb-4">
-        <p className="text-sm font-semibold text-gray-700 mb-1">Treatment Advice</p>
-        <p className="text-sm text-gray-600">{treatment}</p>
+      <div className="vein-divider mb-5" />
+
+      <div className="mb-5">
+        <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">Treatment</p>
+        <p className="text-sm text-ink/80 leading-relaxed">{treatment}</p>
       </div>
 
       {yieldLossPercent !== null && (
-        <div className="bg-yellow-50 border border-yellow-300 rounded p-3">
-          <p className="text-sm font-semibold text-yellow-800">
-            Estimated Yield Loss: {yieldLossPercent}%
+        <div className="border-l-2 border-clay pl-4">
+          <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-1">Yield Impact</p>
+          <p className="text-sm text-ink/80">
+            Estimated loss of <span className="text-clay font-medium">{yieldLossPercent}%</span> if left untreated.
           </p>
         </div>
       )}

@@ -32,48 +32,57 @@ const Register = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-6 text-green-700">Create Account</h2>
+    <div className="max-w-sm mx-auto px-6 pt-20">
+      <span className="font-mono text-xs text-clay uppercase tracking-widest">New Entry</span>
+      <h2 className="font-display text-4xl text-ink mt-2 mb-8">Create account</h2>
 
-      {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm">{error}</div>}
+      {error && (
+        <p className="font-mono text-xs text-clay mb-5 border-l-2 border-clay pl-3">{error}</p>
+      )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="border rounded px-3 py-2"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="border rounded px-3 py-2"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
-          className="border rounded px-3 py-2"
-        />
+        <div>
+          <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full border border-ink/25 bg-transparent px-3 py-2 focus:outline-none focus:border-field"
+          />
+        </div>
+        <div>
+          <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full border border-ink/25 bg-transparent px-3 py-2 focus:outline-none focus:border-field"
+          />
+        </div>
+        <div>
+          <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            className="w-full border border-ink/25 bg-transparent px-3 py-2 focus:outline-none focus:border-field"
+          />
+        </div>
         <button
           type="submit"
           disabled={loading}
-          className="bg-green-700 text-white py-2 rounded hover:bg-green-800 disabled:opacity-50"
+          className="bg-field text-parchment py-3 font-mono text-sm uppercase tracking-wide hover:bg-field-dark disabled:opacity-50 transition-colors mt-2"
         >
-          {loading ? 'Creating account...' : 'Register'}
+          {loading ? 'Creating…' : 'Register'}
         </button>
       </form>
 
-      <p className="mt-4 text-sm text-center">
-        Already have an account? <Link to="/login" className="text-green-700 underline">Login</Link>
+      <p className="font-mono text-xs text-sage mt-6">
+        Already have an account? <Link to="/login" className="text-field underline">Sign in</Link>
       </p>
     </div>
   );

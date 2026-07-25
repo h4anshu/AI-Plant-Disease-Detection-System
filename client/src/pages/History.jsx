@@ -24,14 +24,12 @@ const History = () => {
   }, []);
 
   return (
-    <div className="mt-10">
-      <h2 className="text-2xl font-bold text-green-800 text-center mb-4">
-        Prediction History
-      </h2>
+    <div className="max-w-2xl mx-auto px-6 pt-16 pb-20">
+      <span className="font-mono text-xs text-clay uppercase tracking-widest">Your Record</span>
+      <h2 className="font-display text-4xl text-ink mt-2 mb-10">Field log</h2>
 
-      {loading && <p className="text-center text-gray-500">Loading...</p>}
-      {error && <p className="text-center text-red-600">{error}</p>}
-
+      {loading && <p className="font-mono text-xs text-sage">Loading…</p>}
+      {error && <p className="font-mono text-xs text-clay border-l-2 border-clay pl-3">{error}</p>}
       {!loading && !error && <HistoryList predictions={predictions} />}
     </div>
   );

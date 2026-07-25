@@ -21,14 +21,14 @@ const UploadBox = ({ onFileSelect }) => {
     handleFile(e.dataTransfer.files[0]);
   };
 
-  return (
+   return (
     <div
       onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
       onDragLeave={() => setDragActive(false)}
       onDrop={handleDrop}
       onClick={() => inputRef.current.click()}
-      className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-        ${dragActive ? 'border-green-600 bg-green-50' : 'border-gray-300 bg-white'}`}
+      className={`border-2 border-dashed p-10 text-center cursor-pointer transition-colors
+        ${dragActive ? 'border-field bg-field/5' : 'border-ink/25 bg-transparent hover:border-ink/40'}`}
     >
       <input
         ref={inputRef}
@@ -39,11 +39,13 @@ const UploadBox = ({ onFileSelect }) => {
       />
 
       {preview ? (
-        <img src={preview} alt="Leaf preview" className="max-h-64 mx-auto rounded" />
+        <img src={preview} alt="Leaf preview" className="max-h-64 mx-auto border border-ink/10" />
       ) : (
-        <div className="text-gray-500">
-          <p className="text-lg mb-1">📷 Drag & drop a leaf image here</p>
-          <p className="text-sm">or click to browse</p>
+        <div>
+          <p className="font-display text-xl text-ink/70 italic mb-1">Place the leaf here</p>
+          <p className="font-mono text-xs text-sage uppercase tracking-widest">
+            drag & drop, or click to browse
+          </p>
         </div>
       )}
     </div>

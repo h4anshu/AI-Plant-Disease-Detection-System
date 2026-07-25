@@ -1,3 +1,43 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --color-parchment: #F4EFE1;
+  --color-ink: #1F3B2C;
+  --color-field: #4A6741;
+  --color-field-dark: #385031;
+  --color-clay: #B5652E;
+  --color-wheat: #C9A227;
+  --color-sage: #7A8B6F;
+}
+
+body {
+  background-color: var(--color-parchment);
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background-image: radial-gradient(rgba(31,59,44,0.03) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.stamp {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  border-width: 2px;
+  border-style: solid;
+  transform: rotate(-2deg);
+  display: inline-block;
+}
+
+.card-specimen {
+  background-color: #FBF8F0;
+  border: 1px solid rgba(31,59,44,0.15);
+  box-shadow: 0 1px 0 rgba(31,59,44,0.06);
+}
+
+.vein-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(31,59,44,0.25), transparent);
+}

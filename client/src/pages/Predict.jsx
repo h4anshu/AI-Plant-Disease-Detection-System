@@ -38,17 +38,16 @@ const Predict = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 px-4">
-      <h2 className="text-2xl font-bold text-green-800 mb-6 text-center">
-        Analyze Your Crop
-      </h2>
+    <div className="max-w-xl mx-auto px-6 pt-16 pb-20">
+      <span className="font-mono text-xs text-clay uppercase tracking-widest">Field Diagnosis</span>
+      <h2 className="font-display text-4xl text-ink mt-2 mb-8">Analyze a leaf</h2>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Select Crop</label>
+      <div className="mb-6">
+        <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-2">Crop</label>
         <select
           value={crop}
           onChange={(e) => setCrop(e.target.value)}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border border-ink/25 bg-transparent px-3 py-2 font-body text-ink focus:outline-none focus:border-field"
         >
           {crops.map((c) => (
             <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
@@ -58,14 +57,16 @@ const Predict = () => {
 
       <UploadBox onFileSelect={setFile} />
 
-      {error && <div className="bg-red-100 text-red-700 p-2 rounded mt-4 text-sm">{error}</div>}
+      {error && (
+        <p className="font-mono text-xs text-clay mt-4 border-l-2 border-clay pl-3">{error}</p>
+      )}
 
       <button
         onClick={handleAnalyze}
         disabled={loading}
-        className="w-full mt-4 bg-green-700 text-white py-2 rounded hover:bg-green-800 disabled:opacity-50"
+        className="w-full mt-6 bg-field text-parchment py-3 font-mono text-sm uppercase tracking-wide hover:bg-field-dark disabled:opacity-50 transition-colors"
       >
-        {loading ? 'Analyzing...' : 'Analyze'}
+        {loading ? 'Reading the leaf…' : 'Analyze'}
       </button>
 
       <ResultCard result={result} />
