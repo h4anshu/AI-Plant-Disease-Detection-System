@@ -4,4 +4,6 @@ tensorflow
 scikit-learn
 pillow
 numpy
+scipy
+matplotlib
 python-multipart
