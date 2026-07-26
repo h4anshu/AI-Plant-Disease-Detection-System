@@ -1,0 +1,32 @@
+[
+  {
+    "crop": "wheat",
+    "test_acc": 0.9996,
+    "test_n": 2490
+  },
+  {
+    "crop": "rice",
+    "test_acc": 0.9968,
+    "test_n": 927
+  },
+  {
+    "crop": "sugarcane",
+    "test_acc": 0.9231,
+    "test_n": 1014
+  },
+  {
+    "crop": "potato",
+    "test_acc": 0.9876,
+    "test_n": 323
+  },
+  {
+    "crop": "maize",
+    "test_acc": 0.9428,
+    "test_n": 629
+  },
+  {
+    "crop": "pigeonpea",
+    "test_acc": 0.7905,
+    "test_n": 148
+  }
+]
