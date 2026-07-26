@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+venv/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# ML service data (consolidated dataset — large)
+ml-service/data/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# Binary / archive safety nets (prevent accidental commits)
+*.zip
+*.rar
+*.tar
+*.tar.gz
+*.7z
+
+# Trained model weights (use Git LFS or keep untracked)
+*.h5
+*.hdf5
+*.pkl
+*.pth
+*.onnx
+*.tflite
+*.pb
+*.savedmodel
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Temp audit scripts
+.gemini_audit.ps1
+.gemini_move.ps1
+.gemini_check.ps1
+
+# Local tool configs
+.claude/
