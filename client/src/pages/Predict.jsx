@@ -4,8 +4,7 @@ import ResultCard from '../components/ResultCard'
 import { predictDisease } from '../services/api.js'
 import { useState } from 'react'
 
-const crops = ['wheat', 'potato', 'mustard', 'sugarcane'];
-
+const crops = ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea'];
 const Predict = () => {
   const [file, setFile] = useState(null);
   const [crop, setCrop] = useState('wheat');
