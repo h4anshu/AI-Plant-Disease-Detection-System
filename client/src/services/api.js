@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
+console.log('API_URL is:', API_URL);  // TEMPORARY - remove after debugging
 
 const api = axios.create({
-    baseURL : API_URL
+  baseURL: API_URL
 })
 
 // Attach token to every request automatically, if it exists
@@ -24,7 +25,7 @@ export const loginUser = (data) => api.post('/auth/login', data);
 export const predictDisease = (formData) =>
   api.post('/predict', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
-});
+  });
 
 export const getPredictionHistory = () => api.get('/predict');
 
