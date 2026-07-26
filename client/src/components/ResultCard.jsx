@@ -1,21 +1,14 @@
-const severityColors = {
-  early: 'bg-green-100 text-green-800 border-green-400',
-  moderate: 'bg-orange-100 text-orange-800 border-orange-400',
-  severe: 'bg-red-100 text-red-800 border-red-400'
+const severityStyles = {
+  early: { border: 'border-field', text: 'text-field', label: 'EARLY' },
+  moderate: { border: 'border-wheat', text: 'text-wheat', label: 'MODERATE' },
+  severe: { border: 'border-clay', text: 'text-clay', label: 'SEVERE' }
 };
 
 const ResultCard = ({ result }) => {
   if (!result) return null;
 
-  const {
-    imageUrl,
-    disease,
-    confidence,
-    severity,
-    treatment,
-    yieldLossPercent,
-    crop
-  } = result;
+  const { imageUrl, disease, confidence, severity, treatment, yieldLossPercent, crop, gradcam } = result;
+  const stamp = severityStyles[severity];
 
   return (
     <div className="card-specimen max-w-xl mx-auto mt-10 p-6 relative">
@@ -57,6 +50,17 @@ const ResultCard = ({ result }) => {
         <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">Treatment</p>
         <p className="text-sm text-ink/80 leading-relaxed">{treatment}</p>
       </div>
+
+      {gradcam && (
+        <div className="mb-5">
+          <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">Affected Region</p>
+          <img
+            src={gradcam}
+            alt="Grad-CAM heatmap"
+            className="w-full border border-ink/10"
+          />
+        </div>
+      )}
 
       {yieldLossPercent !== null && (
         <div className="border-l-2 border-clay pl-4">
