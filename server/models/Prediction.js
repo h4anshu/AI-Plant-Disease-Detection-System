@@ -28,7 +28,7 @@ const predictionSchema = new mongoose.Schema({
     severity: {
         type: String,
         required: true,
-        enum: ['early', 'moderate', 'severe']
+        enum: ['healthy', 'early', 'moderate', 'severe']
     },
     yieldLossPercent: {
         type: Number,
@@ -37,6 +37,10 @@ const predictionSchema = new mongoose.Schema({
     treatment: {
         type: String,
         required: true
+    },
+    gradcam: {
+        type: String,
+        default: null
     }
 }, {
     timestamps: true

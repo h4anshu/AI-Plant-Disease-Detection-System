@@ -38,7 +38,7 @@ const predict = async (req, res) => {
       { headers: formData.getHeaders() }
     );
 
-    const { disease, confidence, severity } = mlResponse.data;
+    const { disease, confidence, severity, gradcam } = mlResponse.data;
 
     // 3. Look up treatment advice
     const treatment = getTreatment(disease);
@@ -55,7 +55,8 @@ const predict = async (req, res) => {
       confidence,
       severity,
       yieldLossPercent,
-      treatment
+      treatment,
+      gradcam
     });
 
     // 6. Return full result to frontend
