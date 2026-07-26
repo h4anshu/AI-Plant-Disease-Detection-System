@@ -1,7 +1,7 @@
 crop,test_acc,test_n
-wheat,0.9996,2490
-rice,0.9968,927
-sugarcane,0.9231,1014
-potato,0.9876,323
+wheat,0.9992,2490
+rice,0.9978,927
+sugarcane,0.927,1014
+potato,0.9814,323
 maize,0.9428,629
-pigeonpea,0.7905,148
+pigeonpea,0.8108,148
