@@ -1,0 +1,109 @@
+# Pre-Push Audit & Cleanup Report
+
+## Step 1: Audit Findings
+
+### Git History
+| Check | Result |
+|-------|--------|
+| Commits in history | **0** — repo is freshly initialized, no prior commits |
+| `.git` folder size | **0.03 MB** — pristine, no large objects in history |
+| Large files in history | **None** — no history rewrite needed ✅ |
+
+> [!TIP]
+> Since there are zero commits, we're in the ideal situation — nothing is baked into history. A simple `.gitignore` is all that's needed to keep large files out.
+
+### Pre-Cleanup Directory Sizes (in project root)
+
+| Folder | Size (MB) | Type |
+|--------|-----------|------|
+| ml-service | 10,030 | Code + `data/` + `venv/` (last two gitignored) |
+| FUSARIUM-22 | 6,777 | 🔴 Raw dataset |
+| Master Plant Disease Dataset | 4,518 | 🔴 Raw dataset |
+| Mandely_Wheat Disease | 3,647 | 🔴 Raw dataset |
+| wheat_leaf | 1,450 | 🔴 Raw dataset |
+| Sugarcane_leafs | 1,041 | 🔴 Raw dataset |
+| YELLOW-RUST-19 | 820 | 🔴 Raw dataset |
+| Mendaly_Sugarcane Leaf Dataset | 745 | 🔴 Raw dataset |
+| RAW | 663 | 🔴 Raw dataset |
+| PlantVillage | 653 | 🔴 Raw dataset |
+| Mendeley_Rice Leaf Disease Images | 198 | 🔴 Raw dataset |
+| Sugarcane Leaf Disease Dataset | 160 | 🔴 Raw dataset |
+| 900 MUSTARD LEAF DATASET | 93 | 🔴 Raw dataset |
+| client | 81 | Code + `node_modules/` (gitignored) |
+| Kaggle_Rice Leaf Diseases Dataset | 38 | 🔴 Raw dataset |
+| server | 17 | Code + `node_modules/` (gitignored) |
+| Mendeley_A novel pigeonpea leaf dataset | 12 | 🔴 Raw dataset |
+| mock-ml-service | 3 | Code |
+
+---
+
+## Step 2: Dataset Backup
+
+### Moved 14 folders → `D:\AI-Plant-Disease-RAW-BACKUP\`
+
+| Folder | Size (MB) |
+|--------|-----------|
+| FUSARIUM-22 | 6,777.25 |
+| Master Plant Disease Dataset | 4,518.25 |
+| Mandely_Wheat Disease | 3,647.05 |
+| wheat_leaf | 1,449.66 |
+| Sugarcane_leafs | 1,040.85 |
+| YELLOW-RUST-19 | 820.25 |
+| Mendaly_Sugarcane Leaf Dataset | 745.32 |
+| RAW | 662.60 |
+| PlantVillage | 652.75 |
+| Mendeley_Rice Leaf Disease Images | 198.01 |
+| Sugarcane Leaf Disease Dataset | 159.90 |
+| 900 MUSTARD LEAF DATASET | 93.13 |
+| Kaggle_Rice Leaf Diseases Dataset | 37.89 |
+| Mendeley_A novel pigeonpea leaf dataset | 11.77 |
+| **Total** | **20,814.68 (20.33 GB)** |
+
+> [!IMPORTANT]
+> Backup path: **`D:\AI-Plant-Disease-RAW-BACKUP\`** (sibling to project folder, outside git repo).
+> `ml-service/data/raw/` was **NOT moved** — it stays in the project but is already gitignored.
+
+---
+
+## Step 3: .gitignore Update
+
+Updated [.gitignore](file:///d:/AI%20Plant%20Disease%20Detection%20System/.gitignore) with:
+
+- ✅ `ml-service/data/` — consolidated datasets (already covered)
+- ✅ `node_modules/`, `venv/` — dependencies (already covered)
+- ✅ `.env`, `.env.local`, `.env.*.local` — secrets
+- ✅ `__pycache__/`, `*.pyc`, `*.pyo` — Python build artifacts
+- ✅ `*.zip`, `*.rar`, `*.tar`, `*.tar.gz`, `*.7z` — archive safety nets
+- ✅ `*.h5`, `*.hdf5`, `*.pkl`, `*.pth`, `*.onnx`, `*.tflite`, `*.pb`, `*.savedmodel` — model weights
+- ✅ `.DS_Store`, `Thumbs.db` — OS junk
+- ✅ `.claude/` — local tool config
+
+---
+
+## Step 4: Final `git status` — Clean ✅
+
+```
+On branch master
+No commits yet
+
+Untracked files:
+  .gitignore
+  client/
+  implementation-plan.md
+  ml-service/
+  mock-ml-service/
+  server/
+```
+
+### Files that would be committed (55 total, all code/config/docs):
+
+| Component | Files |
+|-----------|-------|
+| **Root** | `.gitignore`, `implementation-plan.md` |
+| **client/** | `.gitignore`, `.oxlintrc.json`, `README.md`, `index.html`, `package.json`, `package-lock.json`, `vercel.json`, `vite.config.js`, `public/` (2 SVGs), `src/` (JSX components, CSS, assets — hero.png is 12.75 KB) |
+| **ml-service/** | `app.py`, `predict.py`, `requirements.txt`, `train/*.py` (4 scripts) |
+| **mock-ml-service/** | `index.js`, `package.json`, `package-lock.json` |
+| **server/** | `.env.example`, `server.js`, `vercel.json`, `package.json`, `package-lock.json`, `config/` (2), `controllers/` (2), `middleware/` (2), `models/` (2), `routes/` (2), `utils/` (2) |
+
+> [!NOTE]
+> **No large files remain.** The largest file is `client/package-lock.json` at ~77 KB. Everything else is code, config, or small assets. Ready for `git add . && git commit && git push` on your command.
