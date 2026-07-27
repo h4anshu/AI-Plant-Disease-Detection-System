@@ -1,4 +1,5 @@
 const severityStyles = {
+  healthy: { border: 'border-field', text: 'text-field', label: 'HEALTHY' },
   early: { border: 'border-field', text: 'text-field', label: 'EARLY' },
   moderate: { border: 'border-wheat', text: 'text-wheat', label: 'MODERATE' },
   severe: { border: 'border-clay', text: 'text-clay', label: 'SEVERE' }
@@ -8,7 +9,7 @@ const ResultCard = ({ result }) => {
   if (!result) return null;
 
   const { imageUrl, disease, confidence, severity, treatment, yieldLossPercent, crop, gradcam } = result;
-  const stamp = severityStyles[severity];
+  const stamp = severityStyles[severity] || severityStyles.early;
 
   return (
     <div className="card-specimen max-w-xl mx-auto mt-10 p-6 relative">

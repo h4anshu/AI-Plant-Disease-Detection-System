@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
-console.log('API_URL is:', API_URL);  // TEMPORARY - remove after debugging
 
 const api = axios.create({
   baseURL: API_URL

@@ -44,7 +44,7 @@ const predict = async (req, res) => {
     const treatment = getTreatment(crop, disease);
 
     // 4. Look up yield loss estimate
-    const yieldLossPercent = getYieldLoss(severity);
+    const yieldLossPercent = getYieldLoss(crop, disease, severity);
 
     // 5. Save prediction to MongoDB
     const prediction = await PredictionModel.create({
