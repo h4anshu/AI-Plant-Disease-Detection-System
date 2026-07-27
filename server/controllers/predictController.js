@@ -2,7 +2,7 @@ import axios from "axios";
 import FormData from "form-data";
 import cloudinary from "../config/cloudinary.js";
 import PredictionModel from "../models/Prediction.js";
-import getTreatment from "../utils/treatmentMap.js";
+import { getTreatment } from "../utils/treatmentMap.js";
 import getYieldLoss from "../utils/yieldLoss.js";
 
 // @route  POST /api/predict
@@ -41,7 +41,7 @@ const predict = async (req, res) => {
     const { disease, confidence, severity, gradcam } = mlResponse.data;
 
     // 3. Look up treatment advice
-    const treatment = getTreatment(disease);
+    const treatment = getTreatment(crop, disease);
 
     // 4. Look up yield loss estimate
     const yieldLossPercent = getYieldLoss(severity);
