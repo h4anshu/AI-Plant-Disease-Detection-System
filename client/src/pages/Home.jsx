@@ -11,36 +11,36 @@ const Home = () => {
       <div className="grid md:grid-cols-2 gap-12 items-center pt-20 pb-16">
         <div>
           <span className="font-mono text-xs text-clay uppercase tracking-widest">
-            Specimen No. 001 — Leaf Diagnosis
+            Free Leaf Checkup
           </span>
           <h1 className="font-display text-5xl md:text-6xl leading-[1.05] text-ink mt-3 mb-6">
-            Read the leaf<br />before it reads<br /><em className="text-field">your yield.</em>
+            Take a photo.<br />Know the<br /><em className="text-field">disease.</em>
           </h1>
           <p className="text-ink/70 font-body leading-relaxed mb-8 max-w-md">
-            Photograph a leaf. Get a diagnosis, a severity reading, and what it means
-            for what you'll harvest — in under a minute, right from the field.
+            Take a photo of a leaf from your crop. We'll tell you what disease it has,
+            how serious it is, what medicine to use, and how much crop you could lose if you wait.
           </p>
           <Link
             to={isAuthenticated ? '/predict' : '/register'}
             className="inline-block bg-field text-parchment px-6 py-3 font-mono text-sm uppercase tracking-wide hover:bg-field-dark transition-colors"
           >
-            Diagnose a leaf →
+            Check a leaf now →
           </Link>
         </div>
 
         {/* Signature element: a "specimen card" preview */}
         <div className="card-specimen p-6 -rotate-1">
           <div className="flex items-center justify-between mb-4">
-            <span className="font-mono text-[10px] text-sage uppercase tracking-widest">Sample Reading</span>
-            <span className="stamp border-clay text-clay text-[10px] px-2 py-0.5">MODERATE</span>
+            <span className="font-mono text-[10px] text-sage uppercase tracking-widest">Example Result</span>
+            <span className="stamp border-clay text-clay text-[10px] px-2 py-0.5">MEDIUM</span>
           </div>
           <div className="vein-divider mb-4" />
           <p className="font-display text-2xl text-ink mb-1">Wheat — Leaf Rust</p>
-          <p className="font-mono text-xs text-sage mb-4">confidence 87.3%</p>
+          <p className="font-mono text-xs text-sage mb-4">87% sure</p>
           <div className="vein-divider mb-4" />
           <p className="text-sm text-ink/70 leading-relaxed">
-            Est. yield loss: <span className="text-clay font-medium">30%</span> if untreated.
-            Apply Propiconazole within 5–7 days.
+            You could lose <span className="text-clay font-medium">30%</span> of your crop if not treated.
+            Use Propiconazole spray within 5–7 days.
           </p>
         </div>
       </div>
@@ -49,9 +49,9 @@ const Home = () => {
       <div className="vein-divider mb-12" />
       <div className="grid sm:grid-cols-3 gap-8 pb-24">
         {[
-          { step: 'Capture', desc: 'Photograph a single leaf in natural light.' },
-          { step: 'Diagnose', desc: 'The model reads the disease and its severity.' },
-          { step: 'Act', desc: 'Get treatment advice and the yield cost of waiting.' }
+          { step: '1. Take a Photo', desc: 'Click a clear picture of one leaf in daylight.' },
+          { step: '2. Get Results', desc: 'We check the leaf and tell you the disease.' },
+          { step: '3. Treat It', desc: 'See what to spray and how much crop is at risk.' }
         ].map((s) => (
           <div key={s.step}>
             <p className="font-display text-xl text-ink mb-1">{s.step}</p>
