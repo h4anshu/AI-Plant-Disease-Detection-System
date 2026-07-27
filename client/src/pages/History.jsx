@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import HistoryList from '../components/HistoryList';
-import { getPredictionHistory } from '../services/api.js';
-import { useNavigate } from "react-router-dom";
+import { getPredictionHistory } from '../services/api';
 
 const History = () => {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -15,7 +13,7 @@ const History = () => {
         const res = await getPredictionHistory();
         setPredictions(res.data);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load history');
+        setError(err.response?.data?.message || 'Could not load the log.');
       } finally {
         setLoading(false);
       }
