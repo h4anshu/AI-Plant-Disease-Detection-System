@@ -1,43 +1,79 @@
-const severityColors = {
-  early: 'bg-green-100 text-green-800 border-green-400',
-  moderate: 'bg-orange-100 text-orange-800 border-orange-400',
-  severe: 'bg-red-100 text-red-800 border-red-400'
+import React from 'react';
+
+const severityStyles = {
+  early: 'border-emerald-500/30 text-emerald-700 bg-emerald-500/10',
+  moderate: 'border-amber-500/30 text-amber-700 bg-amber-500/10',
+  severe: 'border-rose-500/30 text-rose-700 bg-rose-500/10'
 };
 
 const HistoryList = ({ predictions }) => {
   if (!predictions || predictions.length === 0) {
-    return <p className="text-center text-gray-500 mt-10">No predictions yet. Try analyzing a leaf first!</p>;
+    return (
+      <div className="text-center py-16 px-4 max-w-md mx-auto">
+        <div className="w-12 h-12 rounded-full bg-sage/10 text-sage flex items-center justify-center mx-auto mb-3 text-lg font-mono">
+          00
+        </div>
+        <p className="font-display text-ink text-lg">No analysis records</p>
+        <p className="font-mono text-xs text-ink/50 mt-1">
+          Scan a plant leaf to generate your first diagnostic history.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-2xl mx-auto flex flex-col">
-      {predictions.map((p, i) => {
-        const s = severityColors[p.severity];
+    <div className="max-w-2xl mx-auto space-y-3">
+      {predictions.map((p) => {
+        const severityKey = p.severity?.toLowerCase() || 'early';
+        const badgeStyle = severityStyles[severityKey] || severityStyles.early;
+        const confidencePct = Math.round((p.confidence || 0) * 100);
+
         return (
-          <div key={p._id}>
-            {i > 0 && <div className="vein-divider" />}
-            <div className="flex gap-4 py-5">
-              <img
-                src={p.imageUrl}
-                alt={p.disease}
-                className="w-20 h-20 object-cover border border-ink/10 shrink-0"
-              />
+          <div
+            key={p._id}
+            className="group relative bg-white/70 backdrop-blur border border-ink/10 hover:border-ink/20 rounded-xl p-3.5 transition-all duration-200"
+          >
+            <div className="flex items-center gap-4">
+              {/* Thumbnail */}
+              <div className="relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-ink/10 bg-sage/5">
+                <img
+                  src={p.imageUrl}
+                  alt={p.disease}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+
+              {/* Main Content */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="font-display text-lg text-ink truncate">
-                    {p.disease.replace(/_/g, ' ')}
-                  </p>
-                  <span className={`stamp ${s.border} ${s.text} text-[10px] px-2 py-0.5 shrink-0 ml-3`}>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[11px] font-semibold tracking-wider text-sage uppercase">
+                    {p.crop}
+                  </span>
+                  <span className={`stamp border ${badgeStyle} text-[10px] tracking-wide px-2 py-0.5 rounded shrink-0`}>
                     {p.severity.toUpperCase()}
                   </span>
                 </div>
-                <p className="font-mono text-xs text-sage capitalize">
-                  {p.crop} · {(p.confidence * 100).toFixed(1)}% confidence
-                  {p.yieldLossPercent !== null && ` · ${p.yieldLossPercent}% yield loss`}
-                </p>
-                <p className="font-mono text-[10px] text-ink/40 mt-1">
-                  {new Date(p.createdAt).toLocaleString()}
-                </p>
+
+                <h3 className="font-display text-base font-semibold text-ink truncate mt-0.5">
+                  {p.disease ? p.disease.replace(/_/g, ' ') : 'Unknown'}
+                </h3>
+
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-ink/5 text-[11px] font-mono text-ink/60">
+                  <span>
+                    Accuracy: <strong className="text-ink">{confidencePct}%</strong>
+                  </span>
+                  {p.yieldLossPercent !== null && p.yieldLossPercent !== undefined && (
+                    <span>
+                      Est. Loss: <strong className="text-rose-600">-{p.yieldLossPercent}%</strong>
+                    </span>
+                  )}
+                  <span className="text-ink/40">
+                    {new Date(p.createdAt).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
