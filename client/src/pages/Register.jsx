@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate , Link } from 'react-router-dom';
 import { AuthContext  } from '../context/AuthContext';
 import { useContext } from 'react';
+import PasswordInput from '../components/PasswordInput';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -63,13 +64,11 @@ const Register = () => {
         </div>
         <div>
           <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Password</label>
-          <input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full border border-ink/25 bg-transparent px-3 py-2 focus:outline-none focus:border-field"
           />
         </div>
         <button
