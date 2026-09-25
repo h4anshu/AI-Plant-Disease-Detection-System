@@ -20,8 +20,10 @@ const Home = () => {
             Take a photo of a leaf from your crop. We'll tell you what disease it has,
             how serious it is, what medicine to use, and how much crop you could lose if you wait.
           </p>
+          {/* ponytail: login temporarily disabled, always send to /predict. Restore the ternary below once login is back on. */}
           <Link
-            to={isAuthenticated ? '/predict' : '/register'}
+            to={'/predict'}
+            // to={isAuthenticated ? '/predict' : '/register'}
             className="inline-block bg-field text-parchment px-6 py-3 font-mono text-sm uppercase tracking-wide hover:bg-field-dark transition-colors"
           >
             Check a leaf now →

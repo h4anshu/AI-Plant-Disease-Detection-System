@@ -53,35 +53,13 @@ const Navbar = () => {
             Home
           </Link>
 
-          {isAuthenticated ? (
-            <>
-              <Link to="/predict" className="text-ink/70 hover:text-ink transition-colors">
-                Diagnose
-              </Link>
-              <Link to="/history" className="text-ink/70 hover:text-ink transition-colors">
-                Log
-              </Link>
-              <span className="font-mono text-xs text-sage">{user?.name}</span>
-              <button
-                onClick={handleLogout}
-                className="border border-ink/25 text-ink px-3 py-1.5 text-xs font-mono uppercase tracking-wide hover:bg-ink hover:text-parchment transition-colors"
-              >
-                Sign out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="text-ink/70 hover:text-ink transition-colors">
-                Sign in
-              </Link>
-              <Link
-                to="/register"
-                className="bg-field text-parchment px-4 py-1.5 text-xs font-mono uppercase tracking-wide hover:bg-field-dark transition-colors"
-              >
-                Get started
-              </Link>
-            </>
-          )}
+          {/* ponytail: login temporarily disabled, always show the signed-in links. Restore the isAuthenticated ternary once login is back on. */}
+          <Link to="/predict" className="text-ink/70 hover:text-ink transition-colors">
+            Diagnose
+          </Link>
+          <Link to="/history" className="text-ink/70 hover:text-ink transition-colors">
+            Log
+          </Link>
         </div>
       </div>
 
@@ -92,38 +70,13 @@ const Navbar = () => {
             Home
           </Link>
 
-          {isAuthenticated ? (
-            <>
-              <Link to="/predict" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
-                Diagnose
-              </Link>
-              <Link to="/history" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
-                Log
-              </Link>
-              <div className="pt-2 border-t border-ink/10 flex items-center justify-between">
-                <span className="font-mono text-xs text-sage">{user?.name}</span>
-                <button
-                  onClick={handleLogout}
-                  className="border border-ink/25 text-ink px-3 py-1.5 text-xs font-mono uppercase tracking-wide hover:bg-ink hover:text-parchment transition-colors"
-                >
-                  Sign out
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="pt-2 border-t border-ink/10 flex flex-col gap-3">
-              <Link to="/login" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
-                Sign in
-              </Link>
-              <Link
-                to="/register"
-                onClick={closeMenu}
-                className="bg-field text-parchment px-4 py-2 text-center text-xs font-mono uppercase tracking-wide hover:bg-field-dark transition-colors"
-              >
-                Get started
-              </Link>
-            </div>
-          )}
+          {/* ponytail: login temporarily disabled, always show the signed-in links */}
+          <Link to="/predict" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+            Diagnose
+          </Link>
+          <Link to="/history" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+            Log
+          </Link>
         </div>
       )}
     </nav>

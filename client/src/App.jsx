@@ -8,10 +8,21 @@ import Register from "./pages/Register";
 import Predict from "./pages/Predict";
 import History from "./pages/History";
 
+const AuthDisabled = () => (
+  <div className="max-w-sm mx-auto px-6 pt-20 text-center">
+    <span className="font-mono text-xs text-clay uppercase tracking-widest">Unavailable</span>
+    <h2 className="font-display text-3xl text-ink mt-2">Sign-in is temporarily disabled</h2>
+    <p className="font-mono text-xs text-sage mt-4">Check back soon.</p>
+  </div>
+);
+
+// ponytail: login temporarily disabled, so routes below are open to everyone for now.
+// Restore the commented body once login is back on.
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useContext(AuthContext);
-  if (loading) return <div>Loading...</div>;
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return children;
+  // const { isAuthenticated, loading } = useContext(AuthContext);
+  // if (loading) return <div>Loading...</div>;
+  // return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
 const App = () => {
@@ -20,8 +31,11 @@ const App = () => {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* ponytail: email/password auth temporarily disabled, restore the two lines below to re-enable */}
+        <Route path="/login" element={<AuthDisabled />} />
+        <Route path="/register" element={<AuthDisabled />} />
+        {/* <Route path="/login" element={<Login />} /> */}
+        {/* <Route path="/register" element={<Register />} /> */}
 
         <Route
           path="/predict"
