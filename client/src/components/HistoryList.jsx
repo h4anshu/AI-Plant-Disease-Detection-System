@@ -3,6 +3,12 @@ const severityStyles = {
   moderate: { border: 'border-wheat', text: 'text-wheat', label: 'MEDIUM RISK' },
   severe: { border: 'border-clay', text: 'text-clay', label: 'HIGH RISK' }
 };
+// non-diagnosis outcomes of the ML quality/OOD gate (docs/OOD_GATE.md); old records have no status = ok
+const statusStyles = {
+  uncertain: { border: 'border-wheat', text: 'text-wheat', label: 'NOT SURE', title: 'Not sure - retake needed' },
+  rejected_quality: { border: 'border-wheat', text: 'text-wheat', label: 'RETAKE', title: 'Photo not clear enough' },
+  not_leaf: { border: 'border-wheat', text: 'text-wheat', label: 'RETAKE', title: 'No leaf found' }
+};
 
 const HistoryList = ({ predictions }) => {
   if (!predictions || predictions.length === 0) {
@@ -20,7 +26,8 @@ const HistoryList = ({ predictions }) => {
     <div className="max-w-2xl mx-auto flex flex-col gap-4">
       {predictions.map((p, index) => {
         const severityKey = p.severity?.toLowerCase() || 'early';
-        const s = severityStyles[severityKey] || severityStyles.early;
+        const gated = statusStyles[p.status];
+        const s = gated || severityStyles[severityKey] || severityStyles.early;
         const confidencePct = Math.round((p.confidence || 0) * 100);
 
         const dateObj = p.createdAt ? new Date(p.createdAt) : null;
@@ -48,13 +55,13 @@ const HistoryList = ({ predictions }) => {
                   {p.crop || 'Unknown crop'}
                 </span>
                 <h3 className="font-display text-lg text-ink leading-snug truncate">
-                  {p.disease ? p.disease.replace(/_/g, ' ') : 'Healthy'}
+                  {gated ? gated.title : p.disease ? p.disease.replace(/_/g, ' ') : 'Healthy'}
                 </h3>
 
                 <div className="vein-divider my-2" />
 
                 <div className="flex items-center gap-4 font-mono text-[11px] text-ink/60">
-                  <span>Sure: <strong className="text-ink">{confidencePct}%</strong></span>
+                  {!gated && <span>Sure: <strong className="text-ink">{confidencePct}%</strong></span>}
                   {p.yieldLossPercent !== null && p.yieldLossPercent !== undefined && (
                     <span>Crop at risk: <strong className="text-clay">{p.yieldLossPercent}%</strong></span>
                   )}

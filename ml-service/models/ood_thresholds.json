@@ -1,0 +1,2472 @@
+{
+ "generated": "2026-09-26",
+ "tpr_target": 0.95,
+ "note": "scores are 'higher = more OOD'; uncertain when score > threshold. Re-run train/calibrate_ood.py after any head/backbone change or once the field-photo test set exists (docs/OOD_GATE.md).",
+ "quality": {
+  "thresholds": {
+   "min_short_side": 212,
+   "min_blur": 7.71,
+   "min_brightness": 47.53,
+   "max_brightness": 195.23,
+   "min_vegetation": 0.0129
+  },
+  "n_train_val_images": 20545,
+  "train_val_rejected": 0.0045,
+  "train_val_rejected_per_crop": {
+   "wheat": 0.0,
+   "rice": 0.0106,
+   "sugarcane": 0.0043,
+   "potato": 0.0,
+   "maize": 0.0099,
+   "pigeonpea": 0.0,
+   "groundnut": 0.0,
+   "blackgram": 0.0023,
+   "apple": 0.0005,
+   "banana": 0.0074
+  },
+  "train_val_below_min_short_side": 0.0059,
+  "percentiles": {
+   "short_side": {
+    "0.001": 212.0,
+    "0.004": 220.0,
+    "0.01": 239.0,
+    "0.05": 256.0,
+    "0.5": 512.0,
+    "0.95": 1080.0,
+    "0.996": 3472.0,
+    "0.999": 3472.0
+   },
+   "blur": {
+    "0.001": 7.638,
+    "0.004": 11.76,
+    "0.01": 17.669,
+    "0.05": 51.752,
+    "0.5": 482.55,
+    "0.95": 3033.896,
+    "0.996": 4909.498,
+    "0.999": 5551.104
+   },
+   "brightness": {
+    "0.001": 47.53,
+    "0.004": 64.134,
+    "0.01": 73.984,
+    "0.05": 93.54,
+    "0.5": 128.64,
+    "0.95": 170.008,
+    "0.996": 183.106,
+    "0.999": 194.266
+   },
+   "vegetation": {
+    "0.001": 0.016,
+    "0.004": 0.029,
+    "0.01": 0.053,
+    "0.05": 0.135,
+    "0.5": 0.792,
+    "0.95": 0.999,
+    "0.996": 1.0,
+    "0.999": 1.0
+   }
+  },
+  "imagenette_caught_without_size_rule": {
+   "not_leaf": 0.095,
+   "rejected_quality": 0.05
+  },
+  "plantdoc_caught": {
+   "not_leaf": 0.0004,
+   "rejected_quality": 0.1544
+  },
+  "plantdoc_caught_without_size_rule": {
+   "not_leaf": 0.0004,
+   "rejected_quality": 0.1171
+  }
+ },
+ "crops": {
+  "wheat": {
+   "method": "energy+knn256",
+   "threshold": 1.267051,
+   "norm": {
+    "energy": [
+     -7.924356,
+     3.344811
+    ],
+    "knn256": [
+     0.084723,
+     0.121729
+    ]
+   },
+   "n_val": 241,
+   "n_test": 240,
+   "test_tpr_at_threshold": 0.9583,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.998,
+     "fpr95": 0.0088,
+     "flagged_at_threshold": 0.9874
+    },
+    "near_plantdoc": {
+     "auroc": 0.999,
+     "fpr95": 0.0047,
+     "flagged_at_threshold": 0.9946
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.951,
+      "fpr95": 0.2353,
+      "flagged_at_threshold": 0.8279
+     },
+     "near_plantdoc": {
+      "auroc": 0.9567,
+      "fpr95": 0.2009,
+      "flagged_at_threshold": 0.853
+     },
+     "far_imagenette": {
+      "auroc": 0.9916,
+      "fpr95": 0.01,
+      "flagged_at_threshold": 0.996
+     },
+     "threshold": 0.05344414710998535,
+     "test_tpr_at_threshold": 0.9208
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.975,
+      "fpr95": 0.1135,
+      "flagged_at_threshold": 0.8767
+     },
+     "near_plantdoc": {
+      "auroc": 0.9809,
+      "fpr95": 0.0873,
+      "flagged_at_threshold": 0.9092
+     },
+     "far_imagenette": {
+      "auroc": 0.9984,
+      "fpr95": 0.006,
+      "flagged_at_threshold": 0.993
+     },
+     "threshold": -4.579544544219971,
+     "test_tpr_at_threshold": 0.9542
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.9561,
+      "fpr95": 0.2172,
+      "flagged_at_threshold": 0.7312
+     },
+     "near_plantdoc": {
+      "auroc": 0.966,
+      "fpr95": 0.1637,
+      "flagged_at_threshold": 0.7758
+     },
+     "far_imagenette": {
+      "auroc": 0.939,
+      "fpr95": 0.436,
+      "flagged_at_threshold": 0.462
+     },
+     "threshold": 102.08091735839844,
+     "test_tpr_at_threshold": 0.9542
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.9765,
+      "fpr95": 0.1079,
+      "flagged_at_threshold": 0.86
+     },
+     "near_plantdoc": {
+      "auroc": 0.9843,
+      "fpr95": 0.0497,
+      "flagged_at_threshold": 0.9201
+     },
+     "far_imagenette": {
+      "auroc": 0.9687,
+      "fpr95": 0.18,
+      "flagged_at_threshold": 0.708
+     },
+     "threshold": 206.25436401367188,
+     "test_tpr_at_threshold": 0.9542
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.9873,
+      "fpr95": 0.0614,
+      "flagged_at_threshold": 0.9312
+     },
+     "near_plantdoc": {
+      "auroc": 0.994,
+      "fpr95": 0.0217,
+      "flagged_at_threshold": 0.9732
+     },
+     "far_imagenette": {
+      "auroc": 0.9935,
+      "fpr95": 0.001,
+      "flagged_at_threshold": 0.997
+     },
+     "threshold": 404.7724609375,
+     "test_tpr_at_threshold": 0.95
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.994,
+      "fpr95": 0.0358,
+      "flagged_at_threshold": 0.9633
+     },
+     "near_plantdoc": {
+      "auroc": 0.9979,
+      "fpr95": 0.0085,
+      "flagged_at_threshold": 0.9911
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 3344.677001953125,
+     "test_tpr_at_threshold": 0.9542
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.9983,
+      "fpr95": 0.0098,
+      "flagged_at_threshold": 0.9953
+     },
+     "near_plantdoc": {
+      "auroc": 0.9993,
+      "fpr95": 0.005,
+      "flagged_at_threshold": 0.9969
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.2064516544342041,
+     "test_tpr_at_threshold": 0.9333
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9843,
+      "fpr95": 0.0721,
+      "flagged_at_threshold": 0.9205
+     },
+     "near_plantdoc": {
+      "auroc": 0.9918,
+      "fpr95": 0.0318,
+      "flagged_at_threshold": 0.9647
+     },
+     "far_imagenette": {
+      "auroc": 0.9985,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.175055980682373,
+     "test_tpr_at_threshold": 0.9625
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9892,
+      "fpr95": 0.0507,
+      "flagged_at_threshold": 0.9293
+     },
+     "near_plantdoc": {
+      "auroc": 0.9954,
+      "fpr95": 0.0171,
+      "flagged_at_threshold": 0.9767
+     },
+     "far_imagenette": {
+      "auroc": 0.9974,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.269421935081482,
+     "test_tpr_at_threshold": 0.9708
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9717,
+      "fpr95": 0.0898,
+      "flagged_at_threshold": 0.9391
+     },
+     "near_plantdoc": {
+      "auroc": 0.9792,
+      "fpr95": 0.0434,
+      "flagged_at_threshold": 0.9763
+     },
+     "far_imagenette": {
+      "auroc": 0.9924,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.394517421722412,
+     "test_tpr_at_threshold": 0.9167
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.998,
+      "fpr95": 0.0088,
+      "flagged_at_threshold": 0.9874
+     },
+     "near_plantdoc": {
+      "auroc": 0.999,
+      "fpr95": 0.0047,
+      "flagged_at_threshold": 0.9946
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.2670506238937378,
+     "test_tpr_at_threshold": 0.9583
+    }
+   }
+  },
+  "rice": {
+   "method": "energy+knn256",
+   "threshold": 1.192415,
+   "norm": {
+    "energy": [
+     -11.09968,
+     3.864174
+    ],
+    "knn256": [
+     0.083586,
+     0.153899
+    ]
+   },
+   "n_val": 928,
+   "n_test": 927,
+   "test_tpr_at_threshold": 0.9461,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.9968,
+     "fpr95": 0.0115,
+     "flagged_at_threshold": 0.9885
+    },
+    "near_plantdoc": {
+     "auroc": 0.9991,
+     "fpr95": 0.0019,
+     "flagged_at_threshold": 0.9981
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.9631,
+      "fpr95": 0.1268,
+      "flagged_at_threshold": 0.8852
+     },
+     "near_plantdoc": {
+      "auroc": 0.9839,
+      "fpr95": 0.0663,
+      "flagged_at_threshold": 0.9445
+     },
+     "far_imagenette": {
+      "auroc": 0.9974,
+      "fpr95": 0.004,
+      "flagged_at_threshold": 0.996
+     },
+     "threshold": 0.001183864427730441,
+     "test_tpr_at_threshold": 0.9407
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.9601,
+      "fpr95": 0.1474,
+      "flagged_at_threshold": 0.8608
+     },
+     "near_plantdoc": {
+      "auroc": 0.9835,
+      "fpr95": 0.0768,
+      "flagged_at_threshold": 0.9313
+     },
+     "far_imagenette": {
+      "auroc": 0.9982,
+      "fpr95": 0.005,
+      "flagged_at_threshold": 0.995
+     },
+     "threshold": -7.235506057739258,
+     "test_tpr_at_threshold": 0.9417
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.7886,
+      "fpr95": 0.977,
+      "flagged_at_threshold": 0.0273
+     },
+     "near_plantdoc": {
+      "auroc": 0.8073,
+      "fpr95": 0.9453,
+      "flagged_at_threshold": 0.059
+     },
+     "far_imagenette": {
+      "auroc": 0.6859,
+      "fpr95": 0.996,
+      "flagged_at_threshold": 0.004
+     },
+     "threshold": 124.45642852783203,
+     "test_tpr_at_threshold": 0.9471
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.8296,
+      "fpr95": 0.9268,
+      "flagged_at_threshold": 0.1368
+     },
+     "near_plantdoc": {
+      "auroc": 0.8408,
+      "fpr95": 0.9224,
+      "flagged_at_threshold": 0.1528
+     },
+     "far_imagenette": {
+      "auroc": 0.7837,
+      "fpr95": 0.973,
+      "flagged_at_threshold": 0.049
+     },
+     "threshold": 239.39059448242188,
+     "test_tpr_at_threshold": 0.9288
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.9049,
+      "fpr95": 0.5766,
+      "flagged_at_threshold": 0.5144
+     },
+     "near_plantdoc": {
+      "auroc": 0.9106,
+      "fpr95": 0.6474,
+      "flagged_at_threshold": 0.4585
+     },
+     "far_imagenette": {
+      "auroc": 0.9161,
+      "fpr95": 0.658,
+      "flagged_at_threshold": 0.428
+     },
+     "threshold": 473.4598388671875,
+     "test_tpr_at_threshold": 0.9277
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9886,
+      "fpr95": 0.0416,
+      "flagged_at_threshold": 0.9665
+     },
+     "near_plantdoc": {
+      "auroc": 0.9934,
+      "fpr95": 0.0182,
+      "flagged_at_threshold": 0.9888
+     },
+     "far_imagenette": {
+      "auroc": 0.9998,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 4161.48095703125,
+     "test_tpr_at_threshold": 0.9428
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.997,
+      "fpr95": 0.0167,
+      "flagged_at_threshold": 0.9856
+     },
+     "near_plantdoc": {
+      "auroc": 0.9991,
+      "fpr95": 0.0039,
+      "flagged_at_threshold": 0.9965
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.23748522996902466,
+     "test_tpr_at_threshold": 0.9461
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9504,
+      "fpr95": 0.2364,
+      "flagged_at_threshold": 0.7766
+     },
+     "near_plantdoc": {
+      "auroc": 0.9742,
+      "fpr95": 0.1342,
+      "flagged_at_threshold": 0.8751
+     },
+     "far_imagenette": {
+      "auroc": 0.9965,
+      "fpr95": 0.011,
+      "flagged_at_threshold": 0.99
+     },
+     "threshold": 1.2562896013259888,
+     "test_tpr_at_threshold": 0.9439
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.964,
+      "fpr95": 0.1679,
+      "flagged_at_threshold": 0.8512
+     },
+     "near_plantdoc": {
+      "auroc": 0.9808,
+      "fpr95": 0.0923,
+      "flagged_at_threshold": 0.9185
+     },
+     "far_imagenette": {
+      "auroc": 0.9981,
+      "fpr95": 0.002,
+      "flagged_at_threshold": 0.999
+     },
+     "threshold": 1.2063812017440796,
+     "test_tpr_at_threshold": 0.9428
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9732,
+      "fpr95": 0.122,
+      "flagged_at_threshold": 0.877
+     },
+     "near_plantdoc": {
+      "auroc": 0.9856,
+      "fpr95": 0.0706,
+      "flagged_at_threshold": 0.9286
+     },
+     "far_imagenette": {
+      "auroc": 0.9977,
+      "fpr95": 0.003,
+      "flagged_at_threshold": 0.996
+     },
+     "threshold": 1.6732233762741089,
+     "test_tpr_at_threshold": 0.9504
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.9968,
+      "fpr95": 0.0115,
+      "flagged_at_threshold": 0.9885
+     },
+     "near_plantdoc": {
+      "auroc": 0.9991,
+      "fpr95": 0.0019,
+      "flagged_at_threshold": 0.9981
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.1924152374267578,
+     "test_tpr_at_threshold": 0.9461
+    }
+   }
+  },
+  "sugarcane": {
+   "method": "knn256",
+   "threshold": 0.116333,
+   "norm": null,
+   "n_val": 1011,
+   "n_test": 1014,
+   "test_tpr_at_threshold": 0.9408,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    },
+    "near_plantdoc": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.8765,
+      "fpr95": 0.5904,
+      "flagged_at_threshold": 0.3727
+     },
+     "near_plantdoc": {
+      "auroc": 0.9079,
+      "fpr95": 0.531,
+      "flagged_at_threshold": 0.4224
+     },
+     "far_imagenette": {
+      "auroc": 0.9686,
+      "fpr95": 0.228,
+      "flagged_at_threshold": 0.729
+     },
+     "threshold": 0.46615394949913025,
+     "test_tpr_at_threshold": 0.9615
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.9453,
+      "fpr95": 0.2105,
+      "flagged_at_threshold": 0.7722
+     },
+     "near_plantdoc": {
+      "auroc": 0.972,
+      "fpr95": 0.1179,
+      "flagged_at_threshold": 0.8646
+     },
+     "far_imagenette": {
+      "auroc": 0.9963,
+      "fpr95": 0.013,
+      "flagged_at_threshold": 0.985
+     },
+     "threshold": -4.177220344543457,
+     "test_tpr_at_threshold": 0.9546
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.9731,
+      "fpr95": 0.1321,
+      "flagged_at_threshold": 0.9249
+     },
+     "near_plantdoc": {
+      "auroc": 0.9674,
+      "fpr95": 0.1897,
+      "flagged_at_threshold": 0.9042
+     },
+     "far_imagenette": {
+      "auroc": 0.944,
+      "fpr95": 0.39,
+      "flagged_at_threshold": 0.752
+     },
+     "threshold": 99.50341033935547,
+     "test_tpr_at_threshold": 0.928
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.9906,
+      "fpr95": 0.0392,
+      "flagged_at_threshold": 0.9742
+     },
+     "near_plantdoc": {
+      "auroc": 0.9944,
+      "fpr95": 0.0105,
+      "flagged_at_threshold": 0.9934
+     },
+     "far_imagenette": {
+      "auroc": 0.9903,
+      "fpr95": 0.005,
+      "flagged_at_threshold": 0.999
+     },
+     "threshold": 204.69284057617188,
+     "test_tpr_at_threshold": 0.929
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.998,
+      "fpr95": 0.0077,
+      "flagged_at_threshold": 0.9971
+     },
+     "near_plantdoc": {
+      "auroc": 0.9996,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "far_imagenette": {
+      "auroc": 0.9993,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 414.96221923828125,
+     "test_tpr_at_threshold": 0.925
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9997,
+      "fpr95": 0.0005,
+      "flagged_at_threshold": 0.9995
+     },
+     "near_plantdoc": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 5117.3193359375,
+     "test_tpr_at_threshold": 0.9517
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "near_plantdoc": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.11633294820785522,
+     "test_tpr_at_threshold": 0.9408
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9919,
+      "fpr95": 0.0359,
+      "flagged_at_threshold": 0.9727
+     },
+     "near_plantdoc": {
+      "auroc": 0.9942,
+      "fpr95": 0.012,
+      "flagged_at_threshold": 0.9907
+     },
+     "far_imagenette": {
+      "auroc": 0.993,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.2240099906921387,
+     "test_tpr_at_threshold": 0.9379
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9982,
+      "fpr95": 0.0072,
+      "flagged_at_threshold": 0.9943
+     },
+     "near_plantdoc": {
+      "auroc": 0.9996,
+      "fpr95": 0.0008,
+      "flagged_at_threshold": 0.9996
+     },
+     "far_imagenette": {
+      "auroc": 0.9993,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.2197964191436768,
+     "test_tpr_at_threshold": 0.9428
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9978,
+      "fpr95": 0.0086,
+      "flagged_at_threshold": 0.9938
+     },
+     "near_plantdoc": {
+      "auroc": 0.9996,
+      "fpr95": 0.0008,
+      "flagged_at_threshold": 1.0
+     },
+     "far_imagenette": {
+      "auroc": 0.9993,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.1156625747680664,
+     "test_tpr_at_threshold": 0.9369
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "near_plantdoc": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.2197964191436768,
+     "test_tpr_at_threshold": 0.9497
+    }
+   }
+  },
+  "potato": {
+   "method": "knn256",
+   "threshold": 0.191111,
+   "norm": null,
+   "n_val": 323,
+   "n_test": 323,
+   "test_tpr_at_threshold": 0.969,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.9997,
+     "fpr95": 0.0005,
+     "flagged_at_threshold": 0.999
+    },
+    "near_plantdoc": {
+     "auroc": 0.9999,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 0.9996
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.9572,
+      "fpr95": 0.2512,
+      "flagged_at_threshold": 0.7938
+     },
+     "near_plantdoc": {
+      "auroc": 0.9386,
+      "fpr95": 0.3608,
+      "flagged_at_threshold": 0.6927
+     },
+     "far_imagenette": {
+      "auroc": 0.9807,
+      "fpr95": 0.1,
+      "flagged_at_threshold": 0.923
+     },
+     "threshold": 0.06064293533563614,
+     "test_tpr_at_threshold": 0.9443
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.9645,
+      "fpr95": 0.156,
+      "flagged_at_threshold": 0.7952
+     },
+     "near_plantdoc": {
+      "auroc": 0.938,
+      "fpr95": 0.2661,
+      "flagged_at_threshold": 0.6486
+     },
+     "far_imagenette": {
+      "auroc": 0.9914,
+      "fpr95": 0.026,
+      "flagged_at_threshold": 0.951
+     },
+     "threshold": -2.5348310470581055,
+     "test_tpr_at_threshold": 0.9598
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.995,
+      "fpr95": 0.0105,
+      "flagged_at_threshold": 0.9895
+     },
+     "near_plantdoc": {
+      "auroc": 0.9925,
+      "fpr95": 0.025,
+      "flagged_at_threshold": 0.9754
+     },
+     "far_imagenette": {
+      "auroc": 0.9969,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 96.58736419677734,
+     "test_tpr_at_threshold": 0.9474
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.9986,
+      "fpr95": 0.0005,
+      "flagged_at_threshold": 0.9981
+     },
+     "near_plantdoc": {
+      "auroc": 0.9981,
+      "fpr95": 0.0013,
+      "flagged_at_threshold": 0.997
+     },
+     "far_imagenette": {
+      "auroc": 0.9979,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 197.13067626953125,
+     "test_tpr_at_threshold": 0.9721
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.999,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "near_plantdoc": {
+      "auroc": 0.9985,
+      "fpr95": 0.0008,
+      "flagged_at_threshold": 0.9987
+     },
+     "far_imagenette": {
+      "auroc": 0.9986,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 388.3574523925781,
+     "test_tpr_at_threshold": 0.969
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9996,
+      "fpr95": 0.001,
+      "flagged_at_threshold": 0.9981
+     },
+     "near_plantdoc": {
+      "auroc": 0.9993,
+      "fpr95": 0.0008,
+      "flagged_at_threshold": 0.9992
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 4345.45458984375,
+     "test_tpr_at_threshold": 0.969
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.9997,
+      "fpr95": 0.0005,
+      "flagged_at_threshold": 0.999
+     },
+     "near_plantdoc": {
+      "auroc": 0.9999,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 0.9996
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.19111061096191406,
+     "test_tpr_at_threshold": 0.969
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9985,
+      "fpr95": 0.0014,
+      "flagged_at_threshold": 0.9943
+     },
+     "near_plantdoc": {
+      "auroc": 0.9979,
+      "fpr95": 0.0034,
+      "flagged_at_threshold": 0.9924
+     },
+     "far_imagenette": {
+      "auroc": 0.9979,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.2143326997756958,
+     "test_tpr_at_threshold": 0.9752
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.999,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 0.9986
+     },
+     "near_plantdoc": {
+      "auroc": 0.9984,
+      "fpr95": 0.0013,
+      "flagged_at_threshold": 0.9975
+     },
+     "far_imagenette": {
+      "auroc": 0.9986,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.181309700012207,
+     "test_tpr_at_threshold": 0.969
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9874,
+      "fpr95": 0.0033,
+      "flagged_at_threshold": 0.9981
+     },
+     "near_plantdoc": {
+      "auroc": 0.9828,
+      "fpr95": 0.0076,
+      "flagged_at_threshold": 0.9941
+     },
+     "far_imagenette": {
+      "auroc": 0.9897,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.4510222673416138,
+     "test_tpr_at_threshold": 0.9443
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.9998,
+      "fpr95": 0.001,
+      "flagged_at_threshold": 0.999
+     },
+     "near_plantdoc": {
+      "auroc": 0.9999,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.181309700012207,
+     "test_tpr_at_threshold": 0.9628
+    }
+   }
+  },
+  "maize": {
+   "method": "energy+knn256",
+   "threshold": 1.16309,
+   "norm": {
+    "energy": [
+     -7.993451,
+     4.563016
+    ],
+    "knn256": [
+     0.16823,
+     0.129185
+    ]
+   },
+   "n_val": 628,
+   "n_test": 629,
+   "test_tpr_at_threshold": 0.938,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.9924,
+     "fpr95": 0.0244,
+     "flagged_at_threshold": 0.9828
+    },
+    "near_plantdoc": {
+     "auroc": 0.9992,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.8859,
+      "fpr95": 0.6349,
+      "flagged_at_threshold": 0.356
+     },
+     "near_plantdoc": {
+      "auroc": 0.9009,
+      "fpr95": 0.629,
+      "flagged_at_threshold": 0.3638
+     },
+     "far_imagenette": {
+      "auroc": 0.9662,
+      "fpr95": 0.274,
+      "flagged_at_threshold": 0.714
+     },
+     "threshold": 0.3414818048477173,
+     "test_tpr_at_threshold": 0.9507
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.9633,
+      "fpr95": 0.2426,
+      "flagged_at_threshold": 0.7742
+     },
+     "near_plantdoc": {
+      "auroc": 0.9739,
+      "fpr95": 0.1662,
+      "flagged_at_threshold": 0.8451
+     },
+     "far_imagenette": {
+      "auroc": 0.9957,
+      "fpr95": 0.009,
+      "flagged_at_threshold": 0.992
+     },
+     "threshold": -3.4304347038269043,
+     "test_tpr_at_threshold": 0.9475
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.8822,
+      "fpr95": 0.6335,
+      "flagged_at_threshold": 0.3445
+     },
+     "near_plantdoc": {
+      "auroc": 0.9142,
+      "fpr95": 0.5291,
+      "flagged_at_threshold": 0.4491
+     },
+     "far_imagenette": {
+      "auroc": 0.788,
+      "fpr95": 0.903,
+      "flagged_at_threshold": 0.084
+     },
+     "threshold": 95.068115234375,
+     "test_tpr_at_threshold": 0.9523
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.9372,
+      "fpr95": 0.4545,
+      "flagged_at_threshold": 0.5636
+     },
+     "near_plantdoc": {
+      "auroc": 0.9519,
+      "fpr95": 0.3447,
+      "flagged_at_threshold": 0.6676
+     },
+     "far_imagenette": {
+      "auroc": 0.8914,
+      "fpr95": 0.676,
+      "flagged_at_threshold": 0.333
+     },
+     "threshold": 188.1732635498047,
+     "test_tpr_at_threshold": 0.9459
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.9677,
+      "fpr95": 0.2005,
+      "flagged_at_threshold": 0.8766
+     },
+     "near_plantdoc": {
+      "auroc": 0.9794,
+      "fpr95": 0.114,
+      "flagged_at_threshold": 0.9482
+     },
+     "far_imagenette": {
+      "auroc": 0.9636,
+      "fpr95": 0.327,
+      "flagged_at_threshold": 0.783
+     },
+     "threshold": 351.21392822265625,
+     "test_tpr_at_threshold": 0.9364
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9809,
+      "fpr95": 0.0766,
+      "flagged_at_threshold": 0.9722
+     },
+     "near_plantdoc": {
+      "auroc": 0.9909,
+      "fpr95": 0.0109,
+      "flagged_at_threshold": 0.9982
+     },
+     "far_imagenette": {
+      "auroc": 0.9993,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 3229.8310546875,
+     "test_tpr_at_threshold": 0.9269
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.9904,
+      "fpr95": 0.0373,
+      "flagged_at_threshold": 0.9727
+     },
+     "near_plantdoc": {
+      "auroc": 0.9992,
+      "fpr95": 0.0005,
+      "flagged_at_threshold": 0.9995
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.2974150776863098,
+     "test_tpr_at_threshold": 0.938
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9583,
+      "fpr95": 0.2526,
+      "flagged_at_threshold": 0.7072
+     },
+     "near_plantdoc": {
+      "auroc": 0.9681,
+      "fpr95": 0.1499,
+      "flagged_at_threshold": 0.8093
+     },
+     "far_imagenette": {
+      "auroc": 0.9743,
+      "fpr95": 0.019,
+      "flagged_at_threshold": 0.971
+     },
+     "threshold": 1.2190029621124268,
+     "test_tpr_at_threshold": 0.9523
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9724,
+      "fpr95": 0.1311,
+      "flagged_at_threshold": 0.8952
+     },
+     "near_plantdoc": {
+      "auroc": 0.9816,
+      "fpr95": 0.0599,
+      "flagged_at_threshold": 0.9587
+     },
+     "far_imagenette": {
+      "auroc": 0.9781,
+      "fpr95": 0.007,
+      "flagged_at_threshold": 0.998
+     },
+     "threshold": 1.2236360311508179,
+     "test_tpr_at_threshold": 0.9428
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9628,
+      "fpr95": 0.2455,
+      "flagged_at_threshold": 0.789
+     },
+     "near_plantdoc": {
+      "auroc": 0.9765,
+      "fpr95": 0.1385,
+      "flagged_at_threshold": 0.8865
+     },
+     "far_imagenette": {
+      "auroc": 0.9724,
+      "fpr95": 0.172,
+      "flagged_at_threshold": 0.866
+     },
+     "threshold": 1.3006659746170044,
+     "test_tpr_at_threshold": 0.9428
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.9924,
+      "fpr95": 0.0244,
+      "flagged_at_threshold": 0.9828
+     },
+     "near_plantdoc": {
+      "auroc": 0.9992,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.163089632987976,
+     "test_tpr_at_threshold": 0.938
+    }
+   }
+  },
+  "pigeonpea": {
+   "method": "knn256",
+   "threshold": 0.195701,
+   "norm": null,
+   "n_val": 145,
+   "n_test": 148,
+   "test_tpr_at_threshold": 0.9662,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.9964,
+     "fpr95": 0.0192,
+     "flagged_at_threshold": 0.9755
+    },
+    "near_plantdoc": {
+     "auroc": 0.9984,
+     "fpr95": 0.0047,
+     "flagged_at_threshold": 0.9942
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.7389,
+      "fpr95": 0.8189,
+      "flagged_at_threshold": 0.1945
+     },
+     "near_plantdoc": {
+      "auroc": 0.6911,
+      "fpr95": 0.8448,
+      "flagged_at_threshold": 0.1676
+     },
+     "far_imagenette": {
+      "auroc": 0.9096,
+      "fpr95": 0.422,
+      "flagged_at_threshold": 0.587
+     },
+     "threshold": 0.4721865653991699,
+     "test_tpr_at_threshold": 0.9324
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.7883,
+      "fpr95": 0.8082,
+      "flagged_at_threshold": 0.1441
+     },
+     "near_plantdoc": {
+      "auroc": 0.6658,
+      "fpr95": 0.8208,
+      "flagged_at_threshold": 0.147
+     },
+     "far_imagenette": {
+      "auroc": 0.965,
+      "fpr95": 0.166,
+      "flagged_at_threshold": 0.776
+     },
+     "threshold": -2.096261501312256,
+     "test_tpr_at_threshold": 0.9595
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.9604,
+      "fpr95": 0.1579,
+      "flagged_at_threshold": 0.7864
+     },
+     "near_plantdoc": {
+      "auroc": 0.9667,
+      "fpr95": 0.1451,
+      "flagged_at_threshold": 0.7739
+     },
+     "far_imagenette": {
+      "auroc": 0.9896,
+      "fpr95": 0.005,
+      "flagged_at_threshold": 0.979
+     },
+     "threshold": 97.64594268798828,
+     "test_tpr_at_threshold": 0.9527
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.9821,
+      "fpr95": 0.0852,
+      "flagged_at_threshold": 0.8903
+     },
+     "near_plantdoc": {
+      "auroc": 0.9868,
+      "fpr95": 0.0427,
+      "flagged_at_threshold": 0.9275
+     },
+     "far_imagenette": {
+      "auroc": 0.994,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 186.20828247070312,
+     "test_tpr_at_threshold": 0.9662
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.9896,
+      "fpr95": 0.0624,
+      "flagged_at_threshold": 0.9193
+     },
+     "near_plantdoc": {
+      "auroc": 0.9927,
+      "fpr95": 0.0233,
+      "flagged_at_threshold": 0.9631
+     },
+     "far_imagenette": {
+      "auroc": 0.9998,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 381.9553527832031,
+     "test_tpr_at_threshold": 0.9797
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9939,
+      "fpr95": 0.0433,
+      "flagged_at_threshold": 0.9483
+     },
+     "near_plantdoc": {
+      "auroc": 0.9971,
+      "fpr95": 0.0058,
+      "flagged_at_threshold": 0.9911
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1669.486328125,
+     "test_tpr_at_threshold": 0.9527
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.9964,
+      "fpr95": 0.0192,
+      "flagged_at_threshold": 0.9755
+     },
+     "near_plantdoc": {
+      "auroc": 0.9984,
+      "fpr95": 0.0047,
+      "flagged_at_threshold": 0.9942
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.19570136070251465,
+     "test_tpr_at_threshold": 0.9662
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9719,
+      "fpr95": 0.1186,
+      "flagged_at_threshold": 0.8488
+     },
+     "near_plantdoc": {
+      "auroc": 0.979,
+      "fpr95": 0.0884,
+      "flagged_at_threshold": 0.858
+     },
+     "far_imagenette": {
+      "auroc": 0.9939,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.2320146560668945,
+     "test_tpr_at_threshold": 0.9662
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9822,
+      "fpr95": 0.0834,
+      "flagged_at_threshold": 0.9014
+     },
+     "near_plantdoc": {
+      "auroc": 0.9889,
+      "fpr95": 0.0369,
+      "flagged_at_threshold": 0.9282
+     },
+     "far_imagenette": {
+      "auroc": 0.9998,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.243112325668335,
+     "test_tpr_at_threshold": 0.9662
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9795,
+      "fpr95": 0.0781,
+      "flagged_at_threshold": 0.909
+     },
+     "near_plantdoc": {
+      "auroc": 0.9868,
+      "fpr95": 0.0392,
+      "flagged_at_threshold": 0.9399
+     },
+     "far_imagenette": {
+      "auroc": 0.9998,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.1843611001968384,
+     "test_tpr_at_threshold": 0.9595
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.9942,
+      "fpr95": 0.0308,
+      "flagged_at_threshold": 0.9532
+     },
+     "near_plantdoc": {
+      "auroc": 0.9976,
+      "fpr95": 0.0101,
+      "flagged_at_threshold": 0.9837
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.2618823051452637,
+     "test_tpr_at_threshold": 0.9662
+    }
+   }
+  },
+  "groundnut": {
+   "method": "knn256",
+   "threshold": 0.254039,
+   "norm": null,
+   "n_val": 358,
+   "n_test": 355,
+   "test_tpr_at_threshold": 0.9296,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.9963,
+     "fpr95": 0.0191,
+     "flagged_at_threshold": 0.9866
+    },
+    "near_plantdoc": {
+     "auroc": 0.9889,
+     "fpr95": 0.0671,
+     "flagged_at_threshold": 0.9515
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.7551,
+      "fpr95": 0.8091,
+      "flagged_at_threshold": 0.255
+     },
+     "near_plantdoc": {
+      "auroc": 0.7918,
+      "fpr95": 0.7393,
+      "flagged_at_threshold": 0.3332
+     },
+     "far_imagenette": {
+      "auroc": 0.9253,
+      "fpr95": 0.425,
+      "flagged_at_threshold": 0.666
+     },
+     "threshold": 0.2694333791732788,
+     "test_tpr_at_threshold": 0.9268
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.7267,
+      "fpr95": 0.8947,
+      "flagged_at_threshold": 0.2354
+     },
+     "near_plantdoc": {
+      "auroc": 0.8121,
+      "fpr95": 0.7645,
+      "flagged_at_threshold": 0.4166
+     },
+     "far_imagenette": {
+      "auroc": 0.9565,
+      "fpr95": 0.271,
+      "flagged_at_threshold": 0.874
+     },
+     "threshold": -3.7222602367401123,
+     "test_tpr_at_threshold": 0.9268
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.9811,
+      "fpr95": 0.1163,
+      "flagged_at_threshold": 0.81
+     },
+     "near_plantdoc": {
+      "auroc": 0.9602,
+      "fpr95": 0.289,
+      "flagged_at_threshold": 0.5815
+     },
+     "far_imagenette": {
+      "auroc": 0.955,
+      "fpr95": 0.428,
+      "flagged_at_threshold": 0.414
+     },
+     "threshold": 100.21208953857422,
+     "test_tpr_at_threshold": 0.9662
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.9892,
+      "fpr95": 0.0383,
+      "flagged_at_threshold": 0.9321
+     },
+     "near_plantdoc": {
+      "auroc": 0.975,
+      "fpr95": 0.1222,
+      "flagged_at_threshold": 0.8068
+     },
+     "far_imagenette": {
+      "auroc": 0.9751,
+      "fpr95": 0.073,
+      "flagged_at_threshold": 0.724
+     },
+     "threshold": 195.53538513183594,
+     "test_tpr_at_threshold": 0.9606
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.9929,
+      "fpr95": 0.0445,
+      "flagged_at_threshold": 0.9536
+     },
+     "near_plantdoc": {
+      "auroc": 0.9844,
+      "fpr95": 0.1117,
+      "flagged_at_threshold": 0.8832
+     },
+     "far_imagenette": {
+      "auroc": 0.997,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 399.632568359375,
+     "test_tpr_at_threshold": 0.9549
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9925,
+      "fpr95": 0.0349,
+      "flagged_at_threshold": 0.9598
+     },
+     "near_plantdoc": {
+      "auroc": 0.9805,
+      "fpr95": 0.1059,
+      "flagged_at_threshold": 0.8712
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 5085.94384765625,
+     "test_tpr_at_threshold": 0.9549
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.9963,
+      "fpr95": 0.0191,
+      "flagged_at_threshold": 0.9866
+     },
+     "near_plantdoc": {
+      "auroc": 0.9889,
+      "fpr95": 0.0671,
+      "flagged_at_threshold": 0.9515
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.2540389895439148,
+     "test_tpr_at_threshold": 0.9296
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9789,
+      "fpr95": 0.1239,
+      "flagged_at_threshold": 0.8971
+     },
+     "near_plantdoc": {
+      "auroc": 0.9551,
+      "fpr95": 0.2591,
+      "flagged_at_threshold": 0.7789
+     },
+     "far_imagenette": {
+      "auroc": 0.9742,
+      "fpr95": 0.136,
+      "flagged_at_threshold": 0.91
+     },
+     "threshold": 1.1871048212051392,
+     "test_tpr_at_threshold": 0.9211
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9876,
+      "fpr95": 0.0665,
+      "flagged_at_threshold": 0.9474
+     },
+     "near_plantdoc": {
+      "auroc": 0.9718,
+      "fpr95": 0.1575,
+      "flagged_at_threshold": 0.8635
+     },
+     "far_imagenette": {
+      "auroc": 0.9965,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.1871048212051392,
+     "test_tpr_at_threshold": 0.9324
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9854,
+      "fpr95": 0.101,
+      "flagged_at_threshold": 0.9139
+     },
+     "near_plantdoc": {
+      "auroc": 0.9695,
+      "fpr95": 0.2145,
+      "flagged_at_threshold": 0.8026
+     },
+     "far_imagenette": {
+      "auroc": 0.9941,
+      "fpr95": 0.017,
+      "flagged_at_threshold": 0.988
+     },
+     "threshold": 1.4084749221801758,
+     "test_tpr_at_threshold": 0.9465
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.9952,
+      "fpr95": 0.0211,
+      "flagged_at_threshold": 0.9856
+     },
+     "near_plantdoc": {
+      "auroc": 0.9843,
+      "fpr95": 0.0803,
+      "flagged_at_threshold": 0.941
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.1781469583511353,
+     "test_tpr_at_threshold": 0.9042
+    }
+   }
+  },
+  "blackgram": {
+   "method": "knn256",
+   "threshold": 0.280567,
+   "norm": null,
+   "n_val": 153,
+   "n_test": 152,
+   "test_tpr_at_threshold": 0.9539,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.9881,
+     "fpr95": 0.0751,
+     "flagged_at_threshold": 0.9071
+    },
+    "near_plantdoc": {
+     "auroc": 0.9738,
+     "fpr95": 0.1362,
+     "flagged_at_threshold": 0.8456
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.8575,
+      "fpr95": 0.7399,
+      "flagged_at_threshold": 0.5045
+     },
+     "near_plantdoc": {
+      "auroc": 0.8721,
+      "fpr95": 0.7261,
+      "flagged_at_threshold": 0.5151
+     },
+     "far_imagenette": {
+      "auroc": 0.9804,
+      "fpr95": 0.147,
+      "flagged_at_threshold": 0.972
+     },
+     "threshold": 0.1875789910554886,
+     "test_tpr_at_threshold": 0.9276
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.8622,
+      "fpr95": 0.5979,
+      "flagged_at_threshold": 0.6492
+     },
+     "near_plantdoc": {
+      "auroc": 0.8849,
+      "fpr95": 0.5384,
+      "flagged_at_threshold": 0.6874
+     },
+     "far_imagenette": {
+      "auroc": 0.9903,
+      "fpr95": 0.008,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": -4.007413864135742,
+     "test_tpr_at_threshold": 0.8684
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.9064,
+      "fpr95": 0.3762,
+      "flagged_at_threshold": 0.4848
+     },
+     "near_plantdoc": {
+      "auroc": 0.89,
+      "fpr95": 0.4977,
+      "flagged_at_threshold": 0.3076
+     },
+     "far_imagenette": {
+      "auroc": 0.9144,
+      "fpr95": 0.572,
+      "flagged_at_threshold": 0.218
+     },
+     "threshold": 97.90869903564453,
+     "test_tpr_at_threshold": 0.9934
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.9381,
+      "fpr95": 0.2895,
+      "flagged_at_threshold": 0.7055
+     },
+     "near_plantdoc": {
+      "auroc": 0.9193,
+      "fpr95": 0.3782,
+      "flagged_at_threshold": 0.6098
+     },
+     "far_imagenette": {
+      "auroc": 0.9579,
+      "fpr95": 0.341,
+      "flagged_at_threshold": 0.636
+     },
+     "threshold": 173.25930786132812,
+     "test_tpr_at_threshold": 0.9539
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.9565,
+      "fpr95": 0.2145,
+      "flagged_at_threshold": 0.7931
+     },
+     "near_plantdoc": {
+      "auroc": 0.9395,
+      "fpr95": 0.2673,
+      "flagged_at_threshold": 0.7424
+     },
+     "far_imagenette": {
+      "auroc": 0.9964,
+      "fpr95": 0.006,
+      "flagged_at_threshold": 0.998
+     },
+     "threshold": 330.8975524902344,
+     "test_tpr_at_threshold": 0.9342
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9621,
+      "fpr95": 0.2002,
+      "flagged_at_threshold": 0.7851
+     },
+     "near_plantdoc": {
+      "auroc": 0.9442,
+      "fpr95": 0.256,
+      "flagged_at_threshold": 0.7277
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1733.19970703125,
+     "test_tpr_at_threshold": 0.9671
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.9881,
+      "fpr95": 0.0751,
+      "flagged_at_threshold": 0.9071
+     },
+     "near_plantdoc": {
+      "auroc": 0.9738,
+      "fpr95": 0.1362,
+      "flagged_at_threshold": 0.8456
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.2805672585964203,
+     "test_tpr_at_threshold": 0.9539
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9298,
+      "fpr95": 0.3021,
+      "flagged_at_threshold": 0.6363
+     },
+     "near_plantdoc": {
+      "auroc": 0.9324,
+      "fpr95": 0.3759,
+      "flagged_at_threshold": 0.5217
+     },
+     "far_imagenette": {
+      "auroc": 0.9895,
+      "fpr95": 0.004,
+      "flagged_at_threshold": 0.966
+     },
+     "threshold": 1.530693769454956,
+     "test_tpr_at_threshold": 0.9737
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9481,
+      "fpr95": 0.248,
+      "flagged_at_threshold": 0.7172
+     },
+     "near_plantdoc": {
+      "auroc": 0.9526,
+      "fpr95": 0.2525,
+      "flagged_at_threshold": 0.6676
+     },
+     "far_imagenette": {
+      "auroc": 0.9976,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 0.997
+     },
+     "threshold": 1.5409711599349976,
+     "test_tpr_at_threshold": 0.9737
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9454,
+      "fpr95": 0.2958,
+      "flagged_at_threshold": 0.6962
+     },
+     "near_plantdoc": {
+      "auroc": 0.9298,
+      "fpr95": 0.422,
+      "flagged_at_threshold": 0.5609
+     },
+     "far_imagenette": {
+      "auroc": 0.9911,
+      "fpr95": 0.03,
+      "flagged_at_threshold": 0.966
+     },
+     "threshold": 2.0621392726898193,
+     "test_tpr_at_threshold": 0.9474
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.9759,
+      "fpr95": 0.1309,
+      "flagged_at_threshold": 0.912
+     },
+     "near_plantdoc": {
+      "auroc": 0.9731,
+      "fpr95": 0.1354,
+      "flagged_at_threshold": 0.9112
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.1718028783798218,
+     "test_tpr_at_threshold": 0.9013
+    }
+   }
+  },
+  "apple": {
+   "method": "knn256",
+   "threshold": 0.313614,
+   "norm": null,
+   "n_val": 50,
+   "n_test": 50,
+   "test_tpr_at_threshold": 0.96,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.9906,
+     "fpr95": 0.0282,
+     "flagged_at_threshold": 0.9269
+    },
+    "near_plantdoc": {
+     "auroc": 0.9734,
+     "fpr95": 0.0941,
+     "flagged_at_threshold": 0.7718
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.8885,
+      "fpr95": 0.509,
+      "flagged_at_threshold": 0.2966
+     },
+     "near_plantdoc": {
+      "auroc": 0.862,
+      "fpr95": 0.6004,
+      "flagged_at_threshold": 0.2325
+     },
+     "far_imagenette": {
+      "auroc": 0.9703,
+      "fpr95": 0.161,
+      "flagged_at_threshold": 0.651
+     },
+     "threshold": 0.38793429732322693,
+     "test_tpr_at_threshold": 0.98
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.9077,
+      "fpr95": 0.4432,
+      "flagged_at_threshold": 0.5786
+     },
+     "near_plantdoc": {
+      "auroc": 0.8774,
+      "fpr95": 0.5783,
+      "flagged_at_threshold": 0.4377
+     },
+     "far_imagenette": {
+      "auroc": 0.9825,
+      "fpr95": 0.093,
+      "flagged_at_threshold": 0.915
+     },
+     "threshold": -2.004809856414795,
+     "test_tpr_at_threshold": 0.94
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.9819,
+      "fpr95": 0.0983,
+      "flagged_at_threshold": 0.6047
+     },
+     "near_plantdoc": {
+      "auroc": 0.9752,
+      "fpr95": 0.1388,
+      "flagged_at_threshold": 0.2993
+     },
+     "far_imagenette": {
+      "auroc": 0.9998,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 0.558
+     },
+     "threshold": 132.67796325683594,
+     "test_tpr_at_threshold": 1.0
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.986,
+      "fpr95": 0.0838,
+      "flagged_at_threshold": 0.6282
+     },
+     "near_plantdoc": {
+      "auroc": 0.9746,
+      "fpr95": 0.1562,
+      "flagged_at_threshold": 0.3488
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 0.611
+     },
+     "threshold": 297.1670837402344,
+     "test_tpr_at_threshold": 1.0
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.9842,
+      "fpr95": 0.0718,
+      "flagged_at_threshold": 0.7231
+     },
+     "near_plantdoc": {
+      "auroc": 0.9681,
+      "fpr95": 0.1623,
+      "flagged_at_threshold": 0.4707
+     },
+     "far_imagenette": {
+      "auroc": 0.9998,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 0.874
+     },
+     "threshold": 684.0526123046875,
+     "test_tpr_at_threshold": 1.0
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9763,
+      "fpr95": 0.1064,
+      "flagged_at_threshold": 0.7915
+     },
+     "near_plantdoc": {
+      "auroc": 0.9565,
+      "fpr95": 0.233,
+      "flagged_at_threshold": 0.5644
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 11261.990234375,
+     "test_tpr_at_threshold": 1.0
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.9906,
+      "fpr95": 0.0282,
+      "flagged_at_threshold": 0.9269
+     },
+     "near_plantdoc": {
+      "auroc": 0.9734,
+      "fpr95": 0.0941,
+      "flagged_at_threshold": 0.7718
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.3136135935783386,
+     "test_tpr_at_threshold": 0.96
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9641,
+      "fpr95": 0.1966,
+      "flagged_at_threshold": 0.6846
+     },
+     "near_plantdoc": {
+      "auroc": 0.9359,
+      "fpr95": 0.3905,
+      "flagged_at_threshold": 0.4312
+     },
+     "far_imagenette": {
+      "auroc": 0.9957,
+      "fpr95": 0.006,
+      "flagged_at_threshold": 0.944
+     },
+     "threshold": 1.1446651220321655,
+     "test_tpr_at_threshold": 0.96
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.969,
+      "fpr95": 0.1603,
+      "flagged_at_threshold": 0.7504
+     },
+     "near_plantdoc": {
+      "auroc": 0.941,
+      "fpr95": 0.3254,
+      "flagged_at_threshold": 0.5228
+     },
+     "far_imagenette": {
+      "auroc": 0.9989,
+      "fpr95": 0.001,
+      "flagged_at_threshold": 0.991
+     },
+     "threshold": 1.1446651220321655,
+     "test_tpr_at_threshold": 0.96
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9762,
+      "fpr95": 0.1222,
+      "flagged_at_threshold": 0.6594
+     },
+     "near_plantdoc": {
+      "auroc": 0.9545,
+      "fpr95": 0.2603,
+      "flagged_at_threshold": 0.3957
+     },
+     "far_imagenette": {
+      "auroc": 0.997,
+      "fpr95": 0.001,
+      "flagged_at_threshold": 0.804
+     },
+     "threshold": 1.222689151763916,
+     "test_tpr_at_threshold": 1.0
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.985,
+      "fpr95": 0.0923,
+      "flagged_at_threshold": 0.9154
+     },
+     "near_plantdoc": {
+      "auroc": 0.9633,
+      "fpr95": 0.2477,
+      "flagged_at_threshold": 0.7727
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.1446651220321655,
+     "test_tpr_at_threshold": 0.92
+    }
+   }
+  },
+  "banana": {
+   "method": "knn256",
+   "threshold": 0.397651,
+   "norm": null,
+   "n_val": 698,
+   "n_test": 698,
+   "test_tpr_at_threshold": 0.9441,
+   "evaluation": {
+    "near_other_crops": {
+     "auroc": 0.9855,
+     "fpr95": 0.0656,
+     "flagged_at_threshold": 0.9416
+    },
+    "near_plantdoc": {
+     "auroc": 0.9923,
+     "fpr95": 0.0361,
+     "flagged_at_threshold": 0.9717
+    },
+    "far_imagenette": {
+     "auroc": 1.0,
+     "fpr95": 0.0,
+     "flagged_at_threshold": 1.0
+    }
+   },
+   "all_methods": {
+    "msp": {
+     "near_other_crops": {
+      "auroc": 0.9105,
+      "fpr95": 0.5636,
+      "flagged_at_threshold": 0.4746
+     },
+     "near_plantdoc": {
+      "auroc": 0.9155,
+      "fpr95": 0.5221,
+      "flagged_at_threshold": 0.5151
+     },
+     "far_imagenette": {
+      "auroc": 0.9667,
+      "fpr95": 0.242,
+      "flagged_at_threshold": 0.79
+     },
+     "threshold": 0.1464053988456726,
+     "test_tpr_at_threshold": 0.9441
+    },
+    "energy": {
+     "near_other_crops": {
+      "auroc": 0.9534,
+      "fpr95": 0.2354,
+      "flagged_at_threshold": 0.7722
+     },
+     "near_plantdoc": {
+      "auroc": 0.9591,
+      "fpr95": 0.1978,
+      "flagged_at_threshold": 0.8061
+     },
+     "far_imagenette": {
+      "auroc": 0.9948,
+      "fpr95": 0.011,
+      "flagged_at_threshold": 0.989
+     },
+     "threshold": -6.209280967712402,
+     "test_tpr_at_threshold": 0.9484
+    },
+    "maha64": {
+     "near_other_crops": {
+      "auroc": 0.6966,
+      "fpr95": 0.8244,
+      "flagged_at_threshold": 0.1411
+     },
+     "near_plantdoc": {
+      "auroc": 0.699,
+      "fpr95": 0.8479,
+      "flagged_at_threshold": 0.1129
+     },
+     "far_imagenette": {
+      "auroc": 0.3944,
+      "fpr95": 0.974,
+      "flagged_at_threshold": 0.021
+     },
+     "threshold": 90.05514526367188,
+     "test_tpr_at_threshold": 0.9613
+    },
+    "maha128": {
+     "near_other_crops": {
+      "auroc": 0.7959,
+      "fpr95": 0.7703,
+      "flagged_at_threshold": 0.2856
+     },
+     "near_plantdoc": {
+      "auroc": 0.7991,
+      "fpr95": 0.7696,
+      "flagged_at_threshold": 0.2882
+     },
+     "far_imagenette": {
+      "auroc": 0.571,
+      "fpr95": 0.911,
+      "flagged_at_threshold": 0.112
+     },
+     "threshold": 169.23056030273438,
+     "test_tpr_at_threshold": 0.9269
+    },
+    "maha256": {
+     "near_other_crops": {
+      "auroc": 0.8534,
+      "fpr95": 0.5895,
+      "flagged_at_threshold": 0.4589
+     },
+     "near_plantdoc": {
+      "auroc": 0.865,
+      "fpr95": 0.5849,
+      "flagged_at_threshold": 0.462
+     },
+     "far_imagenette": {
+      "auroc": 0.8152,
+      "fpr95": 0.663,
+      "flagged_at_threshold": 0.367
+     },
+     "threshold": 340.4155578613281,
+     "test_tpr_at_threshold": 0.9355
+    },
+    "maha_full": {
+     "near_other_crops": {
+      "auroc": 0.9385,
+      "fpr95": 0.2545,
+      "flagged_at_threshold": 0.699
+     },
+     "near_plantdoc": {
+      "auroc": 0.9598,
+      "fpr95": 0.1773,
+      "flagged_at_threshold": 0.7886
+     },
+     "far_imagenette": {
+      "auroc": 0.998,
+      "fpr95": 0.007,
+      "flagged_at_threshold": 0.988
+     },
+     "threshold": 3972.533447265625,
+     "test_tpr_at_threshold": 0.9642
+    },
+    "knn256": {
+     "near_other_crops": {
+      "auroc": 0.9855,
+      "fpr95": 0.0656,
+      "flagged_at_threshold": 0.9416
+     },
+     "near_plantdoc": {
+      "auroc": 0.9923,
+      "fpr95": 0.0361,
+      "flagged_at_threshold": 0.9717
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 0.3976512551307678,
+     "test_tpr_at_threshold": 0.9441
+    },
+    "energy+maha128": {
+     "near_other_crops": {
+      "auroc": 0.9372,
+      "fpr95": 0.367,
+      "flagged_at_threshold": 0.6445
+     },
+     "near_plantdoc": {
+      "auroc": 0.9454,
+      "fpr95": 0.3029,
+      "flagged_at_threshold": 0.7102
+     },
+     "far_imagenette": {
+      "auroc": 0.9878,
+      "fpr95": 0.049,
+      "flagged_at_threshold": 0.953
+     },
+     "threshold": 1.2382229566574097,
+     "test_tpr_at_threshold": 0.9456
+    },
+    "energy+maha256": {
+     "near_other_crops": {
+      "auroc": 0.9477,
+      "fpr95": 0.3005,
+      "flagged_at_threshold": 0.7239
+     },
+     "near_plantdoc": {
+      "auroc": 0.953,
+      "fpr95": 0.2541,
+      "flagged_at_threshold": 0.7653
+     },
+     "far_imagenette": {
+      "auroc": 0.9869,
+      "fpr95": 0.039,
+      "flagged_at_threshold": 0.967
+     },
+     "threshold": 1.2275891304016113,
+     "test_tpr_at_threshold": 0.947
+    },
+    "msp+maha256": {
+     "near_other_crops": {
+      "auroc": 0.901,
+      "fpr95": 0.5297,
+      "flagged_at_threshold": 0.4938
+     },
+     "near_plantdoc": {
+      "auroc": 0.9063,
+      "fpr95": 0.4926,
+      "flagged_at_threshold": 0.5318
+     },
+     "far_imagenette": {
+      "auroc": 0.9542,
+      "fpr95": 0.241,
+      "flagged_at_threshold": 0.77
+     },
+     "threshold": 1.5580110549926758,
+     "test_tpr_at_threshold": 0.9441
+    },
+    "energy+knn256": {
+     "near_other_crops": {
+      "auroc": 0.9863,
+      "fpr95": 0.0761,
+      "flagged_at_threshold": 0.9263
+     },
+     "near_plantdoc": {
+      "auroc": 0.9922,
+      "fpr95": 0.0446,
+      "flagged_at_threshold": 0.9577
+     },
+     "far_imagenette": {
+      "auroc": 1.0,
+      "fpr95": 0.0,
+      "flagged_at_threshold": 1.0
+     },
+     "threshold": 1.2275891304016113,
+     "test_tpr_at_threshold": 0.9484
+    }
+   }
+  }
+ }
+}

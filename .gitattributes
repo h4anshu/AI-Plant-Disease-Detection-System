@@ -6,6 +6,7 @@
 
 # Binary: never diff or convert
 *.keras binary
+*.npz binary
 *.png binary
 *.jpg binary
 *.jpeg binary

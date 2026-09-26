@@ -17,17 +17,7 @@ const predict = async (req, res) => {
       return res.status(400).json({ message: 'Crop type is required' });
     }
 
-    // 1. Upload image to Cloudinary
-    const uploadResult = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: 'plant-disease' },
-        (error, result) => (error ? reject(error) : resolve(result))
-      );
-      stream.end(req.file.buffer);
-    });
-    const imageUrl = uploadResult.secure_url;
-
-    // 2. Send image to FastAPI ML service for prediction
+    // 1. Send image to FastAPI ML service (first, so a failed ML call leaves no orphan upload)
     const formData = new FormData();
     formData.append('file', req.file.buffer, { filename: req.file.originalname });
     formData.append('crop', crop);
@@ -38,19 +28,35 @@ const predict = async (req, res) => {
       { headers: formData.getHeaders() }
     );
 
-    const { disease, confidence, severity, gradcam } = mlResponse.data;
+    // status: "ok" | "uncertain" | "rejected_quality" | "not_leaf" (docs/OOD_GATE.md)
+    const { status = 'ok', reasons = [], ood_score = null, quality = null, top3,
+            disease, confidence, severity, gradcam } = mlResponse.data;
 
-    // 3. Look up treatment advice
-    const treatment = getTreatment(crop, disease);
+    // 2. Upload image to Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'plant-disease' },
+        (error, result) => (error ? reject(error) : resolve(result))
+      );
+      stream.end(req.file.buffer);
+    });
+    const imageUrl = uploadResult.secure_url;
 
-    // 4. Look up yield loss estimate
-    const yieldLossPercent = getYieldLoss(crop, disease, severity);
+    // 3-4. Treatment advice and yield loss only for a confident diagnosis
+    const isOk = status === 'ok';
+    const treatment = isOk ? getTreatment(crop, disease) : null;
+    const yieldLossPercent = isOk ? getYieldLoss(crop, disease, severity) : null;
 
     // 5. Save prediction to MongoDB
     const prediction = await PredictionModel.create({
       userId: req.user.id,
       imageUrl,
       crop,
+      status,
+      reasons,
+      oodScore: ood_score,
+      quality,
+      top3,
       disease,
       confidence,
       severity,

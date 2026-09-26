@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+// status comes from the ML service's quality + out-of-distribution gate (docs/OOD_GATE.md).
+// Only "ok" results are diagnoses; records saved before the gate existed read as "ok".
+const STATUSES = ['ok', 'uncertain', 'rejected_quality', 'not_leaf'];
+const hasPrediction = function () { return this.status === 'ok' || this.status === 'uncertain'; };
+
 const predictionSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -15,19 +20,40 @@ const predictionSchema = new mongoose.Schema({
         required: true,
         enum: ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea', 'groundnut', 'blackgram', 'apple', 'banana']
     },
+    status: {
+        type: String,
+        enum: STATUSES,
+        default: 'ok'
+    },
+    reasons: {
+        type: [String],
+        default: []
+    },
+    oodScore: {
+        type: Number,
+        default: null
+    },
+    quality: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+    },
+    top3: {
+        type: [{ disease: String, probability: Number, _id: false }],
+        default: undefined
+    },
     disease: {
         type: String,
-        required: true
+        required: hasPrediction
     },
     confidence: {
         type: Number,
-        required: true,
+        required: hasPrediction,
         min: 0,
         max: 1
     },
     severity: {
         type: String,
-        required: true,
+        required: hasPrediction,
         enum: ['healthy', 'early', 'moderate', 'severe']
     },
     yieldLossPercent: {
@@ -36,7 +62,7 @@ const predictionSchema = new mongoose.Schema({
     },
     treatment: {
         type: String,
-        required: true
+        required: function () { return this.status === 'ok'; }
     },
     gradcam: {
         type: String,

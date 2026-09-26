@@ -9,10 +9,11 @@ _models = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    backbone, heads, label_maps = load_models()  # loaded once, kept in memory for the service's life
+    backbone, heads, label_maps, gate = load_models()  # loaded once, kept in memory for the service's life
     _models["backbone"] = backbone
     _models["heads"] = heads
     _models["label_maps"] = label_maps
+    _models["gate"] = gate
     yield
     _models.clear()
 
@@ -31,4 +32,5 @@ async def predict_disease_route(file: UploadFile = File(...), crop: str = Form(N
         raise HTTPException(status_code=400, detail=f"crop must be one of {ACTIVE_CROPS}")
 
     image_bytes = await file.read()
-    return predict_disease(_models["backbone"], _models["heads"], _models["label_maps"], crop, image_bytes)
+    return predict_disease(_models["backbone"], _models["heads"], _models["label_maps"], _models["gate"],
+                           crop, image_bytes)
