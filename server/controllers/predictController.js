@@ -5,7 +5,8 @@ import cloudinary, { publicIdFromUrl, uploadBuffer } from "../config/cloudinary.
 import PredictionModel, { FEEDBACK } from "../models/Prediction.js";
 import FieldHealthCache, { keyForPrediction } from "../models/FieldHealthCache.js";
 import { getTreatment, LANGUAGES, localizedTreatment, treatmentMap } from "../utils/treatmentMap.js";
-import getYieldLoss from "../utils/yieldLoss.js";
+import getYieldLoss, { yieldLossTable } from "../utils/yieldLoss.js";
+import Report from "../models/Report.js";
 import { BadImage, cleanImage } from "../utils/image.js";
 import { GUEST_ID } from "../middleware/guestDevice.js";
 import logger, { logError } from "../utils/logger.js";
@@ -15,16 +16,23 @@ import { BadLocation, parseLocation } from "../utils/geo.js";
 // - never the exact location (only whether one was attached: locationSource);
 // - treatment advice in the language the browser asked for (Accept-Language), English when there is no
 //   translation. MongoDB always keeps the English text; the other fields never change with the language.
+// - yieldLossConfidence: the lookup table's tag for the figure (utils/yieldLoss.js), null without a figure.
+// The PDF report is built from this same view (controllers/reportController.js).
 const PRIVATE_FIELDS = ['location', 'locationAccuracyM', 'geoCell'];
+export const publicView = (doc, lang) => {
+  const obj = { ...(doc.toObject ? doc.toObject() : doc) };
+  for (const f of PRIVATE_FIELDS) delete obj[f];
+  obj.yieldLossConfidence = obj.yieldLossPercent == null ? null : yieldLossTable[obj.crop]?.[obj.disease]?.confidence ?? null;
+  if (!obj.treatment || lang === 'en') return obj;
+  const t = localizedTreatment(obj.crop, obj.disease, lang);
+  return { ...obj, treatment: t.text, treatmentLanguage: t.lang, treatmentNeedsReview: t.needsReview };
+};
 const toResponse = (req, res, doc) => {
   const lang = req.acceptsLanguages(...LANGUAGES) || 'en';
   res.vary('Accept-Language');
-  const obj = { ...(doc.toObject ? doc.toObject() : doc) };
-  for (const f of PRIVATE_FIELDS) delete obj[f];
-  if (!obj.treatment || lang === 'en') return obj;
-  const t = localizedTreatment(obj.crop, obj.disease, lang);
-  res.set('Content-Language', t.lang);
-  return { ...obj, treatment: t.text, treatmentLanguage: t.lang, treatmentNeedsReview: t.needsReview };
+  const view = publicView(doc, lang);
+  if (view.treatmentLanguage) res.set('Content-Language', view.treatmentLanguage);
+  return view;
 };
 
 const ML_TIMEOUT_MS = 60000;
@@ -234,6 +242,8 @@ const deleteMine = async (req, res) => {
     const { deletedCount } = await PredictionModel.deleteMany(owner);
     // cached satellite answers for those fields go too (their keys are hashes of the location)
     await FieldHealthCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map(keyForPrediction) } });
+    // and their reports: the verify link then answers 404
+    await Report.deleteMany({ predictionId: { $in: docs.map((d) => d._id) } });
     // a failed image delete leaves an orphan file, never a record: logged so it can be removed by hand
     (imagesFailed ? logger.warn : logger.info).call(logger, { requestId: req.id, deleted: deletedCount,
       images: images.length, imagesFailed }, 'records deleted');

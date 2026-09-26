@@ -6,6 +6,7 @@ import authRouter from './routes/auth.routes.js';
 import predictRouter from './routes/predict.routes.js';
 import mapRouter from './routes/map.routes.js';
 import riskRouter from './routes/risk.routes.js';
+import reportRouter from './routes/report.routes.js';
 import { globalLimiter } from './middleware/rateLimit.js';
 import { logError, requestLogger } from './utils/logger.js';
 
@@ -38,6 +39,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/predict', predictRouter);
 app.use('/api/map', mapRouter);
 app.use('/api/disease-risk', riskRouter);
+app.use('/api/reports', reportRouter);
 
 // Upload problems (non-image file, file too large) are the client's fault: 400, not Express's default 500 page
 // eslint-disable-next-line no-unused-vars

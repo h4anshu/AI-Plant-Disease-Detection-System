@@ -75,6 +75,21 @@ supporting evidence. It is a risk indicator, not a forecast of infection.
 - **Where:** the result page (checkups with a location) and the map page (map centre, district zoom).
 - **Every rule, source and limit:** [docs/DISEASE_RISK.md](docs/DISEASE_RISK.md).
 
+## Field report (PDF)
+
+"Download report (PDF)" on a result gives a printable A4 summary of the checkup:
+- the photo and Grad-CAM;
+- the diagnosis, severity and yield-loss estimate with its confidence tag;
+- the rounded location with a small map;
+- the satellite view and the weather risk;
+- the treatment advice and a limitations box.
+
+The last page lists the API field behind every value, and there is a SHA-256 with a public verify link
+(`GET /api/reports/:reportId`). It is drawn with PDFKit (no browser in the image), in English or Hindi.
+It is not an official loss assessment.
+- **Details and the rendering choice:** [docs/REPORT.md](docs/REPORT.md).
+- **Samples:** [docs/sample_report.pdf](docs/sample_report.pdf), [docs/sample_report_hi.pdf](docs/sample_report_hi.pdf).
+
 ## Crops and disease coverage
 
 | Crop | Disease classes | Accuracy [95% CI] | Macro F1 | Weakest-class recall | Images evaluated | Evaluation |
@@ -228,6 +243,8 @@ The golden tests need the ONNX files built from the tracked weights; without the
 | GET | `/api/predict` | Authenticated user's prediction history |
 | GET | `/api/predict/:id/disease-risk` | Weather risk for a checkup's location (potato, rice) |
 | GET | `/api/disease-risk?lat=&lon=&crop=` | Weather risk for a point (potato, rice) |
+| GET | `/api/predict/:id/report.pdf?lang=en\|hi` | PDF field report of a checkup (owner only) |
+| GET | `/api/reports/:reportId` | Public check of a report: hashes and key values |
 | GET | `/health` | Health check |
 
 Auth uses the raw JWT in the `Authorization` header, with no `Bearer` prefix — this matches how the frontend's Axios interceptor sends it, so don't "fix" it to add the prefix without updating both sides.

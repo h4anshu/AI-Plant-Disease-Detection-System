@@ -17,6 +17,8 @@ Added 26 Sep 2026. Tick an item off when it's done.
 - [ ] **Agronomist review of the Hindi content:** 121 entries in `docs/TRANSLATION_REVIEW.csv` (10 crop names, 53 disease names, 4 severity labels, 54 treatment texts, all AI-drafted). Fill `hindi_corrected` / `reviewer`, then apply the corrections in `client/src/locales/terms.json` and `server/utils/treatmentMap.hi.js` with `needs_review: false`, and run `npm run translation-review` in `server/`. Until then the app shows a "not yet checked by an expert" note under Hindi advice.
 - [ ] **Secrets to Secret Manager** (optional): `docs/DEPLOY.md` Part C.
 - [x] **Deploy the server for the disease-risk strip (Task 13), then push `main`:** Done 26 Sep 2026: server `00015`, `main` pushed, Vercel bundle has the strip. Live check: `/api/disease-risk` potato near Shimla → high ×6, rice near Cuttack → low ×6, wheat → 400; live Map → Potato → district zoom shows the strip with the "Why?" numbers and citations. Original step: `gcloud run deploy server --source server --region asia-south1` (no new env vars needed; Open-Meteo needs no key), then `git push origin main` for Vercel. Check: a potato/rice checkup with location shows the strip; Map → Potato → zoom to a district.
+- [ ] **Deploy the server for the PDF report (Task 14), then push `main`:** `gcloud run deploy server --source server --region asia-south1` (no new env vars needed; `REPORT_WATERMARK` must stay unset in production), then `git push origin main` for Vercel. Check: a checkup → "Download report (PDF)", then open the verify link printed on its last page.
+- [ ] **Hindi report strings** (`report.*` in `client/src/locales/hi.json` and the `hi` labels in `server/utils/reportContent.js`, AI-drafted): include them in the agronomist review.
 - [ ] **Hindi disease-risk strings** (`risk.*` in `client/src/locales/hi.json`, AI-drafted): include them in the agronomist review.
 - [x] **Earth Engine setup for field health**, done 26 Sep 2026: registered (noncommercial, BBDU, Community tier), API on, sign-in via gcloud ADC works (test: 7 Sentinel-2 images), `geo-service` service account with both roles. daily EECU cap set to 18,000 EECU-s. **Still open:** an ALU answer (likely no, no GWCID), and **3 real field coordinates** (owners' consent). The field-health code starts after the coordinates.
 
@@ -548,3 +550,82 @@ Brief: a daily risk indicator with a 3-day outlook for potato late blight and ri
 **Needs a deploy:** server only (new routes), then a push for the client. Nothing new in env; Open-Meteo needs no key.
 
 **Live (26 Sep 2026):** server `00015` deployed and `main` pushed by the user. Checked: the public API answers (potato Shimla high ×6, rice Cuttack low ×6, wheat 400 with the list of supported crops), the Vercel bundle contains the strip, and the live Map page (Potato, district zoom over central India) shows six days, the label, the "Why?" numbers (24.4 P-days, too warm → low) and the citations.
+
+## Task 14 — One-click PDF field report (26 Sep 2026)
+
+Brief: a PDF per diagnosis for insurers, banks and FPOs. Header (report id, IST time, model_version); photo + Grad-CAM; diagnosis, confidence, status; severity; yield loss with its confidence tag and source note; rounded location with a small static map; NDVI/NDRE chart and last clear image date; weather risk; treatment; a limitations box; a SHA-256 for tamper evidence. Choose and justify the renderer for Cloud Run; `GET /api/predict/:id/report.pdf` (device-scoped); English, and Hindi since Task 10 is done; a template snapshot test and `docs/sample_report.pdf`. Done when the sample looks professional and every number traces to an API field. Done on `main` instead of `feat/field-report`.
+
+**Agreed before building** (my assessment, the user said proceed):
+- PDFKit, not Playwright (see below).
+- The snapshot runs on the report content object, since there is no HTML template.
+- `yieldLossConfidence` added to the API.
+- A stored hash plus a public verify endpoint, because a printed hash alone proves nothing.
+- The field section uses the cache only, so no Earth Engine quota is spent.
+
+**Renderer: PDFKit** (measured):
+- About +25 MB in node_modules plus 1.7 MB of fonts, against about +300–450 MB for Chromium.
+- 0.12 s to import, 0.1–0.3 s per report, about 70 MB of memory while drawing: it fits the server's 512 MiB, where Chromium needs about 1 GiB.
+- The risk was Hindi shaping. It was tested *first* with a scratch render: fontkit's Indic shaper got क्षेत्र, प्रतिशत, धर्म, कार्य, द्वारा, कि and ज़्यादा right. The only gap was Latin letters missing from the Devanagari font.
+- Built the server Docker image and rendered a Hindi report inside it: works (fonts are bundled; the slim image has none).
+
+**Server:**
+- `utils/reportContent.js`: pure `buildReport()`. It is built from the same `publicView()` of the checkup that the API returns (refactored out of `toResponse`). Every row is `{label, value, source}` with its API route and field. It also has en + hi labels, IST times, the location rounded to 0.01°, a stable-JSON `contentHash()`, and `sourceRows()`.
+- `utils/reportPdf.js`: PDFKit A4.
+  - The header block, photo and Grad-CAM side by side, key-value tables, and the location table with the map beside it.
+  - The NDVI/NDRE chart as vectors: solid line, dashed line, grey neighbours band.
+  - The risk strip as words with white / light / dark grey fills and a thick border on today.
+  - The limitations box, the "Where each value comes from" section, the hash with the verify text, a footer on every page (report id, short hash, page x of y), and an optional watermark.
+  - Headings stay with their tables or text.
+- Mixed Hindi/English: text is split into font runs by glyph coverage, and leading digits go with the first word.
+  - Found by rendering: baselines were misaligned because each font uses its own ascender, so every run now uses one fixed baseline.
+  - Also found by rendering: `→` and `≥` exist in neither font. They were replaced, and a test now checks glyph coverage for every character of both reports and all of `terms.json`.
+- `services/staticMap.js`: OSM tiles at zoom 13 stitched with sharp, a dashed 1 km circle, identifying User-Agent, in-memory tile cache (OSM tile policy). No SVG text, because the slim image has no system fonts; the attribution is drawn by PDFKit on the map.
+- `controllers/reportController.js`:
+  - Owner check; 409 for rejected photos.
+  - Language from `?lang` or `Accept-Language`.
+  - In parallel: photo and heatmap (Cloudinary, or old base64), map, cached field health, weather risk. Each missing part becomes a note, never a failed report.
+  - The id is `PG-` plus 72 random bits.
+  - `Report` record: `contentSha256`, `pdfSha256` (hash of the exact bytes sent) and a summary.
+  - Public `GET /api/reports/:reportId` returns the hashes and key values, with no location or device.
+  - `reportLimiter` (20 per 10 min). "Delete my data" also deletes the reports.
+- `assets/terms.json` is a copy of the client's crop/disease names, needed because the image is built from `server/` alone; a test checks the two are equal.
+- Noto fonts come with their OFL licence.
+
+**Client:**
+- `ReportButton.jsx` on the result card: fetches as a blob with the device header, in the app language.
+- A hint that the satellite section is included only if it was opened, and "not an official loss assessment".
+- en + hi strings. The privacy page now mentions OSM tiles.
+
+**Sample** (`docs/sample_report.pdf`, `docs/sample_report_hi.pdf`, `docs/sample_report_api.json`, made by `server/scripts/sample_report.js`):
+- It went through the real local pipeline:
+  - ML service on the golden test image `rice.jpg` gave Bacterialblight, early, 10% (high);
+  - real Earth Engine for cropland next to PAU Ludhiana (95% cropland) gave normal, 14 of 31 clear, last clear 18 Sept;
+  - real Open-Meteo (rice blast low ×6) and real OSM tiles.
+- The server ran with `REPORT_WATERMARK="SAMPLE: test-set image"`.
+- Checked: `sha256sum` of each sample equals the `pdfSha256` from its verify answer.
+- Reviewed as images in colour and in greyscale over 4 rounds. Fixes from that review:
+  - the map moved beside the location table;
+  - headings kept with their content;
+  - confidence ≥ 99.95% prints "> 99.9%", never a certain-looking "100.0%".
+
+**Tests:**
+- Server Jest 267 (+18 in `report.test.js`, 2 snapshots):
+  - content snapshots in en and hi;
+  - every row sourced; the numbers equal the API fields;
+  - the location is rounded and the exact point appears nowhere;
+  - each missing part gets its note;
+  - the hash is stable under key order and changes on edits;
+  - glyph coverage; the terms copy equals the client's;
+  - the PDF is A4 and at most 3 pages (en and hi);
+  - routes: the owner gets the PDF and the stored hash equals the bytes; the verify answer has no private data; missing parts still give a PDF; the cached field check is used and the geo-service is never called; 404 and 409 cases; delete makes the verify link 404.
+- Client Vitest 40 (+2): download in the app language, and the error message.
+- ml-service 46 and geo-service 24 unchanged. Lint (old warnings only) and build OK.
+
+**Known limits:**
+- English disease names are the raw class names from `terms.json` (for example "Bacterialblight"), the same as in the app. Better English names belong to the terms review.
+- The sample's verify link points at localhost.
+- The hash is a record we keep, not a signature (PAdES would be the upgrade).
+- The weather risk is as of the report date, not the checkup date.
+
+**Needs a deploy:** server (new routes, fonts, pdfkit), then a push for the client.
+

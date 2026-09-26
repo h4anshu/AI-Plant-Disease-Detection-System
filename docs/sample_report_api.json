@@ -1,0 +1,893 @@
+{
+  "prediction": {
+    "userId": "000000000000000000000000",
+    "deviceId": "8082d206-0f89-4fe6-87e0-f4fc05419e46",
+    "imageUrl": "http://127.0.0.1:4110/plant-disease/1",
+    "crop": "rice",
+    "status": "ok",
+    "reasons": [],
+    "oodScore": 0.148,
+    "quality": {
+      "short_side": 256,
+      "blur": 13.83,
+      "brightness": 112.81,
+      "vegetation": 0.9986
+    },
+    "modelVersion": {
+      "backbone": "1.0.0",
+      "head": "1.0.0",
+      "gate": "1.0.0"
+    },
+    "disease": "Bacterialblight",
+    "confidence": 0.999860405921936,
+    "severity": "early",
+    "yieldLossPercent": 10,
+    "treatment": "Bacterial leaf blight causes yellow-to-white drying along leaf margins and can wilt young seedlings. Grow resistant varieties, avoid excess nitrogen, and ensure good drainage. Spray streptocycline with copper oxychloride 0.25% at first symptoms — ordinary fungicides will not work since this is a bacterial disease.",
+    "gradcam": "http://127.0.0.1:4110/plant-disease/gradcam/2",
+    "feedback": null,
+    "correctedLabel": null,
+    "feedbackAt": null,
+    "locationSource": "gps",
+    "demo": false,
+    "_id": "6ab7e31b5227a52907e561ee",
+    "createdAt": "2026-09-26T15:22:03.761Z",
+    "updatedAt": "2026-09-26T15:22:03.761Z",
+    "__v": 0,
+    "yieldLossConfidence": "high"
+  },
+  "fieldHealth": {
+    "window": {
+      "start": "2026-05-29",
+      "end": "2026-09-26"
+    },
+    "geometry_source": "buffer_30m",
+    "field_farmland": 0.95,
+    "images": 31,
+    "clear_images": 14,
+    "last_clear_date": "2026-09-18",
+    "latest": {
+      "date": "2026-09-18",
+      "ndvi": 0.5923,
+      "ndre": 0.4267,
+      "z": 0.08
+    },
+    "flag": {
+      "code": "normal",
+      "since": null,
+      "stale": false
+    },
+    "summary": "In line with nearby fields.",
+    "series": [
+      {
+        "date": "2026-05-31",
+        "clear_fraction": 1,
+        "ndvi": 0.3445,
+        "ndre": 0.2419,
+        "neighbours": {
+          "pixels": 11430,
+          "ndvi": [
+            0.2011,
+            0.3378,
+            0.5687
+          ],
+          "ndre": [
+            0.1622,
+            0.2515,
+            0.3884
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": 0.02
+      },
+      {
+        "date": "2026-06-05",
+        "clear_fraction": 1,
+        "ndvi": 0.3427,
+        "ndre": 0.2278,
+        "neighbours": {
+          "pixels": 11430,
+          "ndvi": [
+            0.1699,
+            0.334,
+            0.5723
+          ],
+          "ndre": [
+            0.1347,
+            0.2402,
+            0.3693
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": 0.03
+      },
+      {
+        "date": "2026-06-07",
+        "clear_fraction": 1,
+        "ndvi": 0.3229,
+        "ndre": 0.2356,
+        "neighbours": {
+          "pixels": 11430,
+          "ndvi": [
+            0.1659,
+            0.3145,
+            0.5487
+          ],
+          "ndre": [
+            0.1312,
+            0.2361,
+            0.3806
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": 0.03
+      },
+      {
+        "date": "2026-06-10",
+        "clear_fraction": 1,
+        "ndvi": 0.2995,
+        "ndre": 0.2258,
+        "neighbours": {
+          "pixels": 11430,
+          "ndvi": [
+            0.1662,
+            0.279,
+            0.4784
+          ],
+          "ndre": [
+            0.1388,
+            0.221,
+            0.3416
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": 0.09
+      },
+      {
+        "date": "2026-06-15",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-06-20",
+        "clear_fraction": 1,
+        "ndvi": 0.3191,
+        "ndre": 0.2423,
+        "neighbours": {
+          "pixels": 11315,
+          "ndvi": [
+            0.1993,
+            0.4026,
+            0.6521
+          ],
+          "ndre": [
+            0.1582,
+            0.2986,
+            0.4591
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": -0.25
+      },
+      {
+        "date": "2026-06-25",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 910,
+          "ndvi": [
+            0.1893,
+            0.542,
+            0.9127
+          ],
+          "ndre": [
+            0.2121,
+            0.4255,
+            0.6041
+          ],
+          "enough": true
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-06-27",
+        "clear_fraction": 1,
+        "ndvi": 0.2534,
+        "ndre": 0.2135,
+        "neighbours": {
+          "pixels": 10931,
+          "ndvi": [
+            0.1991,
+            0.4644,
+            0.7149
+          ],
+          "ndre": [
+            0.1934,
+            0.3422,
+            0.4943
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": -0.55
+      },
+      {
+        "date": "2026-06-30",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-07-05",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-07-10",
+        "clear_fraction": 1,
+        "ndvi": 0.369,
+        "ndre": 0.2813,
+        "neighbours": {
+          "pixels": 11430,
+          "ndvi": [
+            0.3028,
+            0.506,
+            0.6893
+          ],
+          "ndre": [
+            0.2362,
+            0.3729,
+            0.5019
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": -0.48
+      },
+      {
+        "date": "2026-07-15",
+        "clear_fraction": 1,
+        "ndvi": 0.4387,
+        "ndre": 0.272,
+        "neighbours": {
+          "pixels": 11430,
+          "ndvi": [
+            0.3399,
+            0.5823,
+            0.8088
+          ],
+          "ndre": [
+            0.2324,
+            0.3687,
+            0.5098
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": -0.41
+      },
+      {
+        "date": "2026-07-20",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-07-25",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 5206,
+          "ndvi": [
+            0.2677,
+            0.4703,
+            0.6268
+          ],
+          "ndre": [
+            0.2283,
+            0.3497,
+            0.4433
+          ],
+          "enough": true
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-07-27",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-07-30",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-08-04",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-08-09",
+        "clear_fraction": 1,
+        "ndvi": 0.423,
+        "ndre": 0.3441,
+        "neighbours": {
+          "pixels": 8344,
+          "ndvi": [
+            0.4823,
+            0.6312,
+            0.7245
+          ],
+          "ndre": [
+            0.3731,
+            0.4748,
+            0.5491
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": -1.16
+      },
+      {
+        "date": "2026-08-14",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-08-16",
+        "clear_fraction": 1,
+        "ndvi": 0.4484,
+        "ndre": 0.3476,
+        "neighbours": {
+          "pixels": 11430,
+          "ndvi": [
+            0.4474,
+            0.5606,
+            0.6309
+          ],
+          "ndre": [
+            0.3544,
+            0.4268,
+            0.4853
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": -0.83
+      },
+      {
+        "date": "2026-08-19",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 3431,
+          "ndvi": [
+            0.3036,
+            0.3821,
+            0.4466
+          ],
+          "ndre": [
+            0.2612,
+            0.3135,
+            0.3684
+          ],
+          "enough": true
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-08-24",
+        "clear_fraction": 1,
+        "ndvi": 0.4512,
+        "ndre": 0.3279,
+        "neighbours": {
+          "pixels": 5889,
+          "ndvi": [
+            0.373,
+            0.4827,
+            0.58
+          ],
+          "ndre": [
+            0.2862,
+            0.3564,
+            0.4267
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": -0.21
+      },
+      {
+        "date": "2026-08-29",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-09-03",
+        "clear_fraction": 1,
+        "ndvi": 0.349,
+        "ndre": 0.2786,
+        "neighbours": {
+          "pixels": 4502,
+          "ndvi": [
+            0.2705,
+            0.3469,
+            0.3955
+          ],
+          "ndre": [
+            0.2216,
+            0.2743,
+            0.3135
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": 0.02
+      },
+      {
+        "date": "2026-09-05",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 2341,
+          "ndvi": [
+            0.2049,
+            0.2753,
+            0.3457
+          ],
+          "ndre": [
+            0.1777,
+            0.2284,
+            0.2873
+          ],
+          "enough": true
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-09-08",
+        "clear_fraction": 1,
+        "ndvi": 0.6421,
+        "ndre": 0.4717,
+        "neighbours": {
+          "pixels": 10408,
+          "ndvi": [
+            0.4588,
+            0.658,
+            0.7675
+          ],
+          "ndre": [
+            0.3458,
+            0.4749,
+            0.5527
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": -0.07
+      },
+      {
+        "date": "2026-09-13",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-09-18",
+        "clear_fraction": 1,
+        "ndvi": 0.5923,
+        "ndre": 0.4267,
+        "neighbours": {
+          "pixels": 11430,
+          "ndvi": [
+            0.4122,
+            0.5761,
+            0.6739
+          ],
+          "ndre": [
+            0.3066,
+            0.4038,
+            0.4786
+          ],
+          "enough": true
+        },
+        "used": true,
+        "z": 0.08
+      },
+      {
+        "date": "2026-09-21",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 0,
+          "ndvi": [
+            null,
+            null,
+            null
+          ],
+          "ndre": [
+            null,
+            null,
+            null
+          ],
+          "enough": false
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-09-23",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 4161,
+          "ndvi": [
+            0.2206,
+            0.3225,
+            0.4005
+          ],
+          "ndre": [
+            0.1711,
+            0.2472,
+            0.3015
+          ],
+          "enough": true
+        },
+        "used": false,
+        "z": null
+      },
+      {
+        "date": "2026-09-25",
+        "clear_fraction": 0,
+        "ndvi": null,
+        "ndre": null,
+        "neighbours": {
+          "pixels": 965,
+          "ndvi": [
+            0.0931,
+            0.2248,
+            0.2833
+          ],
+          "ndre": [
+            0.1083,
+            0.2147,
+            0.2561
+          ],
+          "enough": true
+        },
+        "used": false,
+        "z": null
+      }
+    ],
+    "method": {
+      "ndvi": "(B8 - B4) / (B8 + B4)",
+      "ndre": "(B8A - B5) / (B8A + B5)",
+      "clear_scl_classes": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "min_clear_fraction": 0.6,
+      "neighbourhood": "ESA WorldCover farmland pixels 100-1000 m around the field",
+      "min_field_farmland": 0.5,
+      "z": "(field NDVI - neighbours' median) / (IQR / 1.349)",
+      "below_z": -1
+    },
+    "cached": false
+  },
+  "risk": {
+    "crop": "rice",
+    "disease": "blast",
+    "label": "risk indicator, not a forecast of infection",
+    "today": "2026-09-26",
+    "model": {
+      "name": "Yoshino infection hours",
+      "citation": "Yoshino (1979); rules as in Katsantonis et al. (2017) Phytopathologia Mediterranea 56(2):187-216",
+      "url": "https://oajournals.fupress.net/index.php/pm/article/view/5722"
+    },
+    "supporting": {
+      "name": "Padmanabhan (1965), CRRI Cuttack",
+      "citation": "Padmanabhan S.Y. (1965) Proc. Indian Acad. Sci. 62:117-129",
+      "url": "https://oajournals.fupress.net/index.php/pm/article/view/5722"
+    },
+    "days": [
+      {
+        "date": "2026-09-24",
+        "level": "low",
+        "conditions": {
+          "infectionHours": 0,
+          "padmanabhanStreak": 1,
+          "padmanabhanMet": false
+        },
+        "forecast": false
+      },
+      {
+        "date": "2026-09-25",
+        "level": "low",
+        "conditions": {
+          "infectionHours": 0,
+          "padmanabhanStreak": 0,
+          "padmanabhanMet": false
+        },
+        "forecast": false
+      },
+      {
+        "date": "2026-09-26",
+        "level": "low",
+        "conditions": {
+          "infectionHours": 0,
+          "padmanabhanStreak": 0,
+          "padmanabhanMet": false
+        },
+        "forecast": false
+      },
+      {
+        "date": "2026-09-27",
+        "level": "low",
+        "conditions": {
+          "infectionHours": 0,
+          "padmanabhanStreak": 0,
+          "padmanabhanMet": false
+        },
+        "forecast": true
+      },
+      {
+        "date": "2026-09-28",
+        "level": "low",
+        "conditions": {
+          "infectionHours": 0,
+          "padmanabhanStreak": 1,
+          "padmanabhanMet": false
+        },
+        "forecast": true
+      },
+      {
+        "date": "2026-09-29",
+        "level": "low",
+        "conditions": {
+          "infectionHours": 0,
+          "padmanabhanStreak": 2,
+          "padmanabhanMet": false
+        },
+        "forecast": true
+      }
+    ],
+    "weatherSource": "Weather data by Open-Meteo.com (CC BY 4.0)",
+    "timezone": "Asia/Kolkata"
+  },
+  "reports": {
+    "en": {
+      "file": "sample_report.pdf",
+      "verify": {
+        "reportId": "PG-mhvU2cE9cPz2",
+        "generatedAt": "2026-09-26T15:22:07.209Z",
+        "lang": "en",
+        "contentSha256": "cf6ad36cdd6ba6c0279db4fe62586e5be0160a487da350e3ecee723ff628cf5b",
+        "pdfSha256": "3a457889b05c86dda367be53d02832c8c48d17e9db0ea868103fc26eec7acf15",
+        "summary": {
+          "crop": "rice",
+          "disease": "Bacterialblight",
+          "status": "ok",
+          "confidence": 0.999860405921936,
+          "severity": "early",
+          "yieldLossPercent": 10,
+          "yieldLossConfidence": "high",
+          "checkupAt": "2026-09-26T15:22:03.761Z",
+          "modelVersion": {
+            "backbone": "1.0.0",
+            "head": "1.0.0",
+            "gate": "1.0.0"
+          }
+        }
+      }
+    },
+    "hi": {
+      "file": "sample_report_hi.pdf",
+      "verify": {
+        "reportId": "PG-W-CdfItdxW_I",
+        "generatedAt": "2026-09-26T15:22:07.721Z",
+        "lang": "hi",
+        "contentSha256": "95fefa8c8f35df5f7eafdd764765d378b89b3a02bebd4025fcfdfdad7a36e561",
+        "pdfSha256": "0ddb7a678ca35595bba922829ce0a2f941f1ef82e386546970d10b09a7ba323f",
+        "summary": {
+          "crop": "rice",
+          "disease": "Bacterialblight",
+          "status": "ok",
+          "confidence": 0.999860405921936,
+          "severity": "early",
+          "yieldLossPercent": 10,
+          "yieldLossConfidence": "high",
+          "checkupAt": "2026-09-26T15:22:03.761Z",
+          "modelVersion": {
+            "backbone": "1.0.0",
+            "head": "1.0.0",
+            "gate": "1.0.0"
+          }
+        }
+      }
+    }
+  }
+}

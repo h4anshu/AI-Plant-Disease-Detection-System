@@ -1,0 +1,651 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`report content snapshot (en) 1`] = `
+{
+  "brand": "PlantGuard",
+  "generatedAt": "2026-09-26T09:15:00.000Z",
+  "header": [
+    {
+      "label": "Report ID",
+      "source": "report record › reportId",
+      "value": "PG-TESTREPORT01",
+    },
+    {
+      "label": "Generated",
+      "source": "report record › generatedAt",
+      "value": "26 Sept 2026, 14:45 IST",
+    },
+    {
+      "label": "Checkup date",
+      "source": "GET /api/predict › createdAt",
+      "value": "20 Sept 2026, 11:00 IST",
+    },
+    {
+      "label": "Checkup ID",
+      "source": "GET /api/predict › _id",
+      "value": "66f5a0c2e4b0a1b2c3d4e5f6",
+    },
+    {
+      "label": "Model version",
+      "source": "GET /api/predict › modelVersion",
+      "value": "efficientnetb3-v1 · rice-v2 · gate-v1",
+    },
+  ],
+  "lang": "en",
+  "reportId": "PG-TESTREPORT01",
+  "sections": [
+    {
+      "gradcam": {
+        "caption": "Grad-CAM: where the model looked most (brighter = more)",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      },
+      "id": "images",
+      "note": null,
+      "photo": {
+        "caption": "Leaf photo as uploaded (resized, camera data removed)",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      },
+      "title": "Leaf photo and model attention",
+    },
+    {
+      "id": "diagnosis",
+      "notes": [
+        "Severity is estimated from the share of discoloured leaf area in this one photo (early < 15%, moderate 15–40%, severe > 40%). In our test it agreed with expert grades 44% of the time.",
+        "From a lookup table of published figures (ICAR institutes, IRRI, state agricultural universities, peer-reviewed studies) by crop, disease and severity. High = India-specific or severity-resolved data; medium = international data; low = a proxy. It is not a measurement of this field.",
+      ],
+      "rows": [
+        {
+          "label": "Crop",
+          "source": "GET /api/predict › crop",
+          "value": "rice",
+        },
+        {
+          "label": "Diagnosis",
+          "source": "GET /api/predict › disease",
+          "value": "Blast",
+        },
+        {
+          "label": "Model confidence",
+          "source": "GET /api/predict › confidence",
+          "value": "93.1%",
+        },
+        {
+          "label": "Result status",
+          "source": "GET /api/predict › status",
+          "value": "Confident diagnosis",
+        },
+        {
+          "label": "Other possibilities",
+          "source": "GET /api/predict › top3[].disease, top3[].probability",
+          "value": "Brownspot 5.1%, Healthy 1.2%",
+        },
+        {
+          "label": "Severity (from this photo)",
+          "source": "GET /api/predict › severity",
+          "value": "moderate",
+        },
+        {
+          "label": "Estimated yield loss if untreated",
+          "source": "GET /api/predict › yieldLossPercent, yieldLossConfidence",
+          "value": "25% (high confidence)",
+        },
+      ],
+      "title": "Diagnosis",
+    },
+    {
+      "id": "location",
+      "map": {
+        "center": {
+          "lat": 30.91,
+          "lon": 75.81,
+        },
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      },
+      "notes": [
+        "The circle marks the rounded location (about 1 km), not the field boundary. Map © OpenStreetMap contributors.",
+      ],
+      "rows": [
+        {
+          "label": "Location (rounded to about 1 km)",
+          "source": "stored checkup location (private; never in an API answer), rounded to 0.01°",
+          "value": "30.91° N, 75.81° E",
+        },
+        {
+          "label": "Location from",
+          "source": "GET /api/predict › locationSource",
+          "value": "phone GPS",
+        },
+        {
+          "label": "Reported accuracy",
+          "source": "stored checkup locationAccuracyM (private)",
+          "value": "± 12 m",
+        },
+      ],
+      "title": "Location",
+    },
+    {
+      "chart": {
+        "legend": {
+          "band": "Nearby fields NDVI, middle half",
+          "ndre": "Field NDRE (leaf chlorophyll)",
+          "ndvi": "Field NDVI (greenness)",
+        },
+        "points": [
+          {
+            "band": [
+              0.15,
+              0.26,
+            ],
+            "date": "2026-06-28",
+            "ndre": 0.11,
+            "ndvi": 0.21,
+          },
+          {
+            "band": [
+              0.66,
+              0.79,
+            ],
+            "date": "2026-08-22",
+            "ndre": 0.38,
+            "ndvi": 0.74,
+          },
+          {
+            "band": [
+              0.7,
+              0.81,
+            ],
+            "date": "2026-09-13",
+            "ndre": 0.29,
+            "ndvi": 0.58,
+          },
+          {
+            "band": [
+              0.69,
+              0.8,
+            ],
+            "date": "2026-09-18",
+            "ndre": 0.27,
+            "ndvi": 0.55,
+          },
+        ],
+        "window": {
+          "end": "2026-09-20",
+          "start": "2026-05-23",
+        },
+        "windowLabels": [
+          "23 May 2026",
+          "20 Sept 2026",
+        ],
+      },
+      "id": "field",
+      "notes": [
+        "Satellites show crop stress, not which disease; the leaf photo tells which disease. Field = a 30 m circle around the location.",
+      ],
+      "rows": [
+        {
+          "label": "Verdict",
+          "source": "GET /api/predict/:id/field-health › flag.code, flag.since",
+          "value": "Below neighbouring fields since 13 Sept 2026.",
+        },
+        {
+          "label": "Last clear image",
+          "source": "GET /api/predict/:id/field-health › last_clear_date",
+          "value": "18 Sept 2026",
+        },
+        {
+          "label": "Clear images",
+          "source": "GET /api/predict/:id/field-health › clear_images, images",
+          "value": "4 of 31",
+        },
+        {
+          "label": "Window",
+          "source": "GET /api/predict/:id/field-health › window.start, window.end",
+          "value": "23 May 2026 – 20 Sept 2026",
+        },
+        {
+          "label": "Latest field NDVI / NDRE",
+          "source": "GET /api/predict/:id/field-health › series[last used].ndvi, .ndre, .date",
+          "value": "0.55 / 0.27 (18 Sept 2026)",
+        },
+        {
+          "label": "Nearby fields NDVI (middle half)",
+          "source": "GET /api/predict/:id/field-health › series[last used].neighbours.ndvi[p25, p75]",
+          "value": "0.69 – 0.80",
+        },
+        {
+          "label": "Farmland share of the 30 m circle",
+          "source": "GET /api/predict/:id/field-health › field_farmland",
+          "value": "94%",
+        },
+      ],
+      "title": "Field from space (Sentinel-2)",
+    },
+    {
+      "days": [
+        {
+          "date": "2026-09-24",
+          "label": "24 Sept",
+          "level": "low",
+          "levelText": "Low",
+          "today": false,
+        },
+        {
+          "date": "2026-09-25",
+          "label": "25 Sept",
+          "level": "medium",
+          "levelText": "Medium",
+          "today": false,
+        },
+        {
+          "date": "2026-09-26",
+          "label": "Today",
+          "level": "medium",
+          "levelText": "Medium",
+          "today": true,
+        },
+        {
+          "date": "2026-09-27",
+          "label": "27 Sept",
+          "level": "high",
+          "levelText": "High",
+          "today": false,
+        },
+        {
+          "date": "2026-09-28",
+          "label": "28 Sept",
+          "level": "high",
+          "levelText": "High",
+          "today": false,
+        },
+        {
+          "date": "2026-09-29",
+          "label": "29 Sept",
+          "level": null,
+          "levelText": "–",
+          "today": false,
+        },
+      ],
+      "daysSource": "GET /api/predict/:id/disease-risk › days[].date, days[].level",
+      "id": "risk",
+      "notes": [
+        "Risk indicator from weather, not a forecast of infection. Worked out when this report was made (26 Sept 2026): past 2 days, today and the next 3.",
+        "Weather data by Open-Meteo.com (CC BY 4.0)",
+      ],
+      "rows": [
+        {
+          "label": "Infection hours today",
+          "source": "GET /api/predict/:id/disease-risk › days[today].conditions.infectionHours",
+          "value": "4 (3 = medium, 6 = high)",
+        },
+        {
+          "label": "Cool, humid days in a row (CRRI Cuttack rule)",
+          "source": "GET /api/predict/:id/disease-risk › days[today].conditions.padmanabhanStreak",
+          "value": "3 (4 in a row = warning)",
+        },
+        {
+          "label": "Model",
+          "source": "GET /api/predict/:id/disease-risk › model.name, model.citation",
+          "value": "Yoshino infection hours: Yoshino (1979); rules as in Katsantonis et al. (2017) Phytopathologia Mediterranea 56(2):187-216",
+        },
+        {
+          "label": "Also shown",
+          "source": "GET /api/predict/:id/disease-risk › supporting.name",
+          "value": "Padmanabhan (1965), CRRI Cuttack",
+        },
+      ],
+      "title": "Weather risk: rice blast",
+    },
+    {
+      "id": "treatment",
+      "notes": [],
+      "source": "GET /api/predict › treatment",
+      "text": "Rice blast causes spindle-shaped gray-centered spots on leaves and can rot the panicle neck, emptying grains. Grow resistant varieties, avoid excess nitrogen, and treat seed before sowing. Spray tricyclazole 75% WP (0.6 g/L) or a combination fungicide (azoxystrobin+difenoconazole, or tebuconazole+trifloxystrobin) at first leaf blast symptoms, repeating at heading to prevent neck blast.",
+      "title": "Treatment advice",
+    },
+    {
+      "id": "limitations",
+      "items": [
+        "This is an AI diagnosis from one leaf photo. It can be wrong; confirm with an agriculture officer or a KVK before acting on it.",
+        "Yield loss is a lookup from published figures for this crop, disease and severity, not a measurement of this field.",
+        "Severity is a heuristic from photo colours (44% agreement with expert grades).",
+        "Satellite data shows crop stress, not which disease, and clouds can hide the field for weeks.",
+        "The weather risk is an indicator from published models, not a forecast of infection.",
+        "This is not an official crop-loss assessment (for example, not a PMFBY crop-cutting experiment).",
+      ],
+      "title": "Limitations: read before relying on this report",
+    },
+  ],
+  "title": "Field diagnosis report",
+  "verify": {
+    "text": "To check this report, open https://api.example/api/reports/PG-TESTREPORT01 : it shows the same hashes and the key values. The SHA-256 of this PDF file must match "pdfSha256" there.",
+    "url": "https://api.example/api/reports/PG-TESTREPORT01",
+  },
+  "version": 1,
+  "watermark": null,
+}
+`;
+
+exports[`report content snapshot (hi) 1`] = `
+{
+  "brand": "PlantGuard",
+  "generatedAt": "2026-09-26T09:15:00.000Z",
+  "header": [
+    {
+      "label": "रिपोर्ट आईडी",
+      "source": "report record › reportId",
+      "value": "PG-TESTREPORT01",
+    },
+    {
+      "label": "बनाई गई",
+      "source": "report record › generatedAt",
+      "value": "26 सित॰ 2026, 14:45 IST",
+    },
+    {
+      "label": "जाँच की तारीख़",
+      "source": "GET /api/predict › createdAt",
+      "value": "20 सित॰ 2026, 11:00 IST",
+    },
+    {
+      "label": "जाँच आईडी",
+      "source": "GET /api/predict › _id",
+      "value": "66f5a0c2e4b0a1b2c3d4e5f6",
+    },
+    {
+      "label": "मॉडल संस्करण",
+      "source": "GET /api/predict › modelVersion",
+      "value": "efficientnetb3-v1 · rice-v2 · gate-v1",
+    },
+  ],
+  "lang": "hi",
+  "reportId": "PG-TESTREPORT01",
+  "sections": [
+    {
+      "gradcam": {
+        "caption": "Grad-CAM: मॉडल ने सबसे ज़्यादा कहाँ देखा (ज़्यादा चमक = ज़्यादा)",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      },
+      "id": "images",
+      "note": null,
+      "photo": {
+        "caption": "अपलोड की गई पत्ती की फ़ोटो (छोटी की गई, कैमरा डेटा हटाया गया)",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      },
+      "title": "पत्ती की फ़ोटो और मॉडल का ध्यान",
+    },
+    {
+      "id": "diagnosis",
+      "notes": [
+        "गंभीरता इसी एक फ़ोटो में पत्ती के बदरंग हिस्से के अनुपात से आँकी गई है (शुरुआती < 15%, मध्यम 15–40%, गंभीर > 40%)। हमारी जाँच में यह 44% बार विशेषज्ञों के आकलन से मेल खाई।",
+        "फसल, रोग और गंभीरता के अनुसार प्रकाशित आँकड़ों (ICAR संस्थान, IRRI, राज्य कृषि विश्वविद्यालय, समीक्षित शोध) की तालिका से। ऊँचा = भारत के या गंभीरता-वार आँकड़े; मध्यम = अंतरराष्ट्रीय आँकड़े; कम = अनुमानित विकल्प। यह इस खेत का माप नहीं है।",
+      ],
+      "rows": [
+        {
+          "label": "फसल",
+          "source": "GET /api/predict › crop",
+          "value": "धान",
+        },
+        {
+          "label": "निदान",
+          "source": "GET /api/predict › disease",
+          "value": "झोंका (ब्लास्ट)",
+        },
+        {
+          "label": "मॉडल का भरोसा",
+          "source": "GET /api/predict › confidence",
+          "value": "93.1%",
+        },
+        {
+          "label": "परिणाम की स्थिति",
+          "source": "GET /api/predict › status",
+          "value": "भरोसेमंद निदान",
+        },
+        {
+          "label": "अन्य संभावनाएँ",
+          "source": "GET /api/predict › top3[].disease, top3[].probability",
+          "value": "भूरा धब्बा 5.1%, स्वस्थ 1.2%",
+        },
+        {
+          "label": "गंभीरता (इस फ़ोटो से)",
+          "source": "GET /api/predict › severity",
+          "value": "मध्यम",
+        },
+        {
+          "label": "इलाज न करने पर उपज में अनुमानित नुकसान",
+          "source": "GET /api/predict › yieldLossPercent, yieldLossConfidence",
+          "value": "25% (ऊँचा भरोसा)",
+        },
+      ],
+      "title": "निदान",
+    },
+    {
+      "id": "location",
+      "map": {
+        "center": {
+          "lat": 30.91,
+          "lon": 75.81,
+        },
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      },
+      "notes": [
+        "घेरा गोल किए गए स्थान (लगभग 1 किमी) को दिखाता है, खेत की सीमा को नहीं। नक्शा © OpenStreetMap contributors।",
+      ],
+      "rows": [
+        {
+          "label": "स्थान (लगभग 1 किमी तक गोल किया गया)",
+          "source": "stored checkup location (private; never in an API answer), rounded to 0.01°",
+          "value": "30.91° N, 75.81° E",
+        },
+        {
+          "label": "स्थान का स्रोत",
+          "source": "GET /api/predict › locationSource",
+          "value": "फ़ोन का GPS",
+        },
+        {
+          "label": "बताई गई सटीकता",
+          "source": "stored checkup locationAccuracyM (private)",
+          "value": "± 12 m",
+        },
+      ],
+      "title": "स्थान",
+    },
+    {
+      "chart": {
+        "legend": {
+          "band": "आसपास के खेतों का NDVI, बीच का आधा",
+          "ndre": "खेत का NDRE (पत्तियों का क्लोरोफ़िल)",
+          "ndvi": "खेत का NDVI (हरियाली)",
+        },
+        "points": [
+          {
+            "band": [
+              0.15,
+              0.26,
+            ],
+            "date": "2026-06-28",
+            "ndre": 0.11,
+            "ndvi": 0.21,
+          },
+          {
+            "band": [
+              0.66,
+              0.79,
+            ],
+            "date": "2026-08-22",
+            "ndre": 0.38,
+            "ndvi": 0.74,
+          },
+          {
+            "band": [
+              0.7,
+              0.81,
+            ],
+            "date": "2026-09-13",
+            "ndre": 0.29,
+            "ndvi": 0.58,
+          },
+          {
+            "band": [
+              0.69,
+              0.8,
+            ],
+            "date": "2026-09-18",
+            "ndre": 0.27,
+            "ndvi": 0.55,
+          },
+        ],
+        "window": {
+          "end": "2026-09-20",
+          "start": "2026-05-23",
+        },
+        "windowLabels": [
+          "23 मई 2026",
+          "20 सित॰ 2026",
+        ],
+      },
+      "id": "field",
+      "notes": [
+        "सैटेलाइट फसल का तनाव दिखाता है, कौन-सा रोग है यह नहीं; रोग पत्ती की फ़ोटो बताती है। खेत = स्थान के चारों ओर 30 मीटर का घेरा।",
+      ],
+      "rows": [
+        {
+          "label": "नतीजा",
+          "source": "GET /api/predict/:id/field-health › flag.code, flag.since",
+          "value": "13 सित॰ 2026 से आसपास के खेतों से कमज़ोर।",
+        },
+        {
+          "label": "आख़िरी साफ़ तस्वीर",
+          "source": "GET /api/predict/:id/field-health › last_clear_date",
+          "value": "18 सित॰ 2026",
+        },
+        {
+          "label": "साफ़ तस्वीरें",
+          "source": "GET /api/predict/:id/field-health › clear_images, images",
+          "value": "31 में से 4",
+        },
+        {
+          "label": "अवधि",
+          "source": "GET /api/predict/:id/field-health › window.start, window.end",
+          "value": "23 मई 2026 – 20 सित॰ 2026",
+        },
+        {
+          "label": "खेत का ताज़ा NDVI / NDRE",
+          "source": "GET /api/predict/:id/field-health › series[last used].ndvi, .ndre, .date",
+          "value": "0.55 / 0.27 (18 सित॰ 2026)",
+        },
+        {
+          "label": "आसपास के खेतों का NDVI (बीच का आधा)",
+          "source": "GET /api/predict/:id/field-health › series[last used].neighbours.ndvi[p25, p75]",
+          "value": "0.69 – 0.80",
+        },
+        {
+          "label": "30 मीटर घेरे में खेती की ज़मीन का हिस्सा",
+          "source": "GET /api/predict/:id/field-health › field_farmland",
+          "value": "94%",
+        },
+      ],
+      "title": "अंतरिक्ष से खेत (Sentinel-2)",
+    },
+    {
+      "days": [
+        {
+          "date": "2026-09-24",
+          "label": "24 सित॰",
+          "level": "low",
+          "levelText": "कम",
+          "today": false,
+        },
+        {
+          "date": "2026-09-25",
+          "label": "25 सित॰",
+          "level": "medium",
+          "levelText": "मध्यम",
+          "today": false,
+        },
+        {
+          "date": "2026-09-26",
+          "label": "आज",
+          "level": "medium",
+          "levelText": "मध्यम",
+          "today": true,
+        },
+        {
+          "date": "2026-09-27",
+          "label": "27 सित॰",
+          "level": "high",
+          "levelText": "ज़्यादा",
+          "today": false,
+        },
+        {
+          "date": "2026-09-28",
+          "label": "28 सित॰",
+          "level": "high",
+          "levelText": "ज़्यादा",
+          "today": false,
+        },
+        {
+          "date": "2026-09-29",
+          "label": "29 सित॰",
+          "level": null,
+          "levelText": "–",
+          "today": false,
+        },
+      ],
+      "daysSource": "GET /api/predict/:id/disease-risk › days[].date, days[].level",
+      "id": "risk",
+      "notes": [
+        "मौसम पर आधारित ख़तरे का संकेत, संक्रमण का पूर्वानुमान नहीं। रिपोर्ट बनाते समय (26 सित॰ 2026) निकाला गया: पिछले 2 दिन, आज और अगले 3 दिन।",
+        "Weather data by Open-Meteo.com (CC BY 4.0)",
+      ],
+      "rows": [
+        {
+          "label": "आज के संक्रमण-घंटे",
+          "source": "GET /api/predict/:id/disease-risk › days[today].conditions.infectionHours",
+          "value": "4 (3 = मध्यम, 6 = ज़्यादा)",
+        },
+        {
+          "label": "लगातार ठंडे, नम दिन (CRRI कटक नियम)",
+          "source": "GET /api/predict/:id/disease-risk › days[today].conditions.padmanabhanStreak",
+          "value": "3 (लगातार 4 = चेतावनी)",
+        },
+        {
+          "label": "मॉडल",
+          "source": "GET /api/predict/:id/disease-risk › model.name, model.citation",
+          "value": "Yoshino infection hours: Yoshino (1979); rules as in Katsantonis et al. (2017) Phytopathologia Mediterranea 56(2):187-216",
+        },
+        {
+          "label": "साथ में दिखाया गया",
+          "source": "GET /api/predict/:id/disease-risk › supporting.name",
+          "value": "Padmanabhan (1965), CRRI Cuttack",
+        },
+      ],
+      "title": "मौसम से ख़तरा: धान का झोंका रोग",
+    },
+    {
+      "id": "treatment",
+      "notes": [],
+      "source": "GET /api/predict › treatment",
+      "text": "Rice blast causes spindle-shaped gray-centered spots on leaves and can rot the panicle neck, emptying grains. Grow resistant varieties, avoid excess nitrogen, and treat seed before sowing. Spray tricyclazole 75% WP (0.6 g/L) or a combination fungicide (azoxystrobin+difenoconazole, or tebuconazole+trifloxystrobin) at first leaf blast symptoms, repeating at heading to prevent neck blast.",
+      "title": "इलाज की सलाह",
+    },
+    {
+      "id": "limitations",
+      "items": [
+        "यह एक पत्ती की फ़ोटो से AI निदान है। यह ग़लत हो सकता है; कोई कदम उठाने से पहले कृषि अधिकारी या KVK से पुष्टि करें।",
+        "उपज का नुकसान इस फसल, रोग और गंभीरता के प्रकाशित आँकड़ों की तालिका से है, इस खेत का माप नहीं।",
+        "गंभीरता फ़ोटो के रंगों से निकाला गया अनुमान है (विशेषज्ञों से 44% मेल)।",
+        "सैटेलाइट फसल का तनाव दिखाता है, कौन-सा रोग है यह नहीं, और बादल हफ़्तों तक खेत को छिपा सकते हैं।",
+        "मौसम से ख़तरा प्रकाशित मॉडलों पर आधारित संकेत है, संक्रमण का पूर्वानुमान नहीं।",
+        "यह फसल नुकसान का आधिकारिक आकलन नहीं है (जैसे PMFBY का फसल-कटाई प्रयोग नहीं)।",
+      ],
+      "title": "सीमाएँ: इस रिपोर्ट पर भरोसा करने से पहले पढ़ें",
+    },
+  ],
+  "title": "खेत निदान रिपोर्ट",
+  "verify": {
+    "text": "इस रिपोर्ट की जाँच के लिए https://api.example/api/reports/PG-TESTREPORT01 खोलें: वहाँ यही हैश और मुख्य मान दिखते हैं। इस PDF फ़ाइल का SHA-256 वहाँ के "pdfSha256" से मेल खाना चाहिए।",
+    "url": "https://api.example/api/reports/PG-TESTREPORT01",
+  },
+  "version": 1,
+  "watermark": null,
+}
+`;

@@ -22,5 +22,9 @@ export const fieldLimiter = limiter(Number(process.env.FIELD_RATE_LIMIT) || 10, 
 export const riskLimiter = limiter(Number(process.env.RISK_RATE_LIMIT) || 60, 10,
   'Too many risk checks from this device. Please wait a few minutes.');
 
+// a report fetches the photo, heatmap, map tiles and weather, and draws a PDF
+export const reportLimiter = limiter(Number(process.env.REPORT_RATE_LIMIT) || 20, 10,
+  'Too many reports from this device. Please wait a few minutes.');
+
 export const globalLimiter = limiter(Number(process.env.GLOBAL_RATE_LIMIT) || 300, 15,
   'Too many requests. Please try again later.');

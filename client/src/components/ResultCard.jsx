@@ -2,6 +2,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import Feedback from './Feedback';
 import FieldHealth from './FieldHealth';
 import RiskStrip from './RiskStrip';
+import ReportButton from './ReportButton';
 import { getPredictionRisk } from '../services/api';
 import { cropName, diseaseName, severityName } from '../locales/terms';
 
@@ -161,6 +162,8 @@ const ResultCard = ({ result }) => {
       )}
 
       {result._id && ['gps', 'exif'].includes(result.locationSource) && <FieldHealth predictionId={result._id} crop={crop} />}
+
+      {result._id && <ReportButton predictionId={result._id} hasLocation={['gps', 'exif'].includes(result.locationSource)} />}
 
       {result._id && <Feedback predictionId={result._id} crop={crop} />}
     </div>

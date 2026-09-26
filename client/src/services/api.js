@@ -57,6 +57,9 @@ export const deleteMyData = () => api.delete('/predict');
 export const getFieldHealth = (id) => api.get(`/predict/${id}/field-health`, { timeout: 120000 });
 
 // Weather-based disease risk (docs/DISEASE_RISK.md): for a checkup (its private location) or a map point
+// One-click PDF report of a checkup (docs/REPORT.md)
+export const getReport = (id, lang) => api.get(`/predict/${id}/report.pdf`, { params: { lang }, responseType: 'blob', timeout: 60000 });
+
 export const getPredictionRisk = (id) => api.get(`/predict/${id}/disease-risk`);
 export const getDiseaseRisk = (params) => api.get('/disease-risk', { params });
 

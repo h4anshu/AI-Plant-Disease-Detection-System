@@ -181,7 +181,7 @@
     "publicTitle": "What is public",
     "public": "Nothing that identifies you. The public map only shows how many disease reports came from an area of about 5 km², and only when at least 3 different browsers reported there. Your exact location, photos and checkups are never shown to anyone else.",
     "locationTitle": "Your location",
-    "location": "Taken only after you agree: from your phone's location or, if that isn't available, from the location saved in the photo. You can stop sharing any time with \"Change\" on the Diagnose page. For the weather risk of potato and rice, a point rounded to about 5 km is sent to the free weather service Open-Meteo, with nothing that identifies you.",
+    "location": "Taken only after you agree: from your phone's location or, if that isn't available, from the location saved in the photo. You can stop sharing any time with \"Change\" on the Diagnose page. For the weather risk of potato and rice, a point rounded to about 5 km is sent to the free weather service Open-Meteo, with nothing that identifies you. For a PDF report, our server loads the map around that rounded area from OpenStreetMap.",
     "deleteTitle": "Delete your data",
     "delete": "This removes every checkup made in this browser, with its photos, from our servers. It cannot be undone. Do it before clearing your browser data: after that we can no longer tell which checkups were yours.",
     "deleteButton": "Delete my data",
@@ -252,5 +252,12 @@
       "7-day": "7-day",
       "10+ day": "10+ day"
     }
+  },
+  "report": {
+    "download": "Download report (PDF)",
+    "preparing": "Preparing the report…",
+    "failed": "Could not make the report. Please try again.",
+    "what": "A printable A4 summary of this checkup with its limits, for your records, an FPO, a bank or an insurer. Not an official loss assessment.",
+    "whatLocation": "A printable A4 summary of this checkup with its limits, for your records, an FPO, a bank or an insurer. It includes the satellite view only if you opened it above. Not an official loss assessment."
   }
 }
