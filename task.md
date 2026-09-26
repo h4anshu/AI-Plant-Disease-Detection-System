@@ -180,7 +180,7 @@ git tag -a v0.2-10crops c91b408 -m "Baseline: 10 live crops, LF-normalised repo,
 
 **What happened**
 1. User saw `/predict` on `localhost:5173` still returning "No token provided, authorization denied" after restarting the server with `npm run dev`.
-2. `server/config/db.js` swallows the real Mongo error (`console.log("DB Error...")` only) — ran a standalone `mongoose.connect()` with the same `.env` to surface it: `querySrv ENOTFOUND _mongodb._tcp.cluster0.xtdsd3e.mongodb.net`. Confirmed with `nslookup` that general DNS works (`google.com` resolves) but that specific Atlas cluster hostname is NXDOMAIN — the cluster itself no longer exists (deleted/renamed in Atlas), not a network/DNS-provider issue. User was told to get a fresh connection string from the Atlas dashboard and update `MONGODB_URI`.
+2. `server/config/db.js` swallows the real Mongo error (`console.log("DB Error...")` only) — ran a standalone `mongoose.connect()` with the same `.env` to surface it: `querySrv ENOTFOUND _mongodb._tcp.<cluster>.mongodb.net`. Confirmed with `nslookup` that general DNS works (`google.com` resolves) but that specific Atlas cluster hostname is NXDOMAIN — the cluster itself no longer exists (deleted/renamed in Atlas), not a network/DNS-provider issue. User was told to get a fresh connection string from the Atlas dashboard and update `MONGODB_URI`.
 3. User then fixed the URI and DB connected, but the same "No token provided" error persisted in the browser. Checked `server/middleware/auth.js` — the guest-bypass fix was intact and committed (`git show HEAD:server/middleware/auth.js`), so the running Node process wasn't the problem.
 4. Root cause: `client/.env` had `VITE_API_URL=https://server-211927486412.asia-south1.run.app/api` — the frontend was calling the **deployed Cloud Run backend**, not `localhost:4000`, the whole time. Any local server fix was invisible because requests never reached it.
 5. Fix: `client/.env` → `VITE_API_URL=http://localhost:4000/api`, old value kept commented directly below for switching back to prod testing. File is gitignored (`.gitignore:6`), so this is a local-only change with no repo impact.
@@ -644,4 +644,22 @@ Brief: a PDF per diagnosis for insurers, banks and FPOs. Header (report id, IST 
     - Hindi advice with its not-yet-reviewed note.
   - Logs: two `report` lines (map true, risk true, fieldHealth false, 2.8 s / 1.7 s), no warnings or errors.
   - **Cleaned up:** "Delete my data" for that device deleted 1 checkup; both verify links now answer 404, and the history is empty.
+
+## GitHub secret-scanning alert #1 (26 Sep 2026)
+
+GitHub flagged "MongoDB Atlas Database URI with credentials" in `server/tests/map.test.js:211` (commit `33d06ef`).
+
+**What it is:** a made-up URI in a test that checks the demo-seed script refuses to run against a remote database. The string is `mongodb+srv://user:pw@cluster0.abcd.mongodb.net/prod`: user "user", password "pw", cluster "abcd". It is not a leaked secret. Checked, without printing the real values:
+- It is not the real URI, and not the real cluster host.
+- `server/.env` is gitignored and was never committed.
+- The real password appears in no commit.
+
+**What was changed:**
+- The test now uses `mongodb+srv://cluster0.example.mongodb.net/prod`. It is still a remote Atlas-style URI (same test meaning, 29/29 pass) but has no credentials, so the scanner has nothing to match.
+- While checking, the **real cluster hostname** turned up in one place: an old error message in this file (Task 1 DB debugging, committed in `9ea8f0a`). It is masked now (`<cluster>.mongodb.net`). A hostname alone gives no access (it needs the user and password).
+
+**For the user:**
+- Close the alert on GitHub as "Used in tests" (or false positive).
+- Nothing to rotate.
+- Git history is not rewritten: both old strings are harmless, and rewriting a public repo's history is disruptive.
 

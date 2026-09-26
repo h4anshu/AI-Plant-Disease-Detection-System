@@ -208,7 +208,7 @@ describe('demo seed (scripts/seed_demo_map.js)', () => {
   test.each([
     ['mongodb://127.0.0.1:27017/plantdisease', true],
     ['mongodb://localhost/x', true],
-    ['mongodb+srv://user:pw@cluster0.abcd.mongodb.net/prod', false],
+    ['mongodb+srv://cluster0.example.mongodb.net/prod', false], // an Atlas-style remote URI (no credentials: GitHub secret scanning flags any)
     ['mongodb://db.example.com:27017/x', false],
     ['mongodb://localhost:1,db.example.com:2/x', false],
     ['', false],
