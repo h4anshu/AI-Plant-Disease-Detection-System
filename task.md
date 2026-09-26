@@ -17,7 +17,7 @@ Added 26 Sep 2026. Tick an item off when it's done.
 - [ ] **Agronomist review of the Hindi content:** 121 entries in `docs/TRANSLATION_REVIEW.csv` (10 crop names, 53 disease names, 4 severity labels, 54 treatment texts, all AI-drafted). Fill `hindi_corrected` / `reviewer`, then apply the corrections in `client/src/locales/terms.json` and `server/utils/treatmentMap.hi.js` with `needs_review: false`, and run `npm run translation-review` in `server/`. Until then the app shows a "not yet checked by an expert" note under Hindi advice.
 - [ ] **Secrets to Secret Manager** (optional): `docs/DEPLOY.md` Part C.
 - [x] **Deploy the server for the disease-risk strip (Task 13), then push `main`:** Done 26 Sep 2026: server `00015`, `main` pushed, Vercel bundle has the strip. Live check: `/api/disease-risk` potato near Shimla → high ×6, rice near Cuttack → low ×6, wheat → 400; live Map → Potato → district zoom shows the strip with the "Why?" numbers and citations. Original step: `gcloud run deploy server --source server --region asia-south1` (no new env vars needed; Open-Meteo needs no key), then `git push origin main` for Vercel. Check: a potato/rice checkup with location shows the strip; Map → Potato → zoom to a district.
-- [ ] **Deploy the server for the PDF report (Task 14), then push `main`:** `gcloud run deploy server --source server --region asia-south1` (no new env vars needed; `REPORT_WATERMARK` must stay unset in production), then `git push origin main` for Vercel. Check: a checkup → "Download report (PDF)", then open the verify link printed on its last page.
+- [x] **Deploy the server for the PDF report (Task 14), then push `main`:** Done 26 Sep 2026: server `00016` (no watermark env), `main` pushed at `c98b5d0`, Vercel bundle has the button (en + hi); verified live end to end (Task 14, "Live"). Original step: `gcloud run deploy server --source server --region asia-south1` (no new env vars needed; `REPORT_WATERMARK` must stay unset in production), then `git push origin main` for Vercel. Check: a checkup → "Download report (PDF)", then open the verify link printed on its last page.
 - [ ] **Hindi report strings** (`report.*` in `client/src/locales/hi.json` and the `hi` labels in `server/utils/reportContent.js`, AI-drafted): include them in the agronomist review.
 - [ ] **Hindi disease-risk strings** (`risk.*` in `client/src/locales/hi.json`, AI-drafted): include them in the agronomist review.
 - [x] **Earth Engine setup for field health**, done 26 Sep 2026: registered (noncommercial, BBDU, Community tier), API on, sign-in via gcloud ADC works (test: 7 Sentinel-2 images), `geo-service` service account with both roles. daily EECU cap set to 18,000 EECU-s. **Still open:** an ALU answer (likely no, no GWCID), and **3 real field coordinates** (owners' consent). The field-health code starts after the coordinates.
@@ -628,4 +628,20 @@ Brief: a PDF per diagnosis for insurers, banks and FPOs. Header (report id, IST 
 - The weather risk is as of the report date, not the checkup date.
 
 **Needs a deploy:** server (new routes, fonts, pdfkit), then a push for the client.
+
+**Live (26 Sep 2026, 21:04 IST):** server `server-00016-krt` (100% traffic, 512 MiB, `REPORT_WATERMARK` not set) and `main` pushed at `c98b5d0`, deployed by the user. Checked:
+- **Routes:** a bogus report id gives 404 JSON. A report with no device, another device's id or a bad id gives 404.
+- **Website:** the Vercel bundle has "Download report (PDF)" and "रिपोर्ट डाउनलोड करें".
+- **End-to-end run with my own test checkup** (golden `rice.jpg`, the PAU point, a fresh device id):
+  - The checkup answered Bacterialblight, early, 10% (high), with the new `yieldLossConfidence` and no coordinates.
+  - The English report was 286 KB in 3.0 s, cold; the Hindi one 311 KB in 1.9 s. Both came back as `application/pdf`, attachment, `no-store`, A4, 3 pages, no watermark.
+  - The verify link printed in each is `https://server-…run.app/api/reports/PG-…`.
+  - `sha256sum` of each downloaded file equals `pdfSha256` from its verify answer.
+  - The verify answers hold the summary only: no coordinates, device or image URL.
+  - Pages checked as images:
+    - the Cloudinary photo and heatmap, and the OSM map fetched by Cloud Run;
+    - the weather risk (rice blast, low ×6) and "satellite view not opened" for the field section;
+    - Hindi advice with its not-yet-reviewed note.
+  - Logs: two `report` lines (map true, risk true, fieldHealth false, 2.8 s / 1.7 s), no warnings or errors.
+  - **Cleaned up:** "Delete my data" for that device deleted 1 checkup; both verify links now answer 404, and the history is empty.
 
