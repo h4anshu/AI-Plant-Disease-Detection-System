@@ -20,7 +20,8 @@ HEADS_DIR = ROOT / "models" / "heads"
 LABEL_MAPS_PATH = ROOT / "data" / "label_maps.json"
 
 IMG_SIZE = (224, 224)
-ACTIVE_CROPS = ["wheat", "rice", "sugarcane", "potato", "maize", "pigeonpea"]
+ACTIVE_CROPS = ["wheat", "rice", "sugarcane", "potato", "maize", "pigeonpea",
+                "groundnut", "blackgram", "apple", "banana"]  # Sep 2026 additions: NEW_CROPS_REPORT.md
 
 
 def load_models():

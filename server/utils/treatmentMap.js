@@ -92,6 +92,64 @@ const treatmentMap = {
     Sterilic_mosaic:
       "Sterility mosaic ('green plague') causes bushy, pale plants with little to no pod formation, transmitted by tiny mites. There is no cure once infected — grow resistant varieties, rogue infected plants within the first ~40 days, and avoid ratoon pigeonpea near new crops. Seed treatment with imidacloprid plus foliar miticide sprays (fenazaquin or fenpyroximate) at 25, 40, and 55 days after sowing helps control the mite vector.",
   },
+
+  // ---- New crops (Sep 2026 expansion). Sources: TNAU Agritech / ICRISAT (groundnut), ICAR-IIPR and
+  // Legume Research trials (blackgram), SKUAST-K / Kashmir field trials (apple), ICAR-NRC Banana
+  // Trichy trials (banana). Doses are the published recommendations; have an agronomist review
+  // before wide release (see ml-service/NEW_CROPS_REPORT.md).
+  groundnut: {
+    Alternaria_Leaf_Spot:
+      "Alternaria leaf spot causes small brown, irregular spots with a yellow halo that merge and blight the leaf, mostly late in the season. Remove and burn crop debris after harvest and avoid dense planting. Spray mancozeb (3 g/L) at first symptoms; where the disease is severe, two sprays of hexaconazole or difenoconazole (0.025%, about 0.5 ml/L) around 60 and 70 days after sowing give the best control.",
+    Healthy:
+      "Your groundnut leaf appears healthy. No disease symptoms detected. Continue balanced fertilization (including gypsum at pegging), timely irrigation, and weekly scouting for leaf spots and rust.",
+    Leaf_Spot:
+      "Early and late leaf spot (tikka) cause brown to black circular spots, often with a yellow halo, and heavy leaf drop; together with rust they can halve pod yield. Rotate with cereals, deep-plough to bury infected debris, and avoid excess plant density. Spray carbendazim (100 g) + mancozeb (400 g) per acre, or chlorothalonil (400 g per acre) or tebuconazole 0.1%, at first symptoms and repeat after 15 days.",
+    Nutrition_Deficiency:
+      "Pale yellow leaves with green veins on young growth usually mean iron (lime-induced) chlorosis, common on calcareous or alkaline soils. Spray ferrous sulphate 0.5% (5 g/L) with citric acid 0.1% (1 g/L) two to three times at 10-15 day intervals starting about 30 days after emergence. Uniform yellowing of older leaves points instead to nitrogen or sulphur shortage - get a soil test before adding fertilizer.",
+    Rosette:
+      "Rosette-type symptoms (stunted, bushy plants with small, mottled or chlorotic leaflets) are caused by aphid- or thrips-transmitted viruses and cannot be cured. Pull out and destroy affected plants early, sow early at the recommended close spacing, and control the vector with an imidacloprid seed treatment or a dimethoate spray. Grow tolerant varieties. Have a local plant-protection officer confirm the virus, since several viruses give similar symptoms in India.",
+    Rust:
+      "Rust shows orange-brown powdery pustules on the underside of leaves, causing early leaf drop; combined with leaf spot it can cut pod yield by over 70%. Destroy volunteer groundnut plants that carry rust between seasons. Spray chlorothalonil or mancozeb, or hexaconazole / propiconazole (0.1%), at first appearance and repeat after 15 days; a 2-5% neem leaf extract spray is a low-cost option in light infections.",
+  },
+
+  blackgram: {
+    Anthracnose:
+      "Anthracnose causes dark brown, sunken spots with darker margins on leaves, stems and pods, and can cause shot-holes and defoliation in wet weather. Use healthy seed, treat seed with carbendazim (2 g/kg), and remove crop debris. Spray carbendazim 0.1% (1 g/L) or mancozeb 0.2% (2 g/L) at first symptoms, repeating after 10-15 days if rain continues.",
+    Healthy:
+      "Your blackgram leaf appears healthy. No disease symptoms detected. Keep monitoring for whiteflies (they spread yellow mosaic) and for powdery patches during dry, cool spells.",
+    Leaf_Crinkle:
+      "Urdbean leaf crinkle is a seed-borne virus that makes leaves enlarged, thick and crinkled, and plants give few pods; losses of 35-81% are reported. There is no cure. Sow certified, virus-free seed, pull out infected plants as soon as they appear, and control insect vectors (aphids, whiteflies) with an imidacloprid seed treatment and spray.",
+    Powdery_Mildew:
+      "Powdery mildew forms white powdery patches on leaves that later dry and fall. Spray wettable sulphur 0.25% (2.5 g/L) or carbendazim 0.1% (1 g/L) at first appearance and repeat after 10-15 days. A Bacillus subtilis spray (6 g/L) and resistant varieties are effective non-chemical options.",
+    Yellow_Mosaic:
+      "Yellow mosaic is a whitefly-transmitted virus (MYMV) that causes bright yellow and green patches on leaves and can destroy 30-80% of the crop. There is no cure - remove infected plants early and control whiteflies. Treat seed with imidacloprid 600 FS (5 ml/kg) and spray imidacloprid 17.8 SL (0.5 ml/L) or thiamethoxam 25 WG (0.4 g/L) twice; use yellow sticky traps and grow YMV-resistant varieties.",
+  },
+
+  apple: {
+    Alternaria_Leaf_Blotch:
+      "Alternaria leaf blotch causes brown circular blotches that merge, followed by heavy premature leaf fall in the rainy season; it is now a major disease in Kashmir orchards. Collect and destroy fallen leaves, prune for good air flow, and avoid overhead irrigation. Follow the SKUAST spray schedule - hexaconazole 5 EC (1 ml/L) or carbendazim 25% + mancozeb 50% WS (2.5 g/L) at 15-20 day intervals from early summer.",
+    Healthy:
+      "Your apple leaf appears healthy. No disease symptoms detected. Keep following the recommended orchard spray schedule and remove fallen leaves to reduce scab and blotch inoculum.",
+    Mosaic:
+      "Apple mosaic is a virus spread through infected budwood and rootstocks, causing pale yellow to cream patches and bands on leaves; yield losses of 30-50% are reported on susceptible cultivars. It cannot be cured by spraying. Use certified virus-free planting material, never take budwood or scions from affected trees, and replace severely affected, low-yielding trees.",
+  },
+
+  banana: {
+    Bract_Mosaic_Virus:
+      "Banana bract mosaic is an aphid-transmitted virus causing spindle-shaped streaks on leaves, pseudostem and bracts; average bunch weight losses of about 30% (up to 70%) are reported in India. There is no cure. Uproot and destroy infected plants, use virus-free tissue-culture plants, and control aphids.",
+    Healthy:
+      "Your banana leaf appears healthy. No disease symptoms detected. Continue removing old spotted leaves, balanced fertilization, and regular scouting for Sigatoka streaks.",
+    Insect_Pest:
+      "Insect feeding damage is visible on the leaf. Identify the pest (caterpillars, thrips, aphids or beetles) before spraying. Remove heavily damaged leaves, keep the plantation weed-free, and use neem oil (3-5 ml/L) for light infestations; consult your local agriculture officer for a pest-specific insecticide if damage spreads.",
+    Moko_Wilt:
+      "Moko is a bacterial wilt (Ralstonia) causing yellowing and wilting of leaves, and internal brown discoloration of the fruit and pseudostem. There is no chemical cure. Destroy the whole affected mat, disinfect tools with bleach between plants, remove male buds with a forked stick, and never take suckers from affected fields.",
+    Panama_Wilt:
+      "Panama wilt (Fusarium wilt) is a soil-borne fungus causing yellowing of older leaves, splitting of the pseudostem base and plant death. There is no reliable cure. Remove and destroy affected plants, do not move soil or suckers from infected fields, improve drainage, and replant with resistant cultivars. Report any wilting on Cavendish/Grand Naine immediately - it may be the TR4 strain.",
+    Pestalotiopsis_Leaf_Spot:
+      "Pestalotiopsis leaf spot causes grey-brown spots with dark borders, usually on older or stressed leaves. Remove affected leaves and improve plant nutrition and drainage. If spots keep spreading, spray mancozeb 0.2% (2 g/L) or copper oxychloride 0.25% (2.5 g/L).",
+    Sigatoka_Leaf_Spot:
+      "Sigatoka leaf spot (yellow and black Sigatoka) starts as pale yellow or dark streaks that become brown-black spots with grey centres, destroying leaf area; under favourable weather it can reduce yield by up to 65%. Remove and burn infected leaves, maintain spacing and drainage. Spray propiconazole 0.05% (0.5 ml/L) mixed with mineral oil 1% at 20-25 day intervals, 3-5 times during the rainy season, alternating fungicide groups to avoid resistance. Report fast-spreading black streaks to your horticulture officer (possible black Sigatoka).",
+  },
 };
 
 const FALLBACK_TREATMENT =

@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY app.py predict.py severity.py gradcam.py ./
 
-# Copy model weights (backbone + all 6 heads)
+# Copy model weights (backbone + one head per crop)
 COPY models/ ./models/
 
 # Copy label maps (required at runtime)

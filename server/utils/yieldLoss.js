@@ -47,6 +47,37 @@ const yieldLossTable = {
     Leaf_webber:     { early: 15, moderate: 40, severe: 68, confidence: "med" }, // insect pest, not pathogen - route to IPM advisory downstream
     Sterilic_mosaic: { early: 40, moderate: 65, severe: 97, confidence: "high" },
     Healthy:         { early: 0,  moderate: 0,  severe: 0,  confidence: "high" }
+  },
+  // ---- New crops (Sep 2026). Literature ranges mapped onto early/moderate/severe; sources in
+  // ml-service/NEW_CROPS_REPORT.md.
+  groundnut: {
+    Leaf_Spot:            { early: 10, moderate: 25, severe: 50, confidence: "med" },  // TNAU/ICRISAT: foliar leaf spots ~50% pod loss
+    Rust:                 { early: 10, moderate: 25, severe: 50, confidence: "med" },  // >70% only when combined with leaf spot
+    Alternaria_Leaf_Spot: { early: 5,  moderate: 12, severe: 22, confidence: "med" },  // pod loss up to 22% (fodder up to 63%)
+    Rosette:              { early: 20, moderate: 50, severe: 90, confidence: "low" },  // GRD data is African; Indian rosette-type viruses proxied
+    Nutrition_Deficiency: { early: 8,  moderate: 16, severe: 24, confidence: "low" },  // iron chlorosis: Fe+citric acid recovered 16-24% pod yield
+    Healthy:              { early: 0,  moderate: 0,  severe: 0,  confidence: "high" }
+  },
+  blackgram: {
+    Yellow_Mosaic:  { early: 20, moderate: 50, severe: 80, confidence: "high" }, // India: 30-80%, up to 100%
+    Leaf_Crinkle:   { early: 20, moderate: 45, severe: 80, confidence: "high" }, // India: 35-81%
+    Powdery_Mildew: { early: 10, moderate: 20, severe: 40, confidence: "low" },  // proxied from mungbean foliar-disease range (20-60%)
+    Anthracnose:    { early: 10, moderate: 25, severe: 50, confidence: "low" },  // proxied from mungbean foliar-disease range (20-60%)
+    Healthy:        { early: 0,  moderate: 0,  severe: 0,  confidence: "high" }
+  },
+  apple: {
+    Alternaria_Leaf_Blotch: { early: 5,  moderate: 15, severe: 30, confidence: "low" }, // defoliation-driven; no severity-resolved yield data
+    Mosaic:                 { early: 10, moderate: 25, severe: 46, confidence: "med" }, // 25% mild to 50% severe strains (international)
+    Healthy:                { early: 0,  moderate: 0,  severe: 0,  confidence: "high" }
+  },
+  banana: {
+    Sigatoka_Leaf_Spot:       { early: 10, moderate: 30, severe: 60, confidence: "med" },  // India: up to 65% in epidemics
+    Bract_Mosaic_Virus:       { early: 15, moderate: 30, severe: 70, confidence: "high" }, // India (Nendran): mean 30%, up to 70%
+    Panama_Wilt:              { early: 20, moderate: 60, severe: 100, confidence: "med" }, // affected plants usually lost
+    Moko_Wilt:                { early: 20, moderate: 60, severe: 100, confidence: "low" }, // plant death; little Indian data
+    Pestalotiopsis_Leaf_Spot: { early: 2,  moderate: 5,  severe: 10, confidence: "low" },  // minor leaf spot, interpolated
+    Insect_Pest:              { early: 5,  moderate: 10, severe: 20, confidence: "low" },  // label does not name the pest
+    Healthy:                  { early: 0,  moderate: 0,  severe: 0,  confidence: "high" }
   }
 };
 

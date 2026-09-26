@@ -3,7 +3,7 @@ import UploadBox from '../components/UploadBox';
 import ResultCard from '../components/ResultCard';
 import { predictDisease } from '../services/api';
 
-const crops = ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea'];
+const crops = ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea', 'groundnut', 'blackgram', 'apple', 'banana'];
 
 const Predict = () => {
   const [file, setFile] = useState(null);

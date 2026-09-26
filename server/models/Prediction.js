@@ -13,7 +13,7 @@ const predictionSchema = new mongoose.Schema({
     crop: {
         type: String,
         required: true,
-        enum: ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea']
+        enum: ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea', 'groundnut', 'blackgram', 'apple', 'banana']
     },
     disease: {
         type: String,

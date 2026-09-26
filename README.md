@@ -43,6 +43,12 @@ The crop is selected by the user, not inferred from the image. That's intentiona
 | Potato | 3 | 98.76% | 323 |
 | Maize | 4 | 94.28% | 629 |
 | Pigeonpea | 4 | 79.05% | 148 |
+| Groundnut | 6 | 92.7% (5-fold grouped CV) | 2,367 |
+| Blackgram | 5 | 96.2% (5-fold grouped CV) | 1,007 |
+| Apple | 3 | 94.9% (5-fold grouped CV) | 332 |
+| Banana | 7 | 96.8% (5-fold grouped CV) | 4,634 |
+
+The four crops added in Sep 2026 are scored differently from the original six: 5-fold cross-validation over every *independent* image, with near-duplicate and augmented copies of the same leaf never split across train and test. Several source datasets hide 7–80 augmented copies per leaf, which a plain random split turns into inflated accuracy. Seventeen other candidate crops were analysed and rejected or left for a product decision; see [ml-service/NEW_CROPS_REPORT.md](ml-service/NEW_CROPS_REPORT.md).
 
 Pigeonpea is the weakest crop by a wide margin, and the reason is unglamorous: it has the smallest dataset of the six (973 raw images total, versus 16,000+ for wheat). Sugarcane's lower accuracy relative to wheat/rice/potato is a more normal effect of having the most classes (11) with real inter-disease visual overlap, not a dataset-size problem.
 
