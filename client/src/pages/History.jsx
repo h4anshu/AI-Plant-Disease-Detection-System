@@ -2,24 +2,28 @@ import { useState, useEffect } from 'react';
 import HistoryList from '../components/HistoryList';
 import { getPredictionHistory } from '../services/api';
 
+const PAGE_SIZE = 50; // server/controllers/predictController.js
+
 const History = () => {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hasMore, setHasMore] = useState(false);
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const res = await getPredictionHistory();
-        setPredictions(res.data);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Could not load the log.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHistory();
-  }, []);
+  const load = async (before) => {
+    setLoading(true);
+    try {
+      const res = await getPredictionHistory(before);
+      setPredictions((shown) => (before ? [...shown, ...res.data] : res.data));
+      setHasMore(res.data.length === PAGE_SIZE);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not load the log.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
 
   return (
     <div className="max-w-2xl mx-auto px-6 pt-16 pb-20">
@@ -28,7 +32,16 @@ const History = () => {
 
       {loading && <p className="font-mono text-xs text-sage">Loading…</p>}
       {error && <p className="font-mono text-xs text-clay border-l-2 border-clay pl-3">{error}</p>}
-      {!loading && !error && <HistoryList predictions={predictions} />}
+      {!error && (predictions.length > 0 || !loading) && <HistoryList predictions={predictions} />}
+      {!loading && hasMore && (
+        <button
+          type="button"
+          onClick={() => load(predictions[predictions.length - 1].createdAt)}
+          className="w-full mt-6 border border-ink/25 py-2.5 font-mono text-xs uppercase tracking-wide text-ink/70 hover:border-ink/50"
+        >
+          Load older checkups
+        </button>
+      )}
     </div>
   );
 };

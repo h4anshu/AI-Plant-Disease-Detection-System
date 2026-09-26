@@ -3,6 +3,9 @@ import UploadBox from '../components/UploadBox';
 import ResultCard from '../components/ResultCard';
 import { predictDisease } from '../services/api';
 
+// Both Cloud Run services scale to zero: the first check after a quiet spell also starts them
+export const SLOW_AFTER_MS = 8000;
+
 const crops = ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea', 'groundnut', 'blackgram', 'apple', 'banana'];
 
 const Predict = () => {
@@ -11,6 +14,7 @@ const Predict = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [slow, setSlow] = useState(false);
 
   const handleAnalyze = async () => {
     if (!file) {
@@ -20,6 +24,7 @@ const Predict = () => {
     setError('');
     setLoading(true);
     setResult(null);
+    const slowTimer = setTimeout(() => setSlow(true), SLOW_AFTER_MS);
 
     try {
       const formData = new FormData();
@@ -30,6 +35,8 @@ const Predict = () => {
     } catch (err) {
       setError(err.response?.data?.message || 'Diagnosis failed. Try again.');
     } finally {
+      clearTimeout(slowTimer);
+      setSlow(false);
       setLoading(false);
     }
   };
@@ -77,6 +84,11 @@ const Predict = () => {
           >
             {loading ? 'Reading the leaf…' : 'Analyze'}
           </button>
+          {slow && (
+            <p role="status" className="font-mono text-xs text-sage mt-3">
+              Waking up the model… the first check after a quiet spell can take up to 30 seconds.
+            </p>
+          )}
         </div>
 
         {/* Right: result */}

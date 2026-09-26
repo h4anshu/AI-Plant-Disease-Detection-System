@@ -24,4 +24,5 @@ COPY data/label_maps.json ./data/label_maps.json
 USER app
 EXPOSE 8000
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Cloud Run passes the port in $PORT; 8000 locally. Shell form for the expansion, exec so uvicorn gets SIGTERM.
+CMD exec uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000}

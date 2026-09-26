@@ -1,0 +1,12 @@
+[
+  {
+    "name": "keep-3-newest",
+    "action": { "type": "Keep" },
+    "mostRecentVersions": { "keepCount": 3 }
+  },
+  {
+    "name": "delete-older-than-14-days",
+    "action": { "type": "Delete" },
+    "condition": { "olderThan": "14d" }
+  }
+]

@@ -1,11 +1,35 @@
 import axios from "axios";
 import FormData from "form-data";
-import cloudinary from "../config/cloudinary.js";
+import { uploadBuffer } from "../config/cloudinary.js";
 import PredictionModel from "../models/Prediction.js";
 import { getTreatment } from "../utils/treatmentMap.js";
 import getYieldLoss from "../utils/yieldLoss.js";
 import { BadImage, cleanImage } from "../utils/image.js";
 import { GUEST_ID } from "../middleware/guestDevice.js";
+
+const ML_TIMEOUT_MS = 60000;
+const RETRYABLE = new Set([429, 502, 503, 504]); // Cloud Run while an instance starts or is saturated
+
+// One retry after 1 s for connection errors and gateway answers; never after our own timeout, which
+// would make the user wait twice. The form is rebuilt each time: a sent form-data stream is used up.
+const callML = async (image, filename, crop) => {
+  for (let attempt = 1; ; attempt++) {
+    const formData = new FormData();
+    formData.append('file', image, { filename });
+    formData.append('crop', crop);
+    try {
+      return await axios.post(`${process.env.FASTAPI_URL}/predict-disease`, formData, {
+        headers: { ...formData.getHeaders(), 'x-ml-token': process.env.ML_SERVICE_TOKEN ?? '' },
+        timeout: ML_TIMEOUT_MS,
+      });
+    } catch (err) {
+      const status = err.response?.status;
+      const retryable = status ? RETRYABLE.has(status) : err.code !== 'ECONNABORTED';
+      if (attempt >= 2 || !retryable) throw err;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+};
 
 // @route  POST /api/predict
 const predict = async (req, res) => {
@@ -19,7 +43,7 @@ const predict = async (req, res) => {
       return res.status(400).json({ message: 'Crop type is required' });
     }
 
-    // 0. Check the real file type and size; the stored copy has no EXIF (GPS etc.)
+    // 0. Check the real file type and size; the stored copy is downsized and has no EXIF (GPS etc.)
     let publicImage;
     try {
       publicImage = await cleanImage(req.file.buffer);
@@ -30,17 +54,9 @@ const predict = async (req, res) => {
 
     // 1. Send image to FastAPI ML service (first, so a failed ML call leaves no orphan upload).
     // It gets the original bytes so predictions match the parity-tested pipeline exactly.
-    const formData = new FormData();
-    formData.append('file', req.file.buffer, { filename: req.file.originalname });
-    formData.append('crop', crop);
-
     let mlResponse;
     try {
-      mlResponse = await axios.post(
-        `${process.env.FASTAPI_URL}/predict-disease`,
-        formData,
-        { headers: { ...formData.getHeaders(), 'x-ml-token': process.env.ML_SERVICE_TOKEN ?? '' }, timeout: 60000 }
-      );
+      mlResponse = await callML(req.file.buffer, req.file.originalname, crop);
     } catch (mlError) {
       // the ML service says the request itself is bad: tell the user; anything else is our outage
       const mlStatus = mlError.response?.status;
@@ -58,15 +74,12 @@ const predict = async (req, res) => {
     const { status = 'ok', reasons = [], ood_score = null, quality = null, top3, model_version = null,
             disease, confidence, severity, gradcam } = mlResponse.data;
 
-    // 2. Upload image to Cloudinary
-    const uploadResult = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: 'plant-disease' },
-        (error, result) => (error ? reject(error) : resolve(result))
-      );
-      stream.end(publicImage);
-    });
-    const imageUrl = uploadResult.secure_url;
+    // 2. Upload the photo and the Grad-CAM PNG to Cloudinary; MongoDB keeps only their URLs
+    // (a base64 heatmap is ~100 KB, which would fill the 512 MB free Atlas cluster in ~5,000 records)
+    const [imageUrl, gradcamUrl] = await Promise.all([
+      uploadBuffer(publicImage, 'plant-disease'),
+      gradcam ? uploadBuffer(Buffer.from(gradcam, 'base64'), 'plant-disease/gradcam') : null,
+    ]);
 
     // 3-4. Treatment advice and yield loss only for a confident diagnosis
     const isOk = status === 'ok';
@@ -90,7 +103,7 @@ const predict = async (req, res) => {
       severity,
       yieldLossPercent,
       treatment,
-      gradcam
+      gradcam: gradcamUrl
     });
 
     // 6. Return full result to frontend
@@ -102,13 +115,19 @@ const predict = async (req, res) => {
   }
 };
 
-// @route  GET /api/predictions
+const PAGE_SIZE = 50;
+
+// @route  GET /api/predict?before=<createdAt of the last record shown>  (newest first, 50 per page)
 const getHistory = async (req, res) => {
   try {
+    const before = req.query.before ? new Date(req.query.before) : null;
+    if (before && isNaN(before)) return res.status(400).json({ message: 'Invalid before date' });
     // guests only see their own browser's records (middleware/guestDevice.js); no device id = no history
     if (req.user.id === GUEST_ID && !req.deviceId) return res.status(200).json([]);
     const filter = req.user.id === GUEST_ID ? { userId: GUEST_ID, deviceId: req.deviceId } : { userId: req.user.id };
-    const predictions = await PredictionModel.find(filter).sort({ createdAt: -1 });
+    if (before) filter.createdAt = { $lt: before };
+    // the list never shows the heatmap, and records from before the migration hold it as ~100 KB base64
+    const predictions = await PredictionModel.find(filter).select('-gradcam').sort({ createdAt: -1 }).limit(PAGE_SIZE);
     res.status(200).json(predictions);
   } catch (error) {
     console.error('History error:', error.message);

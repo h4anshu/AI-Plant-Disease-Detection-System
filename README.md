@@ -209,4 +209,6 @@ Auth uses the raw JWT in the `Authorization` header, with no `Bearer` prefix —
 
 ## Deployment
 
+Step-by-step commands, free-tier settings, secrets, costs (about $0 at 1,000 predictions/month) and rollback: [docs/DEPLOY.md](docs/DEPLOY.md).
+
 FastAPI and Express are containerized (see the `Dockerfile` in each) and deployed to Google Cloud Run in the `asia-south1` region; React is deployed to Vercel. MongoDB Atlas and Cloudinary are used as-is, no self-hosting. Two things came up during the Cloud Run deploy that are worth keeping on record: the FastAPI image originally installed `libgl1-mesa-glx` for OpenCV/Pillow's system dependencies, which no longer exists in current Debian package repos and had to be swapped for `libgl1`; and the MongoDB URI's password contains characters that don't survive being passed as a plain `--set-env-vars` flag on the `gcloud run deploy` command line, which needed an `env.yaml` file instead.

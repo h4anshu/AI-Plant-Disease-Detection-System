@@ -38,7 +38,8 @@ export const predictDisease = (formData) =>
     headers: { 'Content-Type': 'multipart/form-data' }
   });
 
-export const getPredictionHistory = () => api.get('/predict');
+// newest first, 50 per page; pass the createdAt of the last record shown to get older ones
+export const getPredictionHistory = (before) => api.get('/predict', { params: before ? { before } : {} });
 
 
 export default api;

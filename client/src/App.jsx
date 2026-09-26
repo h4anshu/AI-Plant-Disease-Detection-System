@@ -28,6 +28,10 @@ const ProtectedRoute = ({ children }) => {
 const App = () => {
   return (
     <>
+      {/* TODO(auth): remove when login returns */}
+      <div className="bg-wheat/20 border-b border-wheat/40 px-6 py-2 text-center font-mono text-[11px] text-ink/70">
+        Demo mode: sign-in is disabled. Your checkups are saved only in this browser.
+      </div>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />

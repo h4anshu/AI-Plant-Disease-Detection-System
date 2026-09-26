@@ -241,3 +241,34 @@ Tests:
 - ML: shared-secret test. Client: device-id interceptor test.
 - Totals: pytest 40, Jest 21, Vitest 10 passed.
 - Docker smoke test of the server image: missing vars list all 8 names and exit; headers present; a fake JPEG is rejected by sharp in the container; runs as `node`.
+- **Deployed by the user (26 Sep, 15:47 / 15:49 IST, server first, then ML):**
+  - `server-00009-crl` has `ML_SERVICE_TOKEN` and `CLIENT_ORIGINS`; `ml-service-00004-f8c` = `ml-service:v3` with `ML_SERVICE_TOKEN`; `main` pushed and Vercel serving the new client (bundle sends `x-device-id`).
+  - Live checks:
+    - ML `/predict-disease` without token or with a wrong one → 401; `/health` still 200.
+    - Server sends HSTS, nosniff and RateLimit-Policy 300/15 min.
+    - CORS preflight from the Vercel origin → 204 and allows `x-device-id`; other origin → no allow-origin header.
+    - A fake JPEG → 400 before any ML, Cloudinary or DB work.
+  - Not checked by me: a real prediction through the site (it would write to prod MongoDB and Cloudinary) — left to the user.
+
+## Task 8 — Free-tier deployment readiness
+
+Brief: production Dockerfiles, `docs/DEPLOY.md`, Grad-CAM out of MongoDB, cold-start handling, Vercel, a GitHub deploy workflow (WIF), and a demo-mode banner. Done on `main` (the user's preference) instead of `feat/deploy`.
+
+Assessment first: the app was already live on exactly this stack, so Vercel (#5) was done. Measured the base64 Grad-CAM stored per record at 75–127 KB (average 106), which fills the 512 MB Atlas M0 after about 4,800 predictions, and every history call shipped all of it. Also found the Cloudinary photo copy stored at up to 4000 px (2–4 MB), plus 1.7 GB in Artifact Registry (free: 0.5 GB; the TF `v1` image alone is 923 MB). Live Cloud Run config: server timeout 60 s (same as its ML call timeout), ML 2 CPU / 4 GiB / concurrency 1.
+
+What was done:
+- **Grad-CAM → Cloudinary** (`plant-disease/gradcam`), uploaded in parallel with the photo; `Prediction.gradcam` now holds the URL (the client accepts URL or legacy base64). History excludes `gradcam`, returns 50 per page, `?before=<createdAt>` for older pages (client "Load older checkups"). `server/scripts/migrate-gradcam.js`: dry run by default, `--apply` uploads each legacy heatmap and replaces it with the URL; idempotent (dry run checked on an in-memory DB: counted 2 legacy records, skipped URL, null and missing).
+- **Stored photo downsized** to ≤ 1280 px (the ML service still gets the original bytes).
+- **Cold starts**: the server retries the ML call once after 1 s on 429/502/503/504 or a connection error, never after its own 60 s timeout; the form is rebuilt per attempt. The client shows "Waking up the model…" after 8 s.
+- **Demo-mode banner** in `App.jsx` (`TODO(auth)`).
+- **ML Dockerfile** honours `$PORT` (shell-form `exec uvicorn`). A Docker HEALTHCHECK was skipped: Cloud Run ignores it.
+- **`docs/DEPLOY.md`**:
+  - a beginner PowerShell path: the manual-steps list, APIs, Artifact Registry with a cleanup policy (`docs/artifact-cleanup-policy.json`), Atlas, Cloudinary, Secret Manager helpers (no trailing newline, random generation for JWT/ML token), IAM secretAccessor;
+  - deploy flags chosen from the benchmark: ML 2 vCPU / 1 GiB / concurrency 4 / 0–3 instances / cpu-boost; server 1 vCPU / 512 MiB / timeout 180;
+  - Vercel, checks, the upgrade path for the live deployment, rollback, cold starts;
+  - the cost table: about $0 at 1,000 predictions/month;
+  - GitHub Actions + WIF left as a documented TODO.
+- Tests:
+  - new Jest: heatmap uploaded to Cloudinary and saved as a URL; a cold-start 503 retried once; a second 503 not retried; photo downsized to 1280×853; history drops `gradcam`, pages 50 + 5, bad `before` gives 400;
+  - new Vitest: the waking-up note appears at 8 s and clears with the result;
+  - totals: pytest 40, Jest 25, Vitest 11; client build OK; banner checked in the browser.

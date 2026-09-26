@@ -133,11 +133,12 @@ const ResultCard = ({ result }) => {
         <p className="text-sm text-ink/80 leading-relaxed">{treatment}</p>
       </div>
 
+      {/* a Cloudinary URL; records saved before the migration hold base64 */}
       {gradcam && (
         <div className="mb-5">
           <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">Affected Region</p>
           <img
-            src={gradcam.startsWith('data:') ? gradcam : `data:image/png;base64,${gradcam}`}
+            src={/^(https?:|data:)/.test(gradcam) ? gradcam : `data:image/png;base64,${gradcam}`}
             alt="Grad-CAM heatmap"
             className="w-full border border-ink/10"
           />

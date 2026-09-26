@@ -14,6 +14,7 @@ const image = (width, height, format = 'jpeg') =>
   sharp({ create: { width, height, channels: 3, background: '#3a7d2c' } }).toFormat(format).toBuffer();
 let JPEG;
 const UPLOADED_URL = 'https://res.cloudinary.com/test-cloud/image/upload/v1/plant-disease/leaf.jpg';
+const GRADCAM_URL = 'https://res.cloudinary.com/test-cloud/image/upload/v1/plant-disease/gradcam/cam.png';
 
 let mongod;
 
@@ -27,6 +28,7 @@ beforeAll(async () => {
 
 afterEach(async () => {
   nock.cleanAll();
+  cloudUploads.length = 0;
   await Prediction.deleteMany({});
 });
 
@@ -36,10 +38,18 @@ afterAll(async () => {
   nock.enableNetConnect();
 });
 
+// answers both uploads of a prediction: the photo, and the Grad-CAM heatmap (folder plant-disease/gradcam)
+const cloudUploads = [];
 const mockCloudinary = () =>
   nock('https://api.cloudinary.com')
     .post(/\/v1_1\/test-cloud\/image\/upload/)
-    .reply(200, { secure_url: UPLOADED_URL, public_id: 'plant-disease/leaf' });
+    .times(2)
+    .reply(200, (uri, body) => {
+      const text = /^[0-9a-f]+$/i.test(body) ? Buffer.from(body, 'hex').toString('latin1') : String(body); // nock hex-encodes binary bodies
+      const heatmap = text.includes('plant-disease/gradcam');
+      cloudUploads.push(heatmap ? 'gradcam' : 'photo');
+      return { secure_url: heatmap ? GRADCAM_URL : UPLOADED_URL };
+    });
 
 // the ML service only answers calls that carry the shared secret
 const mockML = (status, body) =>
@@ -78,12 +88,14 @@ describe('POST /api/predict', () => {
     expect(res.body.message).toBe('Only image files are allowed');
   });
 
-  test('happy path: saves a Prediction with treatment and yield loss', async () => {
+  test('happy path: saves a Prediction with treatment and yield loss; the heatmap goes to Cloudinary', async () => {
     const ml = mockML(200, ML_OK);
     const cloud = mockCloudinary();
     const res = await upload();
     expect(res.status).toBe(201);
     expect(ml.isDone() && cloud.isDone()).toBe(true);
+    expect(cloudUploads.sort()).toEqual(['gradcam', 'photo']);
+    expect(res.body.gradcam).toBe(GRADCAM_URL); // a URL, not ~100 KB of base64 in MongoDB
     expect(res.body).toMatchObject({
       crop: 'blackgram', status: 'ok', disease: 'Yellow_Mosaic', severity: 'moderate',
       imageUrl: UPLOADED_URL, userId: GUEST_ID, yieldLossPercent: 50,
@@ -127,6 +139,24 @@ describe('POST /api/predict', () => {
     expect(await Prediction.countDocuments()).toBe(0);
   });
 
+  test('a cold-start 503 from the ML service is retried once', async () => {
+    const first = mockML(503, 'Service Unavailable');
+    const second = mockML(200, ML_OK);
+    mockCloudinary();
+    const res = await upload();
+    expect(first.isDone() && second.isDone()).toBe(true);
+    expect(res.status).toBe(201);
+  });
+
+  test('a second failure is not retried again -> 502', async () => {
+    mockML(503, 'x');
+    mockML(503, 'x');
+    const third = mockML(200, ML_OK);
+    const res = await upload();
+    expect(res.status).toBe(502);
+    expect(third.isDone()).toBe(false);
+  });
+
   test('ML service unreachable -> 502', async () => {
     // a closed local port gives a real ECONNREFUSED without leaving the machine
     const saved = process.env.FASTAPI_URL;
@@ -168,7 +198,13 @@ describe('upload validation (real bytes, not the claimed mimetype)', () => {
     }
   });
 
-  test('the stored copy has no EXIF metadata (GPS, camera) and keeps its size', async () => {
+  test('the stored copy is at most 1280 px on its long side', async () => {
+    const { cleanImage } = await import('../utils/image.js');
+    const meta = await sharp(await cleanImage(await image(3000, 2000))).metadata();
+    expect([meta.width, meta.height]).toEqual([1280, 853]);
+  });
+
+  test('the stored copy has no EXIF metadata (GPS, camera) and keeps a small size', async () => {
     const { cleanImage } = await import('../utils/image.js');
     const withExif = await sharp(await image(64, 48)).withExif({ IFD0: { Artist: 'farmer', Make: 'PhoneCo' } }).toBuffer();
     expect((await sharp(withExif).metadata()).exif).toBeDefined();
@@ -196,6 +232,20 @@ describe('GET /api/predict (history)', () => {
     expect(res.body.map((p) => p.crop)).toEqual(['wheat', 'rice', 'sugarcane']);
     expect(res.body.every((p) => p.status === 'ok')).toBe(true);
     expect(res.body[2].modelVersion).toBeNull();
+  });
+
+  test('history leaves out the heatmap and pages by 50 with ?before=', async () => {
+    const day = (i) => new Date(Date.UTC(2026, 0, 1) + i * 86_400_000);
+    await Prediction.insertMany(Array.from({ length: 55 }, (_, i) =>
+      ({ ...base, userId: GUEST_ID, deviceId: DEVICE, gradcam: 'A'.repeat(1000), createdAt: day(i) })));
+    const page1 = (await request(app).get('/api/predict').set('x-device-id', DEVICE)).body;
+    expect(page1).toHaveLength(50);
+    expect(page1[0].gradcam).toBeUndefined();
+    const page2 = (await request(app).get('/api/predict').query({ before: page1[49].createdAt }).set('x-device-id', DEVICE)).body;
+    expect(page2).toHaveLength(5);
+    expect(new Date(page2[0].createdAt) < new Date(page1[49].createdAt)).toBe(true);
+    const bad = await request(app).get('/api/predict').query({ before: 'yesterday-ish' }).set('x-device-id', DEVICE);
+    expect(bad.status).toBe(400);
   });
 
   test("a guest without a device id gets an empty history, never everyone's", async () => {
