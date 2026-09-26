@@ -1,0 +1,5 @@
+# Allowlist: only what the Dockerfile copies (keeps tests, notebooks and any stray key file out of the image)
+*
+!app.py
+!field_health.py
+!requirements.txt

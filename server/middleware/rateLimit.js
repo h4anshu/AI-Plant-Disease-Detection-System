@@ -14,5 +14,9 @@ const limiter = (limit, windowMinutes, message) => rateLimit({
 export const predictLimiter = limiter(Number(process.env.PREDICT_RATE_LIMIT) || 20, 10,
   'Too many predictions from this device. Please wait a few minutes and try again.');
 
+// Every uncached field-health view is an Earth Engine computation (monthly quota: docs/GEE_SETUP.md)
+export const fieldLimiter = limiter(Number(process.env.FIELD_RATE_LIMIT) || 10, 10,
+  'Too many satellite checks from this device. Please wait a few minutes.');
+
 export const globalLimiter = limiter(Number(process.env.GLOBAL_RATE_LIMIT) || 300, 15,
   'Too many requests. Please try again later.');

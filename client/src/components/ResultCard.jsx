@@ -1,5 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next';
 import Feedback from './Feedback';
+import FieldHealth from './FieldHealth';
 import { cropName, diseaseName, severityName } from '../locales/terms';
 
 // stamp labels are the severity names from locales/terms.json
@@ -152,6 +153,8 @@ const ResultCard = ({ result }) => {
           </p>
         </div>
       )}
+
+      {result._id && ['gps', 'exif'].includes(result.locationSource) && <FieldHealth predictionId={result._id} crop={crop} />}
 
       {result._id && <Feedback predictionId={result._id} crop={crop} />}
     </div>

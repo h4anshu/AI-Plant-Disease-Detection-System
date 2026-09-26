@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import FormData from "form-data";
 import cloudinary, { publicIdFromUrl, uploadBuffer } from "../config/cloudinary.js";
 import PredictionModel, { FEEDBACK } from "../models/Prediction.js";
+import FieldHealthCache, { keyForPrediction } from "../models/FieldHealthCache.js";
 import { getTreatment, LANGUAGES, localizedTreatment, treatmentMap } from "../utils/treatmentMap.js";
 import getYieldLoss from "../utils/yieldLoss.js";
 import { BadImage, cleanImage } from "../utils/image.js";
@@ -156,7 +157,7 @@ const predict = async (req, res) => {
 const PAGE_SIZE = 50;
 
 // guests only reach their own browser's records (middleware/guestDevice.js); null = nothing of theirs
-const ownerFilter = (req) => {
+export const ownerFilter = (req) => {
   if (req.user.id !== GUEST_ID) return { userId: req.user.id };
   return req.deviceId ? { userId: GUEST_ID, deviceId: req.deviceId } : null;
 };
@@ -226,11 +227,13 @@ const deleteMine = async (req, res) => {
   try {
     const owner = ownerFilter(req);
     if (!owner) return res.status(400).json({ message: 'Missing device id' });
-    const docs = await PredictionModel.find(owner).select('imageUrl gradcam').lean();
+    const docs = await PredictionModel.find(owner).select('imageUrl gradcam location crop createdAt').lean();
     const images = docs.flatMap((d) => [d.imageUrl, d.gradcam]).map(publicIdFromUrl).filter(Boolean);
     const results = await Promise.allSettled(images.map((id) => cloudinary.uploader.destroy(id)));
     const imagesFailed = results.filter((r) => r.status === 'rejected').length;
     const { deletedCount } = await PredictionModel.deleteMany(owner);
+    // cached satellite answers for those fields go too (their keys are hashes of the location)
+    await FieldHealthCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map(keyForPrediction) } });
     // a failed image delete leaves an orphan file, never a record: logged so it can be removed by hand
     (imagesFailed ? logger.warn : logger.info).call(logger, { requestId: req.id, deleted: deletedCount,
       images: images.length, imagesFailed }, 'records deleted');

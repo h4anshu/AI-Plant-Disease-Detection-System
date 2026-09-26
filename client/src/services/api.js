@@ -53,6 +53,9 @@ export const getCropClasses = () => api.get('/predict/classes');
 // Removes every checkup of this browser (and its photos) from the server: /privacy page
 export const deleteMyData = () => api.delete('/predict');
 
+// Satellite view of the diagnosed field (only for checkups with a consented location)
+export const getFieldHealth = (id) => api.get(`/predict/${id}/field-health`, { timeout: 120000 });
+
 // --- Public disease map: GeoJSON hexagons, { crop?, disease?, days: 7 | 30 | 90 }
 export const getMapReports = (params) => api.get('/map/reports', { params });
 

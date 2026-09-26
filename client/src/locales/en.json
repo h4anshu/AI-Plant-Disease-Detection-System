@@ -190,5 +190,31 @@
     "failed": "Could not delete your data. Please try again.",
     "done_one": "Deleted 1 checkup from this browser.",
     "done_other": "Deleted {{count}} checkups from this browser."
+  },
+  "field": {
+    "show": "See this field from space",
+    "why": "Uses free Sentinel-2 satellite images of your field from the last 4 months.",
+    "loading": "Checking satellite images… this can take up to 30 seconds.",
+    "failed": "Satellite data is unavailable right now. Please try again shortly.",
+    "title": "Field from space",
+    "flag": {
+      "below": "Below neighbouring fields since {{date}}.",
+      "below_once": "Below neighbouring fields on {{date}}. Wait for the next clear image to confirm.",
+      "normal": "In line with neighbouring fields.",
+      "above": "Greener than neighbouring fields.",
+      "no_neighbours": "Not enough clear farmland nearby to compare with.",
+      "no_clear": "No clear satellite view in the last 4 months (clouds)."
+    },
+    "stale": "No clear image since {{date}} (clouds), so this may be out of date.",
+    "chartLabel": "Greenness of your field and of nearby fields over time",
+    "ndvi": "Your field: greenness (NDVI)",
+    "ndre": "Your field: leaf chlorophyll (NDRE)",
+    "band": "Nearby fields (middle half)",
+    "redsiTitle": "Wheat rust stress index (REDSI, experimental)",
+    "redsiNote": "Experimental research index for wheat yellow rust: lower means more stress. Not a diagnosis.",
+    "explain": "The satellite shows whether the field is under stress, not which disease. The leaf photo tells which disease.",
+    "meta": "{{clear}} of {{total}} satellite images were clear; last clear image: {{date}}.",
+    "circle": "Field = a 30 m circle around your location (field boundaries not available).",
+    "boundary": "Field = its mapped boundary."
   }
 }
