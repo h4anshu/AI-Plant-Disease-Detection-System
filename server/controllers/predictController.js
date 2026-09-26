@@ -3,11 +3,23 @@ import mongoose from "mongoose";
 import FormData from "form-data";
 import { uploadBuffer } from "../config/cloudinary.js";
 import PredictionModel, { FEEDBACK } from "../models/Prediction.js";
-import { getTreatment, treatmentMap } from "../utils/treatmentMap.js";
+import { getTreatment, LANGUAGES, localizedTreatment, treatmentMap } from "../utils/treatmentMap.js";
 import getYieldLoss from "../utils/yieldLoss.js";
 import { BadImage, cleanImage } from "../utils/image.js";
 import { GUEST_ID } from "../middleware/guestDevice.js";
 import logger, { logError } from "../utils/logger.js";
+
+// Treatment advice in the language the browser asked for (Accept-Language), English when there is no
+// translation. MongoDB always keeps the English text; the other fields never change with the language.
+const withLanguage = (req, res, doc) => {
+  const lang = req.acceptsLanguages(...LANGUAGES) || 'en';
+  res.vary('Accept-Language');
+  const obj = doc.toObject ? doc.toObject() : doc;
+  if (!obj.treatment || lang === 'en') return obj;
+  const t = localizedTreatment(obj.crop, obj.disease, lang);
+  res.set('Content-Language', t.lang);
+  return { ...obj, treatment: t.text, treatmentLanguage: t.lang, treatmentNeedsReview: t.needsReview };
+};
 
 const ML_TIMEOUT_MS = 60000;
 const RETRYABLE = new Set([429, 502, 503, 504]); // Cloud Run while an instance starts or is saturated
@@ -117,7 +129,7 @@ const predict = async (req, res) => {
       diseaseSeverity: severity ?? null, oodScore: ood_score, modelVersion: model_version, mlLatencyMs }, 'prediction');
 
     // 6. Return full result to frontend
-    res.status(201).json(prediction);
+    res.status(201).json(withLanguage(req, res, prediction));
 
   } catch (error) {
     logError(req, 'Predict failed', error);
@@ -143,7 +155,7 @@ const getHistory = async (req, res) => {
     if (before) filter.createdAt = { $lt: before };
     // the list never shows the heatmap, and records from before the migration hold it as ~100 KB base64
     const predictions = await PredictionModel.find(filter).select('-gradcam').sort({ createdAt: -1 }).limit(PAGE_SIZE);
-    res.status(200).json(predictions);
+    res.status(200).json(predictions.map((p) => withLanguage(req, res, p)));
   } catch (error) {
     logError(req, 'History failed', error);
     res.status(500).json({ message: 'Server error' });

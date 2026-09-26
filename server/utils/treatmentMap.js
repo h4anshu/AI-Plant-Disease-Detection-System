@@ -8,7 +8,9 @@
  * literature. See project docs for full sourced report with citations.
  *
  * Lookup: treatmentMap[crop]?.[disease] ?? FALLBACK_TREATMENT
+ * Other languages: treatmentMap.<lang>.js with the same keys, via localizedTreatment().
  */
+import { FALLBACK_TREATMENT_HI, treatmentMapHi } from './treatmentMap.hi.js';
 
 const treatmentMap = {
   wheat: {
@@ -165,4 +167,18 @@ function getTreatment(crop, disease) {
   return treatmentMap[crop]?.[disease] ?? FALLBACK_TREATMENT;
 }
 
-export { treatmentMap, getTreatment, FALLBACK_TREATMENT };
+const TRANSLATIONS = { hi: [treatmentMapHi, FALLBACK_TREATMENT_HI] };
+export const LANGUAGES = ['en', ...Object.keys(TRANSLATIONS)];
+
+/**
+ * The advice in `lang` when a written translation exists, else English (never translated on the fly).
+ * @returns {{ text: string, lang: string, needsReview: boolean }}
+ */
+function localizedTreatment(crop, disease, lang) {
+  const [map, fallback] = TRANSLATIONS[lang] ?? [];
+  const entry = map && (treatmentMap[crop]?.[disease] ? map[crop]?.[disease] : fallback);
+  if (entry) return { text: entry.text, lang, needsReview: entry.needs_review };
+  return { text: getTreatment(crop, disease), lang: 'en', needsReview: false };
+}
+
+export { treatmentMap, getTreatment, localizedTreatment, FALLBACK_TREATMENT };

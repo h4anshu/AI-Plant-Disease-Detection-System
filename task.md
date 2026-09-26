@@ -12,7 +12,8 @@ Added 26 Sep 2026. Tick an item off when it's done.
 - [ ] **Sentry for the browser:** create a free Sentry React project, turn on "Prevent Storing of IP Addresses", and set `VITE_SENTRY_DSN` in Vercel, then redeploy.
 
 **Carried over from earlier:**
-- [ ] **Deploy monitoring + feedback, then push `main`.** Deploy ml-service (build + push the image, `gcloud run deploy`) and the server (`gcloud run deploy server --source server`) **before** pushing. Otherwise Vercel ships the feedback buttons ahead of the server endpoints. Commands are in the Task 9 hand-off; local commits `4f00939` and `9dd9a40` are waiting.
+- [ ] **Deploy monitoring + feedback + Hindi, then push `main`.** Deploy ml-service (build + push the image, `gcloud run deploy`) and the server (`gcloud run deploy server --source server`) **before** pushing. Otherwise Vercel ships the feedback buttons and the Hindi client ahead of the server endpoints and translated advice. Commands are in the Task 9 hand-off; the local commits since `4f00939` are waiting.
+- [ ] **Agronomist review of the Hindi content:** 121 entries in `docs/TRANSLATION_REVIEW.csv` (10 crop names, 53 disease names, 4 severity labels, 54 treatment texts, all AI-drafted). Fill `hindi_corrected` / `reviewer`, then apply the corrections in `client/src/locales/terms.json` and `server/utils/treatmentMap.hi.js` with `needs_review: false`, and run `npm run translation-review` in `server/`. Until then the app shows a "not yet checked by an expert" note under Hindi advice.
 - [ ] **Secrets to Secret Manager** (optional): `docs/DEPLOY.md` Part C.
 
 ---
@@ -349,3 +350,37 @@ Fixed with `npm audit fix`, patch releases only:
 `npm audit` (incl. dev) now reports 0 vulnerabilities. lint exit 0 (the 10 old warnings only), Vitest 4 files / 14 tests pass, build OK.
 
 Note: `npm audit fix --omit=dev` also prunes devDependencies from `node_modules` (oxlint disappeared). The lockfile was fine; `npm install` restored them. `npm ci` couldn't wipe `node_modules` while the running Vite dev server on :5173 held Tailwind's native `.node` file.
+
+## Task 10 — Hindi + English UI
+
+Brief: i18next with a language switcher, farmers' Hindi names for crops/diseases/severity marked `needs_review`, Hindi treatment advice via Accept-Language with an English fallback (never machine-translated at runtime), Noto Sans Devanagari, a 360 px check, and `docs/TRANSLATION_REVIEW.csv`. Done on `main` instead of `feat/i18n-hi`.
+
+What was done:
+- **Client**:
+  - i18next 26.4 + react-i18next 17.0. `src/i18n.js`: the choice is saved in localStorage `lang`, the default comes from `navigator.language`, `<html lang>` is set.
+  - `locales/en.json` + `hi.json`: every user-facing string of Home, Diagnose, the result card, retake tips, Feedback, History, Navbar, the banner and the sign-in-disabled page. The Login/Register forms aren't routed while login is off, so they stay English (TODO(auth)).
+  - `locales/terms.json` + `terms.js`: crop, disease and severity names (`en`, `hi`, `source`, `needs_review`), keys = ML label maps.
+  - Navbar switcher `EN | हिं`, always visible (also next to the phone menu button).
+  - Axios sends `Accept-Language`.
+  - Result card shows a "not yet checked by an expert" note when `treatmentNeedsReview`.
+- **Hindi content**, all drafted by Claude and flagged honestly, with sources as "drafted from general knowledge" / "transliteration" / "descriptive" (no invented citations):
+  - farmer terms: e.g. अगेती/पछेती झुलसा, झोंका, टिक्का रोग, कंडुआ, रतुआ (गेरुई), उकठा, पीला मोज़ेक, चूर्णिल आसिता;
+  - 53 treatment texts plus the fallback. Chemical and product names stay in Latin script, and doses are unchanged.
+- **Server**:
+  - `utils/treatmentMap.hi.js` (per entry `text`, `needs_review`, `source`);
+  - `localizedTreatment(crop, disease, lang)`; the controller answers the advice in the `req.acceptsLanguages('en','hi')` language with `treatmentLanguage` / `treatmentNeedsReview`, `Content-Language` and `Vary: Accept-Language`;
+  - MongoDB keeps English and no other field changes. History is localized too.
+- **Review list**: `server/scripts/translation_review.js` (`npm run translation-review`) → `docs/TRANSLATION_REVIEW.csv`, 121 open entries, UTF-8 with BOM for Excel, LF (per `.gitattributes`). A test fails if the CSV is stale.
+- **Font / layout**:
+  - Noto Sans Devanagari added second in every font stack.
+  - `:lang(hi)` rules: no letter-spacing (it breaks conjuncts), 10–11 px labels raised to 12 px, taller headings (matras), no fake italic, body font instead of monospace (wide spaces between Hindi words, noticed in the 360 px check).
+  - History stat labels kept together with their values.
+- Checks:
+  - Tests:
+    - Vitest `i18n.test.jsx`: hi keys = en keys; terms cover the label maps; switcher + localStorage + `<html lang>`; browser default vs saved choice; Hindi result card + review note; Accept-Language header.
+    - Jest `i18n.test.js`: coverage, **every number/dose in each English text appears in its Hindi text** (53 cases), chemical names kept and no invented Latin words (53 cases), fallback, CSV freshness. `predict.test.js`: hi / en / fr / no header, and history in Hindi.
+    - Totals: Vitest 21, Jest 158, pytest 46; lint and build OK.
+  - Local offline end-to-end run at 360 px (in-memory DB, Cloudinary stand-in, local ML):
+    - Hindi home, Diagnose (crop buttons, potato → अगेती झुलसा, Hindi advice + review note, heatmap, yield, feedback picker with Hindi disease names → "धन्यवाद…"), History, sign-in-disabled page and the phone menu;
+    - English after switching back;
+    - no horizontal overflow on any page.

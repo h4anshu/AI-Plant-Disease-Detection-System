@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { cropName } from '../locales/terms';
 import UploadBox from '../components/UploadBox';
 import ResultCard from '../components/ResultCard';
 import { predictDisease } from '../services/api';
@@ -9,6 +11,7 @@ export const SLOW_AFTER_MS = 8000;
 const crops = ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea', 'groundnut', 'blackgram', 'apple', 'banana'];
 
 const Predict = () => {
+  const { t, i18n } = useTranslation();
   const [file, setFile] = useState(null);
   const [crop, setCrop] = useState('wheat');
   const [result, setResult] = useState(null);
@@ -18,7 +21,7 @@ const Predict = () => {
 
   const handleAnalyze = async () => {
     if (!file) {
-      setError('Select a leaf image first.');
+      setError(t('predict.selectFirst'));
       return;
     }
     setError('');
@@ -33,7 +36,7 @@ const Predict = () => {
       const res = await predictDisease(formData);
       setResult(res.data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Diagnosis failed. Try again.');
+      setError(err.response?.data?.message || t('predict.failed'));
     } finally {
       clearTimeout(slowTimer);
       setSlow(false);
@@ -43,14 +46,14 @@ const Predict = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-6 pt-16 pb-20">
-      <span className="font-mono text-xs text-clay uppercase tracking-widest">Field Diagnosis</span>
-      <h2 className="font-display text-4xl text-ink mt-2 mb-10">Analyze a leaf</h2>
+      <span className="font-mono text-xs text-clay uppercase tracking-widest">{t('predict.eyebrow')}</span>
+      <h2 className="font-display text-4xl text-ink mt-2 mb-10">{t('predict.title')}</h2>
 
       <div className="grid lg:grid-cols-2 gap-12 items-start">
         {/* Left: form */}
         <div className="w-full">
           <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-3">
-            Select crop
+            {t('predict.selectCrop')}
           </label>
           <div className="flex flex-wrap gap-2 mb-8">
             {crops.map((c) => (
@@ -63,13 +66,13 @@ const Predict = () => {
                     ? 'bg-ink text-parchment border-ink'
                     : 'border-ink/25 text-ink/60 hover:border-ink/50 hover:text-ink'}`}
               >
-                {c}
+                {cropName(c, i18n.language)}
               </button>
             ))}
           </div>
 
           <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-3">
-            Leaf photo
+            {t('predict.leafPhoto')}
           </label>
           <UploadBox onFileSelect={setFile} />
 
@@ -82,11 +85,11 @@ const Predict = () => {
             disabled={loading}
             className="w-full mt-6 bg-field text-parchment py-3.5 font-mono text-sm uppercase tracking-wide hover:bg-field-dark disabled:opacity-50 transition-colors"
           >
-            {loading ? 'Reading the leaf…' : 'Analyze'}
+            {loading ? t('predict.reading') : t('predict.analyze')}
           </button>
           {slow && (
             <p role="status" className="font-mono text-xs text-sage mt-3">
-              Waking up the model… the first check after a quiet spell can take up to 30 seconds.
+              {t('predict.waking')}
             </p>
           )}
         </div>
@@ -101,9 +104,9 @@ const Predict = () => {
                 <path d="M12 3C7 3 4 7 4 12c0 4 3 8 8 9 5-1 8-5 8-9 0-5-3-9-8-9z" stroke="currentColor" strokeWidth="1.2"/>
                 <path d="M12 3v18M12 3C8 6 6 9 6 12" stroke="currentColor" strokeWidth="1"/>
               </svg>
-              <p className="font-display text-lg text-ink/50 italic">Awaiting a sample</p>
+              <p className="font-display text-lg text-ink/50 italic">{t('predict.awaiting')}</p>
               <p className="font-mono text-[10px] text-sage uppercase tracking-widest">
-                Your diagnosis will appear here
+                {t('predict.willAppear')}
               </p>
             </div>
           )}

@@ -108,6 +108,27 @@ describe('POST /api/predict', () => {
     expect(res.body.modelVersion).toEqual({ backbone: '1.0.0', head: '1.0.0', gate: '1.0.0' });
   });
 
+  test('Accept-Language: hi answers the advice in Hindi (flagged for review); MongoDB keeps English', async () => {
+    mockML(200, ML_OK);
+    mockCloudinary();
+    const res = await upload().set('Accept-Language', 'hi-IN,hi;q=0.9,en;q=0.8');
+    expect(res.status).toBe(201);
+    expect(res.body.treatment).toMatch(/^पीला मोज़ेक/);
+    expect(res.body).toMatchObject({ treatmentLanguage: 'hi', treatmentNeedsReview: true,
+      disease: 'Yellow_Mosaic', yieldLossPercent: 50 }); // everything else unchanged
+    expect(res.headers['content-language']).toBe('hi');
+    expect((await Prediction.findById(res.body._id).lean()).treatment).toMatch(/whitefly/i);
+  });
+
+  test.each([[undefined], ['en-US,en;q=0.9'], ['fr-FR']])('Accept-Language %s -> English advice, no review flag', async (lang) => {
+    mockML(200, ML_OK);
+    mockCloudinary();
+    const req = upload();
+    const res = await (lang ? req.set('Accept-Language', lang) : req);
+    expect(res.body.treatment).toMatch(/whitefly/i);
+    expect(res.body.treatmentNeedsReview).toBeUndefined();
+  });
+
   test('uncertain result is saved without treatment or yield loss', async () => {
     mockML(200, { ...ML_OK, status: 'uncertain', reasons: ['unfamiliar_image'], ood_score: 3.2,
       top3: [{ disease: 'Yellow_Mosaic', probability: 0.5 }, { disease: 'Healthy', probability: 0.3 },
@@ -255,6 +276,16 @@ describe('GET /api/predict (history)', () => {
     expect(res.body.map((p) => p.crop)).toEqual(['wheat', 'rice', 'sugarcane']);
     expect(res.body.every((p) => p.status === 'ok')).toBe(true);
     expect(res.body[2].modelVersion).toBeNull();
+  });
+
+  test('history in Hindi: advice translated, records without advice untouched', async () => {
+    await Prediction.create({ ...base, userId: GUEST_ID, deviceId: DEVICE, crop: 'potato', disease: 'Late_blight',
+      treatment: 'English text' });
+    await Prediction.create({ ...base, userId: GUEST_ID, deviceId: DEVICE, status: 'uncertain', treatment: null });
+    const res = await request(app).get('/api/predict').set('x-device-id', DEVICE).set('Accept-Language', 'hi');
+    const withAdvice = res.body.find((p) => p.treatment);
+    expect(withAdvice.treatment).toMatch(/^पछेती झुलसा/);
+    expect(res.body.find((p) => p.status === 'uncertain').treatment).toBeNull();
   });
 
   test('history leaves out the heatmap and pages by 50 with ?before=', async () => {

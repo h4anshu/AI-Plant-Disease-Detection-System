@@ -1,0 +1,134 @@
+{
+  "banner": "Demo mode: sign-in is disabled. Your checkups are saved only in this browser.",
+  "nav": {
+    "home": "Home",
+    "diagnose": "Diagnose",
+    "log": "Log",
+    "toggle": "Toggle navigation",
+    "language": "Language"
+  },
+  "authDisabled": {
+    "eyebrow": "Unavailable",
+    "title": "Sign-in is temporarily disabled",
+    "body": "Check back soon."
+  },
+  "home": {
+    "eyebrow": "Free Leaf Checkup",
+    "title1": "Take a photo.",
+    "title2": "Know the",
+    "titleEm": "disease.",
+    "intro": "Take a photo of a leaf from your crop. We'll tell you what disease it has, how serious it is, what medicine to use, and how much crop you could lose if you wait.",
+    "cta": "Check a leaf now →",
+    "exampleLabel": "Example Result",
+    "exampleStamp": "MEDIUM",
+    "exampleTitle": "Wheat — Leaf Rust",
+    "exampleSure": "87% sure",
+    "exampleAdvice": "You could lose <b>30%</b> of your crop if not treated. Use Propiconazole spray within 5–7 days.",
+    "step1": "1. Take a Photo",
+    "step1Desc": "Click a clear picture of one leaf in daylight.",
+    "step2": "2. Get Results",
+    "step2Desc": "We check the leaf and tell you the disease.",
+    "step3": "3. Treat It",
+    "step3Desc": "See what to spray and how much crop is at risk."
+  },
+  "predict": {
+    "eyebrow": "Field Diagnosis",
+    "title": "Analyze a leaf",
+    "selectCrop": "Select crop",
+    "leafPhoto": "Leaf photo",
+    "selectFirst": "Select a leaf image first.",
+    "failed": "Diagnosis failed. Try again.",
+    "reading": "Reading the leaf…",
+    "analyze": "Analyze",
+    "waking": "Waking up the model… the first check after a quiet spell can take up to 30 seconds.",
+    "awaiting": "Awaiting a sample",
+    "willAppear": "Your diagnosis will appear here"
+  },
+  "upload": {
+    "placeHere": "Place the leaf here",
+    "browse": "drag & drop, or click to browse",
+    "previewAlt": "Leaf preview"
+  },
+  "history": {
+    "eyebrow": "Your Record",
+    "title": "Field log",
+    "loading": "Loading…",
+    "loadFailed": "Could not load the log.",
+    "loadOlder": "Load older checkups",
+    "empty": "No checkups yet.",
+    "emptyHint": "Check a leaf to start your record",
+    "sure": "Sure:",
+    "atRisk": "Crop at risk:",
+    "unknownCrop": "Unknown crop",
+    "healthy": "Healthy",
+    "imgAlt": "{{crop}} with {{disease}}",
+    "imgAltGeneric": "Analyzed leaf",
+    "risk": {
+      "early": "LOW RISK",
+      "moderate": "MEDIUM RISK",
+      "severe": "HIGH RISK"
+    },
+    "status": {
+      "uncertain": { "label": "NOT SURE", "title": "Not sure - retake needed" },
+      "rejected_quality": { "label": "RETAKE", "title": "Photo not clear enough" },
+      "not_leaf": { "label": "RETAKE", "title": "No leaf found" }
+    }
+  },
+  "result": {
+    "specimen": "{{crop}} — specimen reading",
+    "noReading": "{{crop}} — no reading",
+    "confidence": "Confidence",
+    "treatment": "Treatment",
+    "notReviewed": "This Hindi advice has not yet been checked by an agriculture expert. Keep chemical names and doses exactly as written, and confirm with your local agriculture officer.",
+    "affected": "Affected Region",
+    "yieldImpact": "Yield Impact",
+    "yieldLoss": "Estimated loss of <b>{{pct}}%</b> if left untreated.",
+    "retakeStamp": "RETAKE",
+    "goodPhoto": "For a good photo",
+    "leanings": "What the model leaned towards (not a diagnosis)",
+    "analyzedAlt": "Analyzed leaf",
+    "uploadedAlt": "Uploaded photo",
+    "gradcamAlt": "Grad-CAM heatmap",
+    "rejected": {
+      "title": "Photo not clear enough",
+      "message": "We could not read this photo well enough to check the leaf. Please take it again."
+    },
+    "notLeaf": {
+      "title": "No leaf found",
+      "message": "This photo does not seem to show a plant leaf. Please photograph the leaf you want checked."
+    },
+    "uncertain": {
+      "title": "We're not sure about this one",
+      "message": "This photo doesn't look like the {{crop}} leaves our model has learned from, so we won't guess a disease. Please retake it, or ask a local agriculture officer."
+    },
+    "tips": {
+      "too_small": "Use the full camera resolution and move a little closer.",
+      "blurry": "Hold the phone steady and tap the leaf on screen to focus before taking the photo.",
+      "too_dark": "Take the photo in daylight, not at night or in deep shade.",
+      "too_bright": "Avoid harsh direct sun or flash glare. Shade the leaf with your body.",
+      "no_leaf": "Fill most of the frame with one leaf, about 20–30 cm from the camera.",
+      "unreadable_image": "The file could not be opened. Try a JPG or PNG photo.",
+      "unfamiliar_image": "Check that the right crop is selected, then photograph a single leaf of that crop.",
+      "low_confidence": "Check that the right crop is selected, then photograph a single leaf of that crop."
+    },
+    "generalTips": {
+      "light": "Good daylight, no flash",
+      "oneLeaf": "One leaf, filling most of the frame",
+      "distance": "About 20–30 cm away",
+      "focus": "Leaf in sharp focus"
+    }
+  },
+  "feedback": {
+    "question": "Was this correct?",
+    "yes": "Yes",
+    "no": "No",
+    "unsure": "Not sure",
+    "whatWasIt": "What was it?",
+    "other": "Other / not listed",
+    "send": "Send",
+    "thanks": "Thank you for the feedback.",
+    "thanksCorrection": "Thank you. Your correction will be checked by an expert.",
+    "saveFailed": "Could not save your answer. Please try again.",
+    "listFailed": "Could not load the list. Please try again."
+  }
+}

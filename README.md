@@ -35,6 +35,15 @@ The model side uses one shared EfficientNetB0 backbone (ImageNet weights, frozen
 
 The crop is selected by the user, not inferred from the image. That's intentional — production agri-AI apps do the same thing, and it avoids compounding two error sources (wrong crop guess *and* wrong disease guess) into one unreliable prediction. Adding a seventh crop later means training and dropping in one new head, not retraining anything else.
 
+## Languages
+
+The app is available in English and Hindi. The switcher in the navbar remembers the choice; the default comes from the browser language.
+- **UI strings:** `client/src/locales/{en,hi}.json`.
+- **Crop, disease and severity names:** the names farmers use, in `client/src/locales/terms.json`.
+- **Treatment advice:** written Hindi versions in `server/utils/treatmentMap.hi.js`. The API answers in the `Accept-Language` language and falls back to English; advice is never machine-translated at runtime.
+
+All Hindi agricultural content is an AI-drafted first version marked `needs_review`, and the app shows a "not yet checked by an expert" note under unreviewed Hindi advice. The open items for the agronomist are in `docs/TRANSLATION_REVIEW.csv` (regenerate with `npm run translation-review` in `server/`). Tests check that every dose, number and chemical name in the Hindi advice matches the English exactly.
+
 ## Crops and disease coverage
 
 | Crop | Disease classes | Accuracy [95% CI] | Macro F1 | Weakest-class recall | Images evaluated | Evaluation |

@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Fraunces", serif;
-  --font-body: "Inter", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  /* Noto Sans Devanagari second in each stack: the Latin fonts have no Devanagari glyphs */
+  --font-display: "Fraunces", "Noto Sans Devanagari", serif;
+  --font-body: "Inter", "Noto Sans Devanagari", sans-serif;
+  --font-mono: "IBM Plex Mono", "Noto Sans Devanagari", monospace;
 
   --color-parchment: #F4EFE1;
   --color-ink: #1F3B2C;
@@ -40,4 +41,27 @@ body {
 .vein-divider {
   height: 1px;
   background: linear-gradient(to right, transparent, rgba(31,59,44,0.25), transparent);
+}
+/* Hindi (html lang="hi", set by src/i18n.js). Letter-spacing pulls Devanagari conjuncts and the
+   headline bar apart, 10-11px Devanagari is unreadable, and tight headings clip the matras. */
+:lang(hi) [class*="tracking-"],
+:lang(hi) .stamp {
+  letter-spacing: normal;
+}
+:lang(hi) .text-\[10px\],
+:lang(hi) .text-\[11px\] {
+  font-size: 12px;
+}
+:lang(hi) h1,
+:lang(hi) h2,
+:lang(hi) h3 {
+  line-height: 1.35;
+}
+:lang(hi) .font-mono,
+:lang(hi) .stamp {
+  font-family: var(--font-body); /* a monospace space is as wide as a letter: gaps between Hindi words */
+}
+:lang(hi) em,
+:lang(hi) .italic {
+  font-style: normal; /* Noto Sans Devanagari has no italic; a fake slant looks broken */
 }

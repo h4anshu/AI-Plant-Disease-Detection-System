@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { AuthContext } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -8,13 +9,16 @@ import Register from "./pages/Register";
 import Predict from "./pages/Predict";
 import History from "./pages/History";
 
-const AuthDisabled = () => (
-  <div className="max-w-sm mx-auto px-6 pt-20 text-center">
-    <span className="font-mono text-xs text-clay uppercase tracking-widest">Unavailable</span>
-    <h2 className="font-display text-3xl text-ink mt-2">Sign-in is temporarily disabled</h2>
-    <p className="font-mono text-xs text-sage mt-4">Check back soon.</p>
-  </div>
-);
+const AuthDisabled = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="max-w-sm mx-auto px-6 pt-20 text-center">
+      <span className="font-mono text-xs text-clay uppercase tracking-widest">{t('authDisabled.eyebrow')}</span>
+      <h2 className="font-display text-3xl text-ink mt-2">{t('authDisabled.title')}</h2>
+      <p className="font-mono text-xs text-sage mt-4">{t('authDisabled.body')}</p>
+    </div>
+  );
+};
 
 // ponytail: login temporarily disabled, so routes below are open to everyone for now.
 // Restore the commented body once login is back on.
@@ -26,11 +30,12 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const App = () => {
+  const { t } = useTranslation();
   return (
     <>
       {/* TODO(auth): remove when login returns */}
       <div className="bg-wheat/20 border-b border-wheat/40 px-6 py-2 text-center font-mono text-[11px] text-ink/70">
-        Demo mode: sign-in is disabled. Your checkups are saved only in this browser.
+        {t('banner')}
       </div>
       <Navbar />
       <Routes>

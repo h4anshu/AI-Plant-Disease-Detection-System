@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const UploadBox = ({ onFileSelect }) => {
+  const { t } = useTranslation();
   const [preview, setPreview] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef(null);
@@ -39,12 +41,12 @@ const UploadBox = ({ onFileSelect }) => {
       />
 
       {preview ? (
-        <img src={preview} alt="Leaf preview" className="max-h-64 mx-auto border border-ink/10" />
+        <img src={preview} alt={t('upload.previewAlt')} className="max-h-64 mx-auto border border-ink/10" />
       ) : (
         <div>
-          <p className="font-display text-xl text-ink/70 italic mb-1">Place the leaf here</p>
+          <p className="font-display text-xl text-ink/70 italic mb-1">{t('upload.placeHere')}</p>
           <p className="font-mono text-xs text-sage uppercase tracking-widest">
-            drag & drop, or click to browse
+            {t('upload.browse')}
           </p>
         </div>
       )}
