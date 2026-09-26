@@ -33,8 +33,10 @@ one the app already runs in, `plant-disease-503711`.
    | Partner | 100,000 EECU-hours | an application, for high-impact sustainability work |
 
    This project already has billing (Cloud Run), so **Contributor** is available, and Community is
-   plenty to start. A field check is expected to use a few EECU-*seconds*, so 150 hours covers tens
-   of thousands of checks. The service also caches results.
+   plenty to start. **Cost per call is measured, not guessed:** 2–3 tiny test queries already showed
+   about 400 EECU-seconds in the Quotas page, so a field check may cost tens to hundreds of
+   EECU-seconds. The service measures it (section 4) and caches every result, and this guide is
+   updated with the real number once it's known.
 
    Going over the tier isn't a hard stop: the project gets *slower* until the month resets.
 4. Turn on the API:
@@ -110,9 +112,11 @@ The service account doesn't need its own Earth Engine registration: the project 
   Group it by the `workload_tag` label: the service tags every call (`field-health`), so its usage
   shows separately. Google's example notebook for a monthly view:
   [earth_engine_noncommercial_eecu_monitor.ipynb](https://github.com/google/earthengine-community/blob/master/guides/linked/cloud-monitoring/earth_engine_noncommercial_eecu_monitor.ipynb).
-- **A daily cap:** Console → Earth Engine → Configuration: set a daily EECU-time limit (for example
-  2 EECU-hours), so a bug or abuse can't use the month in one day
-  ([cost controls](https://developers.google.com/earth-engine/guides/cost_controls)).
+- **A daily cap:** Console → IAM & Admin → **Quotas**, filter by Service `earthengine.googleapis.com`,
+  then the row **EECU-seconds per day** → ⋮ → Edit quota → **18000** (the monthly 540,000 ÷ 30),
+  so a bug or abuse can't use more than one day's share
+  ([cost controls](https://developers.google.com/earth-engine/guides/cost_controls)). Set on this
+  project on 26 Sep 2026. Lowering a quota applies immediately.
 - **Why per-call EECU isn't in the app's logs:** Earth Engine doesn't return the cost of a single
   interactive request. The service logs how long each call took plus the workload tag, and the exact
   EECU numbers per tag come from Monitoring.
