@@ -16,9 +16,13 @@ const authMiddleware = (req, res , next) => {
         const decode = jwt.verify(token , process.env.JWT_SECRET);
         req.user = decode;
         next();
-        
+
     } catch (error) {
-        return res.status(401).json({ message: 'Token is invalid or expired' });
+        // ponytail: login temporarily disabled — an old/expired token from before shouldn't
+        // block a guest either. Restore the 401 below once login is back on.
+        req.user = { id: '000000000000000000000000' };
+        return next();
+        // return res.status(401).json({ message: 'Token is invalid or expired' });
 
     }
 }
