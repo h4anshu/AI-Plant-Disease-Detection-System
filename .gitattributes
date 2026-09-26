@@ -1,0 +1,19 @@
+# Store text with LF in the repo whatever the checkout OS; Windows scripts keep CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary: never diff or convert
+*.keras binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.zip binary
+*.rar binary
+*.pdf binary
+*.pptx binary
+*.xlsx binary
