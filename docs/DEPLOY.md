@@ -235,6 +235,12 @@ this change hold the heatmap inside MongoDB.
    including `v1`. To free the space now: Console → Artifact Registry → `plant-disease` → `ml-service`
    → select the old versions → Delete. Keep the one Cloud Run is running.
 
+## Disease map notes
+
+- **Never set `MAP_INCLUDE_DEMO` in production.** The server ignores it there anyway (`NODE_ENV=production`), and the seed script refuses non-local databases.
+- **Map tiles** come from the OpenStreetMap Foundation's volunteer servers, which is fine for low traffic with the attribution shown ([tile usage policy](https://operations.osmfoundation.org/policies/tiles/)). If the site grows, switch `TILES` in `client/src/pages/MapPage.jsx` to a commercial tile provider.
+- **New indexes** (`location` 2dsphere, `geoCell`) are created automatically by Mongoose on the first start. On Atlas M0 this is instant for this data size.
+
 ## Rollback
 
 Every deploy creates a new revision; the old ones stay until the images are cleaned up.

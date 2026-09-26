@@ -12,7 +12,7 @@ Added 26 Sep 2026. Tick an item off when it's done.
 - [ ] **Sentry for the browser:** create a free Sentry React project, turn on "Prevent Storing of IP Addresses", and set `VITE_SENTRY_DSN` in Vercel, then redeploy.
 
 **Carried over from earlier:**
-- [ ] **Deploy monitoring + feedback + Hindi, then push `main`.** Deploy ml-service (build + push the image, `gcloud run deploy`) and the server (`gcloud run deploy server --source server`) **before** pushing. Otherwise Vercel ships the feedback buttons and the Hindi client ahead of the server endpoints and translated advice. Commands are in the Task 9 hand-off; the local commits since `4f00939` are waiting.
+- [ ] **Deploy monitoring + feedback + Hindi + disease map, then push `main`.** Deploy ml-service (build + push the image, `gcloud run deploy`) and the server (`gcloud run deploy server --source server`) **before** pushing. Otherwise Vercel ships the feedback buttons and the Hindi client ahead of the server endpoints and translated advice. Commands are in the Task 9 hand-off; the local commits since `4f00939` are waiting.
 - [ ] **Agronomist review of the Hindi content:** 121 entries in `docs/TRANSLATION_REVIEW.csv` (10 crop names, 53 disease names, 4 severity labels, 54 treatment texts, all AI-drafted). Fill `hindi_corrected` / `reviewer`, then apply the corrections in `client/src/locales/terms.json` and `server/utils/treatmentMap.hi.js` with `needs_review: false`, and run `npm run translation-review` in `server/`. Until then the app shows a "not yet checked by an expert" note under Hindi advice.
 - [ ] **Secrets to Secret Manager** (optional): `docs/DEPLOY.md` Part C.
 
@@ -384,3 +384,57 @@ What was done:
     - Hindi home, Diagnose (crop buttons, potato → अगेती झुलसा, Hindi advice + review note, heatmap, yield, feedback picker with Hindi disease names → "धन्यवाद…"), History, sign-in-disabled page and the phone menu;
     - English after switching back;
     - no horizontal overflow on any page.
+
+## Task 11 — Disease map with consent-first location (first geospatial feature)
+
+Brief: consent-first location (GPS, EXIF fallback, skip); a private GeoJSON point + 2dsphere index; an H3 aggregation API with suppression; a Leaflet/OSM map page; a privacy note + DELETE; a demo seed. Done on `main` instead of `feat/geo-map`.
+
+**Three changes agreed with the user, for privacy:**
+1. Suppression counts **distinct browsers** (at least 3), not reports: one farmer checking 3 leaves would otherwise be alone on the map. Guests without a device id count as one.
+2. **Fixed time windows** (7 / 30 / 90 days): free-form windows could be subtracted to isolate one report.
+3. The "done when" goal (one real prediction shows up) contradicts suppression, so it was proved with 3 browsers instead.
+
+**Server**:
+- `utils/geo.js`: `parseLocation` (range and NaN checks, `none` stores nothing), H3 resolution 7 (5.16 km²), `cellPolygon` (h3-js 4.5 already returns a closed ring; a double closing point was caught by a test).
+- `Prediction`: `location` (GeoJSON Point, 2dsphere), `locationAccuracyM`, `locationSource`, `geoCell` (indexed), `demo`.
+- The predict route validates the location before the ML call.
+- `toResponse` strips location, accuracy and cell from every response, including history.
+- `GET /api/map/reports`: returns a FeatureCollection of hexagons with only `{reports}`; `Cache-Control: public, max-age=60`. It counts `ok` diagnoses; healthy leaves only when asked for by name. `crop`/`disease`/`days` are validated, and repeated params (arrays) are rejected.
+- `DELETE /api/predict`: this browser's records + Cloudinary photos/heatmaps (`publicIdFromUrl` + `uploader.destroy`, allSettled). A failed image delete is logged, never a lost record.
+- `scripts/seed_demo_map.js`: seeded RNG, 15 real farming districts with fake farmers, `demo: true`, placeholder image; refuses non-local URIs and production; `--clear`.
+- The drift report and relabel export skip demo records.
+
+**Client**:
+- `components/LocationConsent.jsx`: why, what's public, Share / Skip, the choice remembered, "Change" at any time.
+- `services/location.js`: GPS (10 s timeout) → EXIF via lazily imported exifr → none; only called after consent.
+- `pages/MapPage.jsx`:
+  - loaded lazily (Leaflet 153 kB only on /map);
+  - OSM tiles + attribution (tile policy noted);
+  - hexagons coloured in 4 bins from 3, a legend, crop/disease/time filters;
+  - fits to the reported areas (max zoom 9);
+  - dots on hexagon centres below zoom 8 (a 5 km² hex is a few pixels at country zoom; the centre is already public);
+  - no wheel zoom (it hijacked page scrolling, found while testing);
+  - a demo-data warning.
+- `pages/Privacy.jsx`: stored / public / location / delete, with a two-step confirmation.
+- Nav gets Map + Privacy. All new strings are in en + hi, with i18next plurals ("1 checkup").
+
+**Tests**:
+- Jest `map.test.js` (30 cases):
+  - aggregation GeoJSON without raw points or device counts;
+  - suppression by browsers vs reports; null device = one browser;
+  - crop/disease/window filters; healthy and uncertain excluded;
+  - 400s for bad days/crop/disease/array params;
+  - demo excluded / included only non-prod;
+  - location stored but never returned (predict + history); `none` ignores coordinates; EXIF without accuracy; 6 invalid inputs → 400 before ML;
+  - DELETE removes only own records + calls Cloudinary destroy, and the map re-suppresses; no device → 400;
+  - `isLocalMongo` cases; seeded data flagged and partly suppressed.
+- Vitest: consent flow (asked, sent only after Share, remembered, Skip → none, never read without consent); `getLocation` GPS / EXIF / none; map colour bins; Privacy two-step delete + failure.
+- Totals: Jest 187, Vitest 28, pytest 46; lint and build OK.
+
+**Local offline end-to-end run** (in-memory DB, Cloudinary stand-in, local ML):
+1. The map was empty; 2 browsers reported near Ludhiana via the API and the map stayed empty (suppressed).
+2. A 3rd, real prediction through the UI (consent → Share; geolocation replaced in the page with a fixed test point, so no real location was read) returned `locationSource: gps` with no coordinates in the response.
+3. /map after one load showed the Ludhiana hexagon, popup "3 reports in this area".
+4. Privacy → delete → "Deleted 1 checkup", and the map is empty again.
+5. Demo mode: the seed refused an Atlas URI (exit 1), inserted 267 demo records locally; with `MAP_INCLUDE_DEMO`, 7 district cells are shown (the rest suppressed) under a Hindi demo warning.
+6. At 360 px in Hindi, the map, privacy page and consent box have no horizontal overflow.

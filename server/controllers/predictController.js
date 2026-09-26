@@ -1,20 +1,25 @@
 import axios from "axios";
 import mongoose from "mongoose";
 import FormData from "form-data";
-import { uploadBuffer } from "../config/cloudinary.js";
+import cloudinary, { publicIdFromUrl, uploadBuffer } from "../config/cloudinary.js";
 import PredictionModel, { FEEDBACK } from "../models/Prediction.js";
 import { getTreatment, LANGUAGES, localizedTreatment, treatmentMap } from "../utils/treatmentMap.js";
 import getYieldLoss from "../utils/yieldLoss.js";
 import { BadImage, cleanImage } from "../utils/image.js";
 import { GUEST_ID } from "../middleware/guestDevice.js";
 import logger, { logError } from "../utils/logger.js";
+import { BadLocation, parseLocation } from "../utils/geo.js";
 
-// Treatment advice in the language the browser asked for (Accept-Language), English when there is no
-// translation. MongoDB always keeps the English text; the other fields never change with the language.
-const withLanguage = (req, res, doc) => {
+// What a client may see of a prediction:
+// - never the exact location (only whether one was attached: locationSource);
+// - treatment advice in the language the browser asked for (Accept-Language), English when there is no
+//   translation. MongoDB always keeps the English text; the other fields never change with the language.
+const PRIVATE_FIELDS = ['location', 'locationAccuracyM', 'geoCell'];
+const toResponse = (req, res, doc) => {
   const lang = req.acceptsLanguages(...LANGUAGES) || 'en';
   res.vary('Accept-Language');
-  const obj = doc.toObject ? doc.toObject() : doc;
+  const obj = { ...(doc.toObject ? doc.toObject() : doc) };
+  for (const f of PRIVATE_FIELDS) delete obj[f];
   if (!obj.treatment || lang === 'en') return obj;
   const t = localizedTreatment(obj.crop, obj.disease, lang);
   res.set('Content-Language', t.lang);
@@ -55,6 +60,15 @@ const predict = async (req, res) => {
     const { crop } = req.body;
     if (!crop) {
       return res.status(400).json({ message: 'Crop type is required' });
+    }
+
+    // Optional location, sent only after the user agreed; the exact point is never returned
+    let place;
+    try {
+      place = parseLocation(req.body);
+    } catch (err) {
+      if (err instanceof BadLocation) return res.status(400).json({ message: err.message });
+      throw err;
     }
 
     // 0. Check the real file type and size; the stored copy is downsized and has no EXIF (GPS etc.)
@@ -108,6 +122,7 @@ const predict = async (req, res) => {
     const prediction = await PredictionModel.create({
       userId: req.user.id,
       deviceId: req.deviceId,
+      ...place,
       imageUrl,
       crop,
       status,
@@ -126,10 +141,11 @@ const predict = async (req, res) => {
 
     // what the drift report and dashboards need; never the image, its URL or who sent it
     logger.info({ requestId: req.id, crop, status, disease: disease ?? null, confidence: confidence ?? null,
-      diseaseSeverity: severity ?? null, oodScore: ood_score, modelVersion: model_version, mlLatencyMs }, 'prediction');
+      diseaseSeverity: severity ?? null, oodScore: ood_score, modelVersion: model_version, mlLatencyMs,
+      locationSource: place.locationSource }, 'prediction');
 
     // 6. Return full result to frontend
-    res.status(201).json(withLanguage(req, res, prediction));
+    res.status(201).json(toResponse(req, res, prediction));
 
   } catch (error) {
     logError(req, 'Predict failed', error);
@@ -155,7 +171,7 @@ const getHistory = async (req, res) => {
     if (before) filter.createdAt = { $lt: before };
     // the list never shows the heatmap, and records from before the migration hold it as ~100 KB base64
     const predictions = await PredictionModel.find(filter).select('-gradcam').sort({ createdAt: -1 }).limit(PAGE_SIZE);
-    res.status(200).json(predictions.map((p) => withLanguage(req, res, p)));
+    res.status(200).json(predictions.map((p) => toResponse(req, res, p)));
   } catch (error) {
     logError(req, 'History failed', error);
     res.status(500).json({ message: 'Server error' });
@@ -204,4 +220,25 @@ const giveFeedback = async (req, res) => {
   }
 };
 
-export { predict, getHistory, getClasses, giveFeedback };
+// @route  DELETE /api/predict -> removes every record of this browser (guest) or user, with their photos
+// and heatmaps in Cloudinary; the public map loses them on its next request.
+const deleteMine = async (req, res) => {
+  try {
+    const owner = ownerFilter(req);
+    if (!owner) return res.status(400).json({ message: 'Missing device id' });
+    const docs = await PredictionModel.find(owner).select('imageUrl gradcam').lean();
+    const images = docs.flatMap((d) => [d.imageUrl, d.gradcam]).map(publicIdFromUrl).filter(Boolean);
+    const results = await Promise.allSettled(images.map((id) => cloudinary.uploader.destroy(id)));
+    const imagesFailed = results.filter((r) => r.status === 'rejected').length;
+    const { deletedCount } = await PredictionModel.deleteMany(owner);
+    // a failed image delete leaves an orphan file, never a record: logged so it can be removed by hand
+    (imagesFailed ? logger.warn : logger.info).call(logger, { requestId: req.id, deleted: deletedCount,
+      images: images.length, imagesFailed }, 'records deleted');
+    res.json({ deleted: deletedCount });
+  } catch (error) {
+    logError(req, 'Delete failed', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export { predict, getHistory, getClasses, giveFeedback, deleteMine };

@@ -5,7 +5,9 @@
     "diagnose": "Diagnose",
     "log": "Log",
     "toggle": "Toggle navigation",
-    "language": "Language"
+    "language": "Language",
+    "map": "Map",
+    "privacy": "Privacy"
   },
   "authDisabled": {
     "eyebrow": "Unavailable",
@@ -69,9 +71,18 @@
       "severe": "HIGH RISK"
     },
     "status": {
-      "uncertain": { "label": "NOT SURE", "title": "Not sure - retake needed" },
-      "rejected_quality": { "label": "RETAKE", "title": "Photo not clear enough" },
-      "not_leaf": { "label": "RETAKE", "title": "No leaf found" }
+      "uncertain": {
+        "label": "NOT SURE",
+        "title": "Not sure - retake needed"
+      },
+      "rejected_quality": {
+        "label": "RETAKE",
+        "title": "Photo not clear enough"
+      },
+      "not_leaf": {
+        "label": "RETAKE",
+        "title": "No leaf found"
+      }
     }
   },
   "result": {
@@ -130,5 +141,54 @@
     "thanksCorrection": "Thank you. Your correction will be checked by an expert.",
     "saveFailed": "Could not save your answer. Please try again.",
     "listFailed": "Could not load the list. Please try again."
+  },
+  "location": {
+    "title": "Add your location? (optional)",
+    "why": "It helps show where diseases are spreading, so nearby farmers and officers can act early. Your exact location is never shown to anyone: the public map only shows areas of about 5 km² where at least 3 different people reported.",
+    "share": "Share my location",
+    "skip": "Skip",
+    "on": "Location: shared (only an approximate area is ever public)",
+    "off": "Location: not shared",
+    "change": "Change",
+    "privacyLink": "How we use it",
+    "getting": "Getting location…"
+  },
+  "map": {
+    "eyebrow": "Disease Map",
+    "title": "Where diseases are being reported",
+    "intro": "Each hexagon is an area of about 5 km². It appears only when at least 3 different people reported a disease there, so no single farm can be identified.",
+    "crop": "Crop",
+    "allCrops": "All crops",
+    "disease": "Disease",
+    "allDiseases": "All diseases",
+    "days": "Time",
+    "days7": "Last 7 days",
+    "days30": "Last 30 days",
+    "days90": "Last 90 days",
+    "legend": "Reports per area (about 5 km²)",
+    "popup": "{{count}} reports in this area",
+    "empty": "No area has enough reports for this filter yet.",
+    "loading": "Loading the map…",
+    "failed": "Could not load the map. Please try again.",
+    "demo": "DEMO DATA: made-up points for a local demo, not real reports.",
+    "privacy": "About privacy"
+  },
+  "privacy": {
+    "eyebrow": "Privacy",
+    "title": "Your data",
+    "storedTitle": "What we store",
+    "stored": "For each checkup: the leaf photo (made smaller, with hidden camera data such as GPS removed), the diagnosis and advice, the heatmap, your answer to \"Was this correct?\", and a random ID for this browser. Your location only if you chose to share it.",
+    "publicTitle": "What is public",
+    "public": "Nothing that identifies you. The public map only shows how many disease reports came from an area of about 5 km², and only when at least 3 different browsers reported there. Your exact location, photos and checkups are never shown to anyone else.",
+    "locationTitle": "Your location",
+    "location": "Taken only after you agree: from your phone's location or, if that isn't available, from the location saved in the photo. You can stop sharing any time with \"Change\" on the Diagnose page.",
+    "deleteTitle": "Delete your data",
+    "delete": "This removes every checkup made in this browser, with its photos, from our servers. It cannot be undone. Do it before clearing your browser data: after that we can no longer tell which checkups were yours.",
+    "deleteButton": "Delete my data",
+    "confirm": "Yes, delete everything",
+    "cancel": "Cancel",
+    "failed": "Could not delete your data. Please try again.",
+    "done_one": "Deleted 1 checkup from this browser.",
+    "done_other": "Deleted {{count}} checkups from this browser."
   }
 }

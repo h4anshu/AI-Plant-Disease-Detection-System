@@ -21,7 +21,7 @@ export async function driftReport(collection, { date = new Date(), baselineDays 
   const end = new Date(dayStart(date).getTime() + DAY);
   const from = new Date(end.getTime() - (baselineDays + 1) * DAY);
   const rows = await collection.aggregate([
-    { $match: { createdAt: { $gte: from, $lt: end } } },
+    { $match: { createdAt: { $gte: from, $lt: end }, demo: { $ne: true } } }, // never seed_demo_map.js data
     { $set: { status: { $ifNull: ['$status', 'ok'] } } }, // records from before the gate
     { $group: {
       _id: { crop: '$crop', day: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } } },

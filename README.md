@@ -44,6 +44,16 @@ The app is available in English and Hindi. The switcher in the navbar remembers 
 
 All Hindi agricultural content is an AI-drafted first version marked `needs_review`, and the app shows a "not yet checked by an expert" note under unreviewed Hindi advice. The open items for the agronomist are in `docs/TRANSLATION_REVIEW.csv` (regenerate with `npm run translation-review` in `server/`). Tests check that every dose, number and chemical name in the Hindi advice matches the English exactly.
 
+## Disease map and privacy
+
+With the user's consent, a checkup can carry a location: the browser's GPS, or the photo's own EXIF GPS if GPS isn't available (read in the browser; the stored photo is always stripped).
+- **The exact point is private.** It's stored as a GeoJSON point with a 2dsphere index, and no API ever returns it.
+- **The public map** (`/map`, Leaflet + OpenStreetMap tiles) shows only counts per H3 hexagon at resolution 7 (about 5.2 km²). A hexagon appears only when **at least 3 different browsers** reported in it.
+- **Fixed windows:** only 7, 30 or 90 days, so windows can't be subtracted to isolate a report.
+- **API:** `GET /api/map/reports?crop=&disease=&days=`.
+- **Privacy page:** `/privacy` explains what is stored and public, and "delete my data" (`DELETE /api/predict`) removes a browser's records with their Cloudinary files.
+- **Demo data:** `server/scripts/seed_demo_map.js` writes fake points flagged `demo: true`, refuses any non-local database, and is shown only by a non-production server started with `MAP_INCLUDE_DEMO=true`.
+
 ## Crops and disease coverage
 
 | Crop | Disease classes | Accuracy [95% CI] | Macro F1 | Weakest-class recall | Images evaluated | Evaluation |

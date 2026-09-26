@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { LOCATION_SOURCES } from "../utils/geo.js";
 
 // status comes from the ML service's quality + out-of-distribution gate (docs/OOD_GATE.md).
 // Only "ok" results are diagnoses; records saved before the gate existed read as "ok".
@@ -96,10 +97,41 @@ const predictionSchema = new mongoose.Schema({
     feedbackAt: {
         type: Date,
         default: null
+    },
+    // Optional, only with the user's consent (client LocationConsent, /privacy page). The exact point is
+    // private: no API ever returns it (predictController toResponse). The public map only shows counts
+    // per H3 cell with >= 3 distinct browsers (utils/geo.js, controllers/mapController.js).
+    location: {
+        type: new mongoose.Schema({
+            type: { type: String, enum: ['Point'], required: true },
+            coordinates: { type: [Number], required: true } // [lon, lat]
+        }, { _id: false }),
+        default: undefined
+    },
+    locationAccuracyM: {
+        type: Number,
+        default: null
+    },
+    locationSource: {
+        type: String,
+        enum: LOCATION_SOURCES,
+        default: 'none'
+    },
+    geoCell: { // H3 cell at utils/geo.js H3_RESOLUTION, what the map aggregates on
+        type: String,
+        default: null,
+        index: true
+    },
+    // fake points from scripts/seed_demo_map.js (local databases only); the live map never includes them
+    demo: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
 });
+
+predictionSchema.index({ location: '2dsphere' }); // records without a location are simply not indexed
 
 const PredictionModel = mongoose.models.Prediction || mongoose.model('Prediction', predictionSchema);
 

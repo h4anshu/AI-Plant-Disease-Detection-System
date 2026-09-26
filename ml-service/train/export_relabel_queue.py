@@ -16,7 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ML = Path(__file__).resolve().parents[1]
-QUERY = {"$or": [{"feedback": {"$in": ["incorrect", "unsure"]}}, {"status": "uncertain"}]}
+# demo: records from server/scripts/seed_demo_map.js are fake and never go to review
+QUERY = {"$or": [{"feedback": {"$in": ["incorrect", "unsure"]}}, {"status": "uncertain"}], "demo": {"$ne": True}}
 COLUMNS = ["id", "created_at", "crop", "status", "predicted", "confidence", "top3", "feedback", "corrected_label",
            "model_backbone", "model_head", "model_gate", "image_url", "gradcam_url", "expert_label", "reviewer", "notes"]
 

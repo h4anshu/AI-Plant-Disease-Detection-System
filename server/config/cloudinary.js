@@ -15,4 +15,9 @@ export const uploadBuffer = (buffer, folder) => new Promise((resolve, reject) =>
   stream.end(buffer);
 });
 
+// https://res.cloudinary.com/<cloud>/image/upload/v123/plant-disease/abc.jpg -> "plant-disease/abc";
+// anything else (old base64 heatmaps, demo placeholders) -> null
+export const publicIdFromUrl = (url) =>
+  (typeof url === 'string' && url.match(/\/image\/upload\/(?:v\d+\/)?(.+)\.[a-z0-9]+$/i)?.[1]) || null;
+
 export default cloudinary;

@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { cropName } from '../locales/terms';
 import UploadBox from '../components/UploadBox';
 import ResultCard from '../components/ResultCard';
+import LocationConsent from '../components/LocationConsent';
 import { predictDisease } from '../services/api';
+import { getLocation, readConsent, saveConsent } from '../services/location';
 
 // Both Cloud Run services scale to zero: the first check after a quiet spell also starts them
 export const SLOW_AFTER_MS = 8000;
@@ -18,6 +20,13 @@ const Predict = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [slow, setSlow] = useState(false);
+  const [consent, setConsent] = useState(readConsent);
+  const [locating, setLocating] = useState(false);
+
+  const changeConsent = (value) => {
+    setConsent(value);
+    if (value) saveConsent(value);
+  };
 
   const handleAnalyze = async () => {
     if (!file) {
@@ -33,6 +42,11 @@ const Predict = () => {
       const formData = new FormData();
       formData.append('image', file);
       formData.append('crop', crop);
+      // location only with consent; anything else is sent as "none" (server/utils/geo.js)
+      setLocating(consent === 'granted');
+      const place = consent === 'granted' ? await getLocation(file) : { location_source: 'none' };
+      setLocating(false);
+      for (const [key, value] of Object.entries(place)) formData.append(key, String(value));
       const res = await predictDisease(formData);
       setResult(res.data);
     } catch (err) {
@@ -40,6 +54,7 @@ const Predict = () => {
     } finally {
       clearTimeout(slowTimer);
       setSlow(false);
+      setLocating(false);
       setLoading(false);
     }
   };
@@ -75,6 +90,7 @@ const Predict = () => {
             {t('predict.leafPhoto')}
           </label>
           <UploadBox onFileSelect={setFile} />
+          <LocationConsent consent={consent} onChange={changeConsent} />
 
           {error && (
             <p className="font-mono text-xs text-clay mt-4 border-l-2 border-clay pl-3">{error}</p>
@@ -85,7 +101,7 @@ const Predict = () => {
             disabled={loading}
             className="w-full mt-6 bg-field text-parchment py-3.5 font-mono text-sm uppercase tracking-wide hover:bg-field-dark disabled:opacity-50 transition-colors"
           >
-            {loading ? t('predict.reading') : t('predict.analyze')}
+            {locating ? t('location.getting') : loading ? t('predict.reading') : t('predict.analyze')}
           </button>
           {slow && (
             <p role="status" className="font-mono text-xs text-sage mt-3">

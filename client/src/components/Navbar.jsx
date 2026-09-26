@@ -81,6 +81,12 @@ const Navbar = () => {
           <Link to="/history" className="text-ink/70 hover:text-ink transition-colors">
             {t('nav.log')}
           </Link>
+          <Link to="/map" className="text-ink/70 hover:text-ink transition-colors">
+            {t('nav.map')}
+          </Link>
+          <Link to="/privacy" className="text-ink/70 hover:text-ink transition-colors">
+            {t('nav.privacy')}
+          </Link>
         </div>
         </div>
       </div>
@@ -98,6 +104,12 @@ const Navbar = () => {
           </Link>
           <Link to="/history" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
             {t('nav.log')}
+          </Link>
+          <Link to="/map" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+            {t('nav.map')}
+          </Link>
+          <Link to="/privacy" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+            {t('nav.privacy')}
           </Link>
         </div>
       )}

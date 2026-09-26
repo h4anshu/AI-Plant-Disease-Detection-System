@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { lazy, Suspense, useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AuthContext } from "./context/AuthContext";
@@ -8,6 +8,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Predict from "./pages/Predict";
 import History from "./pages/History";
+import Privacy from "./pages/Privacy";
+
+// Leaflet and the map code load only when someone opens the map
+const MapPage = lazy(() => import("./pages/MapPage"));
 
 const AuthDisabled = () => {
   const { t } = useTranslation();
@@ -54,6 +58,9 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/map" element={<Suspense fallback={null}><MapPage /></Suspense>} />
+        <Route path="/privacy" element={<Privacy />} />
 
         <Route
           path="/history"

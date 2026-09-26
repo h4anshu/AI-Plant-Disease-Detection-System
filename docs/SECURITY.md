@@ -17,6 +17,9 @@ waiting for it.
 | Common web attacks | helmet headers (HSTS, nosniff, frame and referrer policies, no `X-Powered-By`). JSON bodies limited to 10 kB. | `server/app.js` |
 | Leaking internals in error messages | Clients get generic messages; details go to the server log only. | controllers, `server/app.js` |
 | Deploying with a missing secret | The server refuses to start and names every missing variable. In production (`NODE_ENV=production`, set in the Dockerfile) this includes `CLIENT_ORIGINS` and `ML_SERVICE_TOKEN`. | `server/server.js`, `server/.env.example` |
+| Location privacy (disease map) | Location only after consent in the UI; the exact point is never returned by any API (`toResponse` strips it). The public map returns only H3 resolution-7 cells (about 5.2 km²) with at least 3 distinct browsers, report counts only (no device counts), and fixed 7/30/90-day windows so windows can't be subtracted. Guests without a device id count as one browser. | `server/utils/geo.js`, `server/controllers/mapController.js` |
+| Right to delete | `DELETE /api/predict` removes all records of this browser (or user) and their Cloudinary photos and heatmaps; linked from `/privacy`. | `server/controllers/predictController.js`, `client/src/pages/Privacy.jsx` |
+| Demo data leaking into the live map | The seed script refuses non-local MongoDB URIs; demo records are flagged and excluded unless `MAP_INCLUDE_DEMO=true` on a non-production server; the drift report and relabel export skip them. | `server/scripts/seed_demo_map.js` |
 | Container escape impact | Both images run as non-root users (`node`, `app`). | Dockerfiles |
 
 ## Known limits

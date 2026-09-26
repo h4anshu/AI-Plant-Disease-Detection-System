@@ -6,7 +6,8 @@ from train.export_relabel_queue import COLUMNS, QUERY, to_row
 
 
 def test_query_picks_disagreements_unsure_and_uncertain():
-    assert QUERY == {"$or": [{"feedback": {"$in": ["incorrect", "unsure"]}}, {"status": "uncertain"}]}
+    assert QUERY == {"$or": [{"feedback": {"$in": ["incorrect", "unsure"]}}, {"status": "uncertain"}],
+                     "demo": {"$ne": True}}
 
 
 def test_row_for_a_corrected_prediction():

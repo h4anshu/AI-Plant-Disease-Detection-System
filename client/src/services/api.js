@@ -50,5 +50,11 @@ export const getPredictionHistory = (before) => api.get('/predict', { params: be
 export const sendFeedback = (id, body) => api.patch(`/predict/${id}/feedback`, body);
 export const getCropClasses = () => api.get('/predict/classes');
 
+// Removes every checkup of this browser (and its photos) from the server: /privacy page
+export const deleteMyData = () => api.delete('/predict');
+
+// --- Public disease map: GeoJSON hexagons, { crop?, disease?, days: 7 | 30 | 90 }
+export const getMapReports = (params) => api.get('/map/reports', { params });
+
 
 export default api;
