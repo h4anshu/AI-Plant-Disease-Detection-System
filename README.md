@@ -1,6 +1,8 @@
 # AI Plant Disease Detection System
 
-CNN-based disease classification for six Indian field crops, with per-image severity estimation and a literature-backed yield-loss lookup. Demo name: "From Leaf to Loss."
+[![CI](https://github.com/h4anshu/AI-Plant-Disease-Detection-System/actions/workflows/ci.yml/badge.svg)](https://github.com/h4anshu/AI-Plant-Disease-Detection-System/actions/workflows/ci.yml)
+
+CNN-based disease classification for ten Indian field crops, with per-image severity estimation and a literature-backed yield-loss lookup. Demo name: "From Leaf to Loss."
 
 A farmer photographs a leaf, picks the crop from a dropdown, and gets back a disease diagnosis, a severity grade, treatment advice, and an estimated yield-loss percentage — all in one request.
 
@@ -142,7 +144,31 @@ npm install
 npm run dev
 ```
 
-The FastAPI service loads the backbone and all six heads once at startup (not per request) — expect a several-second delay before `/health` responds on first boot.
+The FastAPI service loads the backbone and all ten heads once at startup (not per request) — expect a several-second delay before `/health` responds on first boot.
+
+## Running tests
+
+Each package has its own suite; GitHub Actions (`.github/workflows/ci.yml`) runs all three on every push and pull request. No test touches the network: MongoDB is in-memory, and Cloudinary and the ML service are mocked.
+
+```bash
+# ML service: API contract, golden regression per crop (fixed held-out photo -> same class,
+# confidence within 0.02), severity, Grad-CAM PNG, quality/OOD gate
+cd ml-service
+pip install -r requirements.txt -r requirements-dev.txt
+pytest
+
+# Express API: Jest + supertest, mongodb-memory-server, Cloudinary/ML mocked with nock
+cd server
+npm install
+npm test
+
+# React frontend: Vitest + React Testing Library, lint, production build
+cd client
+npm install
+npm run lint && npm test && npm run build
+```
+
+The golden tests need the model weights (tracked in git); without them they are skipped with a reason. After a head is retrained on purpose, regenerate the fixtures with `python tests/make_golden.py` and review the diff of `tests/golden_expected.json`.
 
 ## API overview
 
@@ -167,7 +193,7 @@ Auth uses the raw JWT in the `Authorization` header, with no `Bearer` prefix —
 
 ## Known limitations
 
-- No automated tests exist — no unit, integration, or end-to-end suite. Verification so far has been manual, via curl against running services.
+- Tests run against fixtures and mocks; there is still no automated end-to-end test through a real browser, database and Cloudinary (that path was checked manually, see `docs/OOD_GATE.md`).
 - Severity grading is a 44%-agreement heuristic against expert-labeled ground truth, not a validated clinical measurement (see above).
 - Pigeonpea's 81.08% test accuracy is the weakest of the six original crops, directly tied to its small dataset (973 images).
 - Training data leans heavily toward controlled/lab-style photography — uniform backgrounds, staged lighting. How the models perform on photos taken by an actual farmer's phone in a field, with variable lighting and background clutter, hasn't been separately measured.

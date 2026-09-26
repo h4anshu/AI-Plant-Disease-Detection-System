@@ -1,6 +1,8 @@
+import io
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from PIL import Image
 
 from predict import ACTIVE_CROPS, load_models, predict_disease
 
@@ -32,5 +34,9 @@ async def predict_disease_route(file: UploadFile = File(...), crop: str = Form(N
         raise HTTPException(status_code=400, detail=f"crop must be one of {ACTIVE_CROPS}")
 
     image_bytes = await file.read()
+    try:
+        Image.open(io.BytesIO(image_bytes)).verify()  # header/structure check only, cheap
+    except Exception:
+        raise HTTPException(status_code=415, detail="file is not a readable image")
     return predict_disease(_models["backbone"], _models["heads"], _models["label_maps"], _models["gate"],
                            crop, image_bytes)

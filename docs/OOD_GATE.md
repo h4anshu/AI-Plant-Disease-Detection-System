@@ -9,7 +9,7 @@ Code: `ml-service/gate.py` (runtime), `ml-service/train/calibrate_ood.py` (calib
 1. **Photo quality** (before the model). Metrics are measured on the 224×224 copy the model already sees, so they do not depend on camera resolution and cost no extra resize; the size rule uses the original photo.
    - too small (short side), blurry (variance of the Laplacian), too dark / too bright (mean grey level) → `rejected_quality`
    - otherwise, too little plant-coloured area (share of pixels with hue 15–170°, saturation ≥ 0.15, value ≥ 0.12: yellow through green, so chlorotic and diseased leaves still count) → `not_leaf`
-   - an unreadable file → `rejected_quality` / `unreadable_image` (was an HTTP 500)
+   - an upload that is not a readable image → HTTP 415 from the ML service (the Express API turns it into a 400 for the user); `predict_disease()` itself still returns `rejected_quality` / `unreadable_image` if called directly
    Rejected photos stop here: no backbone, no Grad-CAM, no severity.
 2. **OOD score** on the backbone features and head outputs, with the method chosen per crop (below). Above the crop's threshold → `uncertain` (Grad-CAM, severity and the top class are still computed, plus the top-3 classes); otherwise `ok`.
 
@@ -18,7 +18,7 @@ Code: `ml-service/gate.py` (runtime), `ml-service/train/calibrate_ood.py` (calib
 | Field | ok | uncertain | rejected_quality / not_leaf |
 |---|---|---|---|
 | `status` | `"ok"` | `"uncertain"` | `"rejected_quality"` / `"not_leaf"` |
-| `reasons` | `[]` | `["unfamiliar_image"]` (feature-distance methods) or `["low_confidence"]` | e.g. `["blurry"]`, `["too_dark","too_small"]`, `["no_leaf"]`, `["unreadable_image"]` |
+| `reasons` | `[]` | `["unfamiliar_image"]` (feature-distance methods) or `["low_confidence"]` | e.g. `["blurry"]`, `["too_dark","too_small"]`, `["no_leaf"]` |
 | `ood_score` | float (higher = more unusual) | float | `null` (not computed) |
 | `quality` | metrics dict | metrics dict | metrics dict (`null` if unreadable) |
 | `disease`, `confidence`, `severity`, `gradcam`, `crop` | yes | yes | only `crop` |

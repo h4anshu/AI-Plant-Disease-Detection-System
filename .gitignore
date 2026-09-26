@@ -7,8 +7,10 @@ venv/
 .env.local
 .env.*.local
 
-# ML service data (consolidated dataset — large)
-ml-service/data/
+# ML service data (consolidated dataset — large); the label/weight maps are needed at runtime, so tracked
+ml-service/data/*
+!ml-service/data/label_maps.json
+!ml-service/data/class_weights.json
 
 # Python artifacts
 __pycache__/

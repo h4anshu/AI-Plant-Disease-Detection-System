@@ -1,0 +1,72 @@
+{
+  "wheat": {
+    "file": "wheat.jpg",
+    "source": "data/test/wheat/BlackPoint/BlackPoint_101.jpg",
+    "disease": "BlackPoint",
+    "confidence": 0.9998,
+    "status": "ok"
+  },
+  "rice": {
+    "file": "rice.jpg",
+    "source": "data/test/rice/Bacterialblight/BACTERAILBLIGHT3_002.jpg",
+    "disease": "Bacterialblight",
+    "confidence": 0.9999,
+    "status": "ok"
+  },
+  "sugarcane": {
+    "file": "sugarcane.jpg",
+    "source": "data/test/sugarcane/Banded_Chlorosis/image013.jpg",
+    "disease": "Banded_Chlorosis",
+    "confidence": 0.9824,
+    "status": "ok"
+  },
+  "potato": {
+    "file": "potato.jpg",
+    "source": "data/test/potato/Early_blight/0267d4ca-522e-4ca0-b1a2-ce925e5b54a2___RS_Early.B 7020.JPG",
+    "disease": "Early_blight",
+    "confidence": 0.9996,
+    "status": "ok"
+  },
+  "maize": {
+    "file": "maize.jpg",
+    "source": "data/test/maize/Blight/test_00000.jpg",
+    "disease": "Blight",
+    "confidence": 0.9834,
+    "status": "ok"
+  },
+  "pigeonpea": {
+    "file": "pigeonpea.jpg",
+    "source": "data/test/pigeonpea/Healthy/images (104).jpg",
+    "disease": "Healthy",
+    "confidence": 0.9802,
+    "status": "ok"
+  },
+  "groundnut": {
+    "file": "groundnut.jpg",
+    "source": "data/test/groundnut/Alternaria_Leaf_Spot/wb__Alternaria_Leaf_Spot_10.jpg",
+    "disease": "Alternaria_Leaf_Spot",
+    "confidence": 0.993,
+    "status": "ok"
+  },
+  "blackgram": {
+    "file": "blackgram.jpg",
+    "source": "data/test/blackgram/Anthracnose/bpld__103a.jpg",
+    "disease": "Anthracnose",
+    "confidence": 0.9998,
+    "status": "ok"
+  },
+  "apple": {
+    "file": "apple.jpg",
+    "source": "data/test/apple/Alternaria_Leaf_Blotch/jk__lpu_rdp_alt1195.jpeg",
+    "disease": "Alternaria_Leaf_Blotch",
+    "confidence": 0.9972,
+    "status": "ok"
+  },
+  "banana": {
+    "file": "banana.jpg",
+    "source": "data/test/banana/Bract_Mosaic_Virus/tn__Bract-Mosaic-Virus-Disease-102-_jpg.rf.565dd84f4fc8c4ac59d7b19979838d67.jpg",
+    "disease": "Bract_Mosaic_Virus",
+    "confidence": 1.0,
+    "status": "ok"
+  }
+}

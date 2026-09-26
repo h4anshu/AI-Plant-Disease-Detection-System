@@ -22,11 +22,25 @@ const predict = async (req, res) => {
     formData.append('file', req.file.buffer, { filename: req.file.originalname });
     formData.append('crop', crop);
 
-    const mlResponse = await axios.post(
-      `${process.env.FASTAPI_URL}/predict-disease`,
-      formData,
-      { headers: formData.getHeaders() }
-    );
+    let mlResponse;
+    try {
+      mlResponse = await axios.post(
+        `${process.env.FASTAPI_URL}/predict-disease`,
+        formData,
+        { headers: formData.getHeaders(), timeout: 60000 }
+      );
+    } catch (mlError) {
+      // the ML service says the request itself is bad: tell the user; anything else is our outage
+      const mlStatus = mlError.response?.status;
+      if (mlStatus === 415) {
+        return res.status(400).json({ message: 'The uploaded file is not a readable image' });
+      }
+      if (mlStatus === 400) {
+        return res.status(400).json({ message: 'Unsupported crop' });
+      }
+      console.error('ML service error:', mlStatus ?? mlError.code, mlError.message);
+      return res.status(502).json({ message: 'The diagnosis service is unavailable right now. Please try again shortly.' });
+    }
 
     // status: "ok" | "uncertain" | "rejected_quality" | "not_leaf" (docs/OOD_GATE.md)
     const { status = 'ok', reasons = [], ood_score = null, quality = null, top3,
@@ -70,7 +84,7 @@ const predict = async (req, res) => {
 
   } catch (error) {
     console.error('Predict error:', error.message);
-    res.status(500).json({ message: 'Prediction failed', error: error.message });
+    res.status(500).json({ message: 'Prediction failed' });  // details stay in the server log
   }
 };
 
@@ -80,7 +94,8 @@ const getHistory = async (req, res) => {
     const predictions = await PredictionModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.status(200).json(predictions);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('History error:', error.message);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

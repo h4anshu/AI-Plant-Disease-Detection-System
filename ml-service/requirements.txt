@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-tensorflow
+tensorflow==2.21.0  # version that saved models/*.keras
 scikit-learn
 pillow
 numpy

@@ -1,0 +1,75 @@
+{
+  "wheat": {
+    "BlackPoint": 0,
+    "FusariumFootRot": 1,
+    "HealthyLeaf": 2,
+    "LeafBlight": 3,
+    "WheatBlast": 4
+  },
+  "rice": {
+    "Bacterialblight": 0,
+    "Blast": 1,
+    "Brownspot": 2,
+    "Healthy": 3,
+    "Tungro": 4
+  },
+  "sugarcane": {
+    "Banded_Chlorosis": 0,
+    "BrownRust": 1,
+    "Brown_Spot": 2,
+    "Dried_Leaves": 3,
+    "Grassy_shoot": 4,
+    "Healthy_Leaves": 5,
+    "Pokkah_Boeng": 6,
+    "Sett_Rot": 7,
+    "Viral_Disease": 8,
+    "Yellow_Leaf": 9,
+    "smut": 10
+  },
+  "potato": {
+    "Early_blight": 0,
+    "Late_blight": 1,
+    "healthy": 2
+  },
+  "maize": {
+    "Blight": 0,
+    "Common_Rust": 1,
+    "Gray_Leaf_Spot": 2,
+    "Healthy": 3
+  },
+  "pigeonpea": {
+    "Healthy": 0,
+    "Leaf_Spot": 1,
+    "Leaf_webber": 2,
+    "Sterilic_mosaic": 3
+  },
+  "groundnut": {
+    "Alternaria_Leaf_Spot": 0,
+    "Healthy": 1,
+    "Leaf_Spot": 2,
+    "Nutrition_Deficiency": 3,
+    "Rosette": 4,
+    "Rust": 5
+  },
+  "blackgram": {
+    "Anthracnose": 0,
+    "Healthy": 1,
+    "Leaf_Crinkle": 2,
+    "Powdery_Mildew": 3,
+    "Yellow_Mosaic": 4
+  },
+  "apple": {
+    "Alternaria_Leaf_Blotch": 0,
+    "Healthy": 1,
+    "Mosaic": 2
+  },
+  "banana": {
+    "Bract_Mosaic_Virus": 0,
+    "Healthy": 1,
+    "Insect_Pest": 2,
+    "Moko_Wilt": 3,
+    "Panama_Wilt": 4,
+    "Pestalotiopsis_Leaf_Spot": 5,
+    "Sigatoka_Leaf_Spot": 6
+  }
+}
