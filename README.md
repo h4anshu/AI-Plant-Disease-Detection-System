@@ -117,7 +117,11 @@ FASTAPI_URL
 CLOUDINARY_CLOUD_NAME
 CLOUDINARY_API_KEY
 CLOUDINARY_API_SECRET
+CLIENT_ORIGINS        # required in production: CORS allowlist, comma-separated
+ML_SERVICE_TOKEN      # required in production: shared secret, same value on the ML service
 ```
+
+See `server/.env.example`; the server refuses to start if a required variable is missing. The ML service reads `ML_SERVICE_TOKEN` too (unset = open, local dev only).
 
 `client/.env`:
 ```
@@ -195,6 +199,7 @@ Auth uses the raw JWT in the `Authorization` header, with no `Bearer` prefix —
 
 ## Known limitations
 
+- Login is disabled, so everyone uses the app as a shared guest. History is kept per browser (random device id), uploads are rate-limited per IP, and photos are stripped of EXIF/GPS before storage. What that covers and what waits for login is in [docs/SECURITY.md](docs/SECURITY.md).
 - Tests run against fixtures and mocks; there is still no automated end-to-end test through a real browser, database and Cloudinary (that path was checked manually, see `docs/OOD_GATE.md`).
 - Severity grading is a 44%-agreement heuristic against expert-labeled ground truth, not a validated clinical measurement (see above).
 - Pigeonpea's 81.08% test accuracy is the weakest of the six original crops, directly tied to its small dataset (973 images).

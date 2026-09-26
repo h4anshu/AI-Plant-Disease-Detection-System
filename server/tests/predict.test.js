@@ -3,16 +3,22 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import nock from 'nock';
 import request from 'supertest';
+import sharp from 'sharp';
 import app from '../app.js';
 import Prediction from '../models/Prediction.js';
 
 const GUEST_ID = '000000000000000000000000'; // guest-auth bypass in middleware/auth.js (login disabled)
-const JPEG = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]); // bytes are not inspected here
+const DEVICE = '3f2b8c1e-9d4a-4e7b-8a6c-2f1e0d9c8b7a';
+const OTHER_DEVICE = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+const image = (width, height, format = 'jpeg') =>
+  sharp({ create: { width, height, channels: 3, background: '#3a7d2c' } }).toFormat(format).toBuffer();
+let JPEG;
 const UPLOADED_URL = 'https://res.cloudinary.com/test-cloud/image/upload/v1/plant-disease/leaf.jpg';
 
 let mongod;
 
 beforeAll(async () => {
+  JPEG = await image(64, 64);
   mongod = await MongoMemoryServer.create();
   await mongoose.connect(mongod.getUri());
   nock.disableNetConnect();
@@ -35,10 +41,12 @@ const mockCloudinary = () =>
     .post(/\/v1_1\/test-cloud\/image\/upload/)
     .reply(200, { secure_url: UPLOADED_URL, public_id: 'plant-disease/leaf' });
 
-const mockML = (status, body) => nock('http://ml.test').post('/predict-disease').reply(status, body);
+// the ML service only answers calls that carry the shared secret
+const mockML = (status, body) =>
+  nock('http://ml.test').matchHeader('x-ml-token', 'test-ml-token').post('/predict-disease').reply(status, body);
 
 const upload = (crop = 'blackgram', file = JPEG, filename = 'leaf.jpg', contentType = 'image/jpeg') => {
-  const req = request(app).post('/api/predict');
+  const req = request(app).post('/api/predict').set('x-device-id', DEVICE);
   if (crop) req.field('crop', crop);
   if (file) req.attach('image', file, { filename, contentType });
   return req;
@@ -139,20 +147,78 @@ describe('POST /api/predict', () => {
   });
 });
 
-describe('GET /api/predict (history)', () => {
-  test("returns the guest user's records, newest first, and old records read as status ok", async () => {
-    const base = { imageUrl: UPLOADED_URL, crop: 'rice', disease: 'Blast', confidence: 0.9, severity: 'early', treatment: 't' };
-    await Prediction.create({ ...base, userId: GUEST_ID, createdAt: new Date('2026-01-01') });
-    await Prediction.create({ ...base, userId: GUEST_ID, crop: 'wheat', createdAt: new Date('2026-02-01') });
-    await Prediction.create({ ...base, userId: '111111111111111111111111' }); // someone else's
-    // a record saved before the OOD gate existed has no status field at all
-    await Prediction.collection.insertOne({ ...base, userId: new mongoose.Types.ObjectId(GUEST_ID), crop: 'maize',
-      createdAt: new Date('2025-12-01') });
+describe('upload validation (real bytes, not the claimed mimetype)', () => {
+  test.each([
+    ['text disguised as a JPEG', () => Buffer.from('definitely not a photo'), 'Only JPEG, PNG or WebP images are allowed'],
+    ['GIF disguised as a JPEG', () => image(32, 32, 'gif'), 'Only JPEG, PNG or WebP images are allowed'],
+    ['image wider than 4000 px', () => image(4001, 8, 'png'), 'Image is too large (max 4000 px per side)'],
+  ])('%s -> 400, ML service never called', async (_, make, message) => {
+    const ml = mockML(200, ML_OK);
+    const res = await upload('blackgram', await make());
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ message });
+    expect(ml.isDone()).toBe(false);
+  });
 
+  test('PNG and WebP are accepted', async () => {
+    for (const format of ['png', 'webp']) {
+      mockML(200, ML_OK);
+      mockCloudinary();
+      expect((await upload('blackgram', await image(64, 64, format), `leaf.${format}`)).status).toBe(201);
+    }
+  });
+
+  test('the stored copy has no EXIF metadata (GPS, camera) and keeps its size', async () => {
+    const { cleanImage } = await import('../utils/image.js');
+    const withExif = await sharp(await image(64, 48)).withExif({ IFD0: { Artist: 'farmer', Make: 'PhoneCo' } }).toBuffer();
+    expect((await sharp(withExif).metadata()).exif).toBeDefined();
+    const meta = await sharp(await cleanImage(withExif)).metadata();
+    expect(meta.exif).toBeUndefined();
+    expect([meta.format, meta.width, meta.height]).toEqual(['jpeg', 64, 48]);
+  });
+});
+
+describe('GET /api/predict (history)', () => {
+  const base = { imageUrl: UPLOADED_URL, crop: 'rice', disease: 'Blast', confidence: 0.9, severity: 'early', treatment: 't' };
+
+  test("a guest sees only this browser's records, newest first; old records read as status ok", async () => {
+    await Prediction.create({ ...base, userId: GUEST_ID, deviceId: DEVICE, createdAt: new Date('2026-01-01') });
+    await Prediction.create({ ...base, userId: GUEST_ID, deviceId: DEVICE, crop: 'wheat', createdAt: new Date('2026-02-01') });
+    await Prediction.create({ ...base, userId: GUEST_ID, deviceId: OTHER_DEVICE, crop: 'potato' }); // another guest
+    await Prediction.create({ ...base, userId: GUEST_ID, crop: 'maize' }); // guest record from before device ids
+    await Prediction.create({ ...base, userId: '111111111111111111111111', crop: 'apple' }); // a signed-in user's
+    // a record saved before the OOD gate and model versioning existed has neither field
+    await Prediction.collection.insertOne({ ...base, userId: new mongoose.Types.ObjectId(GUEST_ID), deviceId: DEVICE,
+      crop: 'sugarcane', createdAt: new Date('2025-12-01') });
+
+    const res = await request(app).get('/api/predict').set('x-device-id', DEVICE.toUpperCase());
+    expect(res.status).toBe(200);
+    expect(res.body.map((p) => p.crop)).toEqual(['wheat', 'rice', 'sugarcane']);
+    expect(res.body.every((p) => p.status === 'ok')).toBe(true);
+    expect(res.body[2].modelVersion).toBeNull();
+  });
+
+  test("a guest without a device id gets an empty history, never everyone's", async () => {
+    await Prediction.create({ ...base, userId: GUEST_ID, deviceId: DEVICE });
+    await Prediction.create({ ...base, userId: GUEST_ID });
     const res = await request(app).get('/api/predict');
     expect(res.status).toBe(200);
-    expect(res.body.map((p) => p.crop)).toEqual(['wheat', 'rice', 'maize']);
-    expect(res.body.every((p) => p.status === 'ok')).toBe(true);
-    expect(res.body[2].modelVersion).toBeNull(); // saved before model versioning existed
+    expect(res.body).toEqual([]);
+  });
+
+  test('a malformed device id -> 400', async () => {
+    const res = await request(app).get('/api/predict').set('x-device-id', '{ "$ne": null }');
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ message: 'Invalid device id' });
+  });
+
+  test('a new prediction is saved under the device id and shows up in that history only', async () => {
+    mockML(200, ML_OK);
+    mockCloudinary();
+    const created = await upload();
+    expect(created.status).toBe(201);
+    expect((await Prediction.findById(created.body._id).lean()).deviceId).toBe(DEVICE);
+    expect((await request(app).get('/api/predict').set('x-device-id', DEVICE)).body).toHaveLength(1);
+    expect((await request(app).get('/api/predict').set('x-device-id', OTHER_DEVICE)).body).toHaveLength(0);
   });
 });

@@ -32,7 +32,8 @@ const register = async(req , res) => {
 
     });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Auth error:', error.message);
+        res.status(500).json({ message: 'Server error' });  // details stay in the server log
     }
 }
 
@@ -66,7 +67,8 @@ const login = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Auth error:', error.message);
+        res.status(500).json({ message: 'Server error' });  // details stay in the server log
   }
 };
 

@@ -36,6 +36,17 @@ def test_invalid_crop_is_400(bare_api):
     assert "crop must be one of" in r.json()["detail"]
 
 
+def test_shared_secret_is_required_when_set(bare_api, monkeypatch):
+    monkeypatch.setenv("ML_SERVICE_TOKEN", "s3cret")
+    assert post(bare_api, "wheat", b"x").status_code == 401  # no header
+    r = bare_api.post("/predict-disease", data={"crop": "wheat"}, files={"file": ("a.jpg", b"x", "image/jpeg")},
+                      headers={"X-ML-Token": "wrong"})
+    assert r.status_code == 401
+    r = bare_api.post("/predict-disease", data={"crop": "wheat"}, files={"file": ("a.jpg", b"x", "image/jpeg")},
+                      headers={"X-ML-Token": "s3cret"})
+    assert r.status_code == 415  # past the token check, stopped by the image check
+
+
 def test_non_image_upload_is_415(bare_api):
     r = post(bare_api, "wheat", b"this is a text file, not a photo", name="notes.txt")
     assert r.status_code == 415

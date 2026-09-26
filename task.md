@@ -220,3 +220,24 @@ git tag -a v0.2-10crops c91b408 -m "Baseline: 10 live crops, LF-normalised repo,
 - WSL Ubuntu disk moved to `D:\wsl\Ubuntu` by the user (`wsl --manage Ubuntu --move`, 21.4 GB, about 6 min to the D: HDD). Ubuntu verified working (user anshu, files intact). C: free 10.9 → 32.3 GB. Next: Docker Desktop disk image location → D:. Note: the GPU env `~/tfgpu` was deleted during the cleanup and must be recreated before any new GPU training.
 - Docker Desktop disk image moved to `D:\wsl\docker\DockerDesktopWSL` by the user (Settings → Resources → Advanced, 20.4 GB). The engine stayed in the error state left over from the WSL move; `docker desktop restart` fixed it. All 5 images intact, and the `plant-ml:onnx` container answers /health. **C: free 0 → 52.7 GB.**
 - **Deployed (by the user), 26 Sep ~15:10 IST:** Cloud Run `ml-service-00002-sx6` = `ml-service:v2` (ONNX) and `server-00008-6f5`, each with 100% of traffic. Live check: /health lists all 10 heads at 1.0.0; all 10 golden photos give the same disease and confidence as local (±0.02), each with Grad-CAM and `model_version`, ~150-400 ms warm. Before this, live ran the July v1 (6 crops, no gate), so the 4 new crops failed on the live site. Rollback: `gcloud run services update-traffic ml-service --region asia-south1 --to-revisions ml-service-00001-jfd=100`.
+
+## Task 7 — Security hardening of the public deployment (login still disabled)
+
+Brief: helmet/CORS/body limit, rate limits, upload validation + EXIF strip, generic errors, ML shared secret, guest history scoping, env validation, `docs/SECURITY.md`. The brief said branch `feat/security`; done on `main` per the user's standing preference. `server/middleware/auth.js` untouched.
+
+Checked the brief's claims against the code first. All true except "errors return error.message": predict/history already returned generic messages; only `authController` (login disabled) still leaked it. The guest leak was real: every guest shares user id `000…000`, so history returned every guest's photos and diagnoses. A live count was blocked by the permission classifier (reading other people's data), so the finding stands on the code. The ML service was confirmed publicly callable.
+
+What was done:
+- **Guest history** (`middleware/guestDevice.js`, `client/src/services/api.js`): the browser keeps a `crypto.randomUUID()` in localStorage and sends `X-Device-Id`. Guest predictions save `Prediction.deviceId` (indexed); guest history filters on it. No id = empty history, malformed = 400. Old guest records (no id) are now visible to nobody. Marked `TODO(auth)` for migration.
+- **Rate limits** (`middleware/rateLimit.js`, express-rate-limit 8.7): POST /api/predict 20 per 10 min, global 300 per 15 min, per IP, both env-configurable; `trust proxy 1` for Cloud Run. In-memory per instance (`ponytail` note). The user set Cloud Run `--max-instances 3` on ml-service.
+- **Uploads** (`utils/image.js`, sharp 0.35): the real format comes from the bytes (libvips), so file-type wasn't needed; jpeg/png/webp only, ≤ 4000 px per side. The Cloudinary copy is auto-oriented and re-encoded without metadata (EXIF/GPS). The ML service still gets the original bytes, so predictions are unchanged. GPS hook marked `HOOK` (the field-location feature isn't built yet).
+- **ML shared secret**: FastAPI `/predict-disease` checks `X-ML-Token` against `ML_SERVICE_TOKEN` with `hmac.compare_digest` (unset = open plus a startup warning); `/health` stays open. Express sends the header.
+- **helmet**, CORS allowlist from `CLIENT_ORIGINS` (unset = any, local only), `express.json` 10 kB; body-parser errors return a generic 4xx.
+- **Fail-fast env check** in `server.js`: base vars always; in production (Dockerfile now sets `NODE_ENV=production`) also `CLIENT_ORIGINS` and `ML_SERVICE_TOKEN`. `.env.example` updated. Server Dockerfile: `npm ci --omit=dev`, `USER node`.
+- `docs/SECURITY.md` (covered / known limits / waiting for auth / GPS hook); README env section and limitations updated.
+
+Tests:
+- New server tests: text-as-JPEG, GIF-as-JPEG and >4000 px each give 400 with no ML call; PNG/WebP accepted; EXIF stripped; the ML call carries the token (nock `matchHeader`); history scoped per device (upper/lower-case id, other guest, legacy guest, signed-in user); no id = []; malformed id = 400; new prediction visible only to its device. `hardening.test.js` loads the app with limit 3: the 4th POST gives 429, /health is unaffected, CORS allows only listed origins, helmet headers present, 20 kB JSON gives 413 with a generic message.
+- ML: shared-secret test. Client: device-id interceptor test.
+- Totals: pytest 40, Jest 21, Vitest 10 passed.
+- Docker smoke test of the server image: missing vars list all 8 names and exit; headers present; a fake JPEG is rejected by sharp in the container; runs as `node`.

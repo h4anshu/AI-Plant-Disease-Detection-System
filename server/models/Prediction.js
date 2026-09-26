@@ -11,6 +11,13 @@ const predictionSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    // guest mode only: the browser's random id, so guests don't see each other's history
+    // (middleware/guestDevice.js). null for signed-in users and for guest records saved before this.
+    deviceId: {
+        type: String,
+        default: null,
+        index: true
+    },
     imageUrl: {
         type: String,
         required: true

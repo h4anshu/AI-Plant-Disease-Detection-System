@@ -4,6 +4,8 @@ import cloudinary from "../config/cloudinary.js";
 import PredictionModel from "../models/Prediction.js";
 import { getTreatment } from "../utils/treatmentMap.js";
 import getYieldLoss from "../utils/yieldLoss.js";
+import { BadImage, cleanImage } from "../utils/image.js";
+import { GUEST_ID } from "../middleware/guestDevice.js";
 
 // @route  POST /api/predict
 const predict = async (req, res) => {
@@ -17,7 +19,17 @@ const predict = async (req, res) => {
       return res.status(400).json({ message: 'Crop type is required' });
     }
 
-    // 1. Send image to FastAPI ML service (first, so a failed ML call leaves no orphan upload)
+    // 0. Check the real file type and size; the stored copy has no EXIF (GPS etc.)
+    let publicImage;
+    try {
+      publicImage = await cleanImage(req.file.buffer);
+    } catch (err) {
+      if (err instanceof BadImage) return res.status(400).json({ message: err.message });
+      throw err;
+    }
+
+    // 1. Send image to FastAPI ML service (first, so a failed ML call leaves no orphan upload).
+    // It gets the original bytes so predictions match the parity-tested pipeline exactly.
     const formData = new FormData();
     formData.append('file', req.file.buffer, { filename: req.file.originalname });
     formData.append('crop', crop);
@@ -27,7 +39,7 @@ const predict = async (req, res) => {
       mlResponse = await axios.post(
         `${process.env.FASTAPI_URL}/predict-disease`,
         formData,
-        { headers: formData.getHeaders(), timeout: 60000 }
+        { headers: { ...formData.getHeaders(), 'x-ml-token': process.env.ML_SERVICE_TOKEN ?? '' }, timeout: 60000 }
       );
     } catch (mlError) {
       // the ML service says the request itself is bad: tell the user; anything else is our outage
@@ -52,7 +64,7 @@ const predict = async (req, res) => {
         { folder: 'plant-disease' },
         (error, result) => (error ? reject(error) : resolve(result))
       );
-      stream.end(req.file.buffer);
+      stream.end(publicImage);
     });
     const imageUrl = uploadResult.secure_url;
 
@@ -64,6 +76,7 @@ const predict = async (req, res) => {
     // 5. Save prediction to MongoDB
     const prediction = await PredictionModel.create({
       userId: req.user.id,
+      deviceId: req.deviceId,
       imageUrl,
       crop,
       status,
@@ -92,7 +105,10 @@ const predict = async (req, res) => {
 // @route  GET /api/predictions
 const getHistory = async (req, res) => {
   try {
-    const predictions = await PredictionModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    // guests only see their own browser's records (middleware/guestDevice.js); no device id = no history
+    if (req.user.id === GUEST_ID && !req.deviceId) return res.status(200).json([]);
+    const filter = req.user.id === GUEST_ID ? { userId: GUEST_ID, deviceId: req.deviceId } : { userId: req.user.id };
+    const predictions = await PredictionModel.find(filter).sort({ createdAt: -1 });
     res.status(200).json(predictions);
   } catch (error) {
     console.error('History error:', error.message);
