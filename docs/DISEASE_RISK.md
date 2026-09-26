@@ -6,8 +6,14 @@ is **not a forecast of infection**: it knows nothing about the variety, the fung
 whether the pathogen is present. Every rule below was sourced before any code was written. A rule that
 couldn't be sourced wasn't shipped.
 
-Weather: [Open-Meteo](https://open-meteo.com) hourly forecast + the past 14 days (CC BY 4.0,
-non-commercial free tier: under 10,000 calls/day, 5,000/hour, 600/minute). Time is local (`timezone=auto`).
+Weather: [Open-Meteo](https://open-meteo.com) hourly data for the past 14 days, today and 4 days ahead
+(`past_days=14`, `forecast_days=5`; the 4th day completes the night of the 3rd outlook day). CC BY 4.0,
+non-commercial free tier: under 10,000 calls/day, 5,000/hour, 600/minute. Time is local (`timezone=auto`).
+
+**Privacy and limits:** the location sent to Open-Meteo is rounded to a 0.05° grid (about 5 km), never the
+exact field point, and nothing identifying the user goes with it. Answers are cached in MongoDB per grid
+cell per hour (3 h TTL), so one busy district costs at most 24 calls a day. The endpoint is rate-limited
+per IP (`RISK_RATE_LIMIT`, default 60 per 10 minutes).
 
 ## Potato late blight (*Phytophthora infestans*)
 
@@ -84,8 +90,9 @@ its mean temperature:
 
 **Known limits:**
 - Developed in the north-eastern USA.
-- The SV table is in whole °F bands, so the °C bands above are converted: 54–55 °F and 59–60 °F fall in
-  the gaps and are assigned to the lower band.
+- The SV table is in whole °F bands. We convert the period's mean temperature to °F and **round to a whole
+  °F** before picking the band, so the table's own boundaries hold exactly (54 → first band, 55 → second).
+  The rows follow one formula, SV = floor((h − 1)/3) − k with k = 4 / 3 / 2, which is what the code uses.
 
 ### Researched, not used
 
@@ -165,8 +172,18 @@ whether it has reached **4 days** (the rule met).
 - **BLASTAM** (Koshimizu 1988), **EPIBLA** (Manibhushanrao & Krishnan 1991): the published summaries
   don't give implementable thresholds.
 
+## Where it shows
+- **Result page:** for potato and rice checkups that have a location (GPS or photo EXIF), via
+  `GET /api/predict/:id/disease-risk`. The checkup's location is read on the server and never returned.
+- **Map page:** when the crop filter is potato or rice and the map is zoomed to district level (zoom ≥ 7),
+  for the centre of the map, via `GET /api/disease-risk?lat=&lon=&crop=`. It reloads when the map stops moving.
+- Code: rules in `server/utils/diseaseRisk.js` (pure functions), weather in `server/services/openMeteo.js`,
+  UI in `client/src/components/RiskStrip.jsx`; threshold-edge tests in `server/tests/diseaseRisk.test.js`.
+
 ## What every answer includes
 - The level per day: past 2 days, today, next 3.
 - The **driving conditions** (P-day and night-RH sums, SV total, DIWH, Tmin streak).
 - The **model name and citation**.
 - The label "risk indicator, not a forecast of infection".
+- The Open-Meteo attribution (CC BY 4.0).
+- A day with too little data shows "–" rather than a guess.

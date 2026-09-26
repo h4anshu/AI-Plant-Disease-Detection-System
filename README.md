@@ -66,6 +66,15 @@ when monsoon clouds hid the field.
 - **Setup:** [docs/GEE_SETUP.md](docs/GEE_SETUP.md).
 - **A visual walk-through:** `geo-service/notebooks/explore_field.ipynb`.
 
+## Weather-based disease risk
+
+For **potato late blight** and **rice blast**, a strip shows the risk level for the past 2 days, today
+and the next 3, from Open-Meteo weather and published models: **INDO-BLIGHTCAST** (ICAR-CPRI) for potato
+and **Yoshino infection hours** for rice, with Wallin/BLITECAST and Padmanabhan (CRRI Cuttack) shown as
+supporting evidence. It is a risk indicator, not a forecast of infection.
+- **Where:** the result page (checkups with a location) and the map page (map centre, district zoom).
+- **Every rule, source and limit:** [docs/DISEASE_RISK.md](docs/DISEASE_RISK.md).
+
 ## Crops and disease coverage
 
 | Crop | Disease classes | Accuracy [95% CI] | Macro F1 | Weakest-class recall | Images evaluated | Evaluation |
@@ -217,6 +226,8 @@ The golden tests need the ONNX files built from the tracked weights; without the
 | POST | `/api/auth/login` | Log in, returns JWT |
 | POST | `/api/predict` | multipart `image` + `crop` → orchestrates the ML call, uploads to Cloudinary, saves the record |
 | GET | `/api/predict` | Authenticated user's prediction history |
+| GET | `/api/predict/:id/disease-risk` | Weather risk for a checkup's location (potato, rice) |
+| GET | `/api/disease-risk?lat=&lon=&crop=` | Weather risk for a point (potato, rice) |
 | GET | `/health` | Health check |
 
 Auth uses the raw JWT in the `Authorization` header, with no `Bearer` prefix — this matches how the frontend's Axios interceptor sends it, so don't "fix" it to add the prefix without updating both sides.

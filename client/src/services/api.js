@@ -56,6 +56,10 @@ export const deleteMyData = () => api.delete('/predict');
 // Satellite view of the diagnosed field (only for checkups with a consented location)
 export const getFieldHealth = (id) => api.get(`/predict/${id}/field-health`, { timeout: 120000 });
 
+// Weather-based disease risk (docs/DISEASE_RISK.md): for a checkup (its private location) or a map point
+export const getPredictionRisk = (id) => api.get(`/predict/${id}/disease-risk`);
+export const getDiseaseRisk = (params) => api.get('/disease-risk', { params });
+
 // --- Public disease map: GeoJSON hexagons, { crop?, disease?, days: 7 | 30 | 90 }
 export const getMapReports = (params) => api.get('/map/reports', { params });
 

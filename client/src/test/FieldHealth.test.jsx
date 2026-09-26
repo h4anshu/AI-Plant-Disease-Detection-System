@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 const api = vi.hoisted(() => ({ reply: null, calls: [] }));
 vi.mock('../services/api', () => ({
   getFieldHealth: async (id) => { api.calls.push(id); return api.reply(); },
+  getPredictionRisk: () => new Promise(() => {}), // RiskStrip.test.jsx covers it
 }));
 import FieldHealth from '../components/FieldHealth';
 import ResultCard from '../components/ResultCard';

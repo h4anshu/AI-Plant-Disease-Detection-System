@@ -7,3 +7,5 @@ process.env.JWT_SECRET = 'test-jwt-secret';
 process.env.ML_SERVICE_TOKEN = 'test-ml-token';
 process.env.PREDICT_RATE_LIMIT = '1000'; // tests/hardening.test.js loads the app with a low limit
 process.env.FIELD_RATE_LIMIT = '1000';
+process.env.RISK_RATE_LIMIT = '1000';
+process.env.OPEN_METEO_URL = 'http://meteo.test/v1/forecast';

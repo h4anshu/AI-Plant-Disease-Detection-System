@@ -16,6 +16,8 @@ Added 26 Sep 2026. Tick an item off when it's done.
 - [x] **Deploy the geo-service**, done: `geo-service-00001` runs as `geo-service@…`, `/health` shows `earth_engine: true`, and calls without the token get 401.
 - [ ] **Agronomist review of the Hindi content:** 121 entries in `docs/TRANSLATION_REVIEW.csv` (10 crop names, 53 disease names, 4 severity labels, 54 treatment texts, all AI-drafted). Fill `hindi_corrected` / `reviewer`, then apply the corrections in `client/src/locales/terms.json` and `server/utils/treatmentMap.hi.js` with `needs_review: false`, and run `npm run translation-review` in `server/`. Until then the app shows a "not yet checked by an expert" note under Hindi advice.
 - [ ] **Secrets to Secret Manager** (optional): `docs/DEPLOY.md` Part C.
+- [ ] **Deploy the server for the disease-risk strip (Task 13), then push `main`:** `gcloud run deploy server --source server --region asia-south1` (no new env vars needed; Open-Meteo needs no key), then `git push origin main` for Vercel. Check: a potato/rice checkup with location shows the strip; Map → Potato → zoom to a district.
+- [ ] **Hindi disease-risk strings** (`risk.*` in `client/src/locales/hi.json`, AI-drafted): include them in the agronomist review.
 - [x] **Earth Engine setup for field health**, done 26 Sep 2026: registered (noncommercial, BBDU, Community tier), API on, sign-in via gcloud ADC works (test: 7 Sentinel-2 images), `geo-service` service account with both roles. daily EECU cap set to 18,000 EECU-s. **Still open:** an ALU answer (likely no, no GWCID), and **3 real field coordinates** (owners' consent). The field-health code starts after the coordinates.
 
 ---
@@ -509,3 +511,39 @@ Brief: GEE setup doc; a field-health endpoint (ALU or 30 m buffer; S2 SR harmoni
 
 Also: the server cache key now includes `FIELD_METHOD_VERSION = 2`, so the old cached "below" answers are not served; the notebook is updated and re-run; FIELD_HEALTH.md has an "Is it a field at all?" section. Tests: geo 24, server 193, client 34.
 **Needs a redeploy:** geo-service (new logic) + server (cache version), then a push (client).
+
+## Task 13 — Weather-based disease risk: potato late blight, rice blast (26 Sep 2026)
+
+Brief: a daily risk indicator with a 3-day outlook for potato late blight and rice blast, from **published models, not invented rules**; research and cite first (docs/DISEASE_RISK.md); Open-Meteo hourly + past days, cached per location per hour; `GET /disease-risk?lat=&lon=&crop=` with per-day level, driving conditions and citation; a strip on the result page and the map page labelled "risk indicator, not a forecast of infection"; unit tests on every threshold edge; an unsourced rule is not shipped. Done on `main`.
+
+**Research first** (committed alone as `5630668`, docs/DISEASE_RISK.md, every rule with its source link and limits):
+- **Potato, drives the level: INDO-BLIGHTCAST** (ICAR-CPRI, Govindakrishnan et al. 2016, Int J Pest Management 62(4)). 7-day sum of P-days > 52.5 and 7-day sum of night mean RH > 525; 7 consecutive favourable days = high, favourable today = medium. P-days per Sands et al. 1979 (7/21/30 °C, weights 5/8/8/3). Needs 13 days of history → 14 past days fetched.
+- **Potato, supporting: Wallin severity values / BLITECAST** (UMaine Bulletin #2418): SV per RH ≥ 90% period, 7-day total → spray interval (5-day / 7-day / 10+ day, lower thresholds with ≥ 30 mm rain). The flattened UMaine table was reconstructed; its rows are one formula, SV = floor((h−1)/3) − k (k = 4/3/2 by whole-°F band).
+- **Rice, drives the level: Yoshino (1979) infection hours** (as used in Katsantonis et al. 2017; Nettleton 2019): 5-day mean 20–25 °C, rain < 4 mm/h, wet run ≥ base wet hours(T) + 4 h. Daily infection hours: < 3 low, 3–5 medium, ≥ 6 high. Leaf wetness proxy RH ≥ 90% or rain ≥ 0.1 mm (Sentelhas et al. 2008) because Open-Meteo has no measured wetness (its `leaf_wetness_probability` is undocumented, so unused).
+- **Rice, supporting: Padmanabhan (1965), CRRI Cuttack** (now ICAR-NRRI): Tmin < 24 °C with high humidity for 4+ days.
+- Researched and not used (reasons in the doc): Hyre, JHULSACAST, Kapoor 2004, BLASTAM, EPIBLA.
+
+**Server:**
+- `server/utils/diseaseRisk.js`: pure functions, no I/O: `dailyAggregates` (a day needs ≥ 20 hours; the night is 18:00–05:00 and needs ≥ 10 hours), `pRate`/`pDay`, `indoBlightcast`, `wallinSV`/`wallinDaily`/`blitecastInterval`, `baseWetHours`/`isWet`/`yoshinoHours`/`yoshinoLevel`, `padmanabhanStreaks`, `MODELS` (names, citations, links) and `assess(crop, weather, today)` → past 2 days, today, next 3, each with level + conditions. A day without enough data is `null` ("–"), never a guess.
+- `server/services/openMeteo.js`: the point is snapped to a 0.05° grid (~5 km) before it leaves the server; hourly temperature, RH and rain with `past_days=14`, `forecast_days=5` (the 5th day completes the 3rd outlook day's night), `timezone=auto`; Mongo `WeatherCache` keyed by grid cell + UTC hour, 3 h TTL. Attribution string "Weather data by Open-Meteo.com (CC BY 4.0)".
+- Routes: public `GET /api/disease-risk?lat=&lon=&crop=` (400 for a bad crop or coordinates) and owner-only `GET /api/predict/:id/disease-risk` (reads the checkup's private location; 404 not yours, 409 no location, 422 crop without a model). Open-Meteo down → 502 with a plain message. `riskLimiter` 60 per 10 min per IP (`RISK_RATE_LIMIT`).
+
+**Bugs found while building:**
+- `dailyAggregates` created a phantom day before the first date (early-morning hours belong to the previous night), shifting every window by one. Now only dates that have their own hours are kept.
+- With `forecast_days=4` the last outlook day for potato was always "–" (its night was cut off), so it's now 5.
+- Two test-arithmetic slips in my own expected values (base wet hours 9.928 at 24 °C, 11.202 at 20 °C); the code was right.
+
+**Client:** `client/src/components/RiskStrip.jsx`
+- 6 cells (past 2 dimmed, today outlined, 3 ahead), coloured low / medium / high / "–"; the label; a "Why?" section with today's driving numbers against their thresholds (P-days and night-RH sums, favourable run, Wallin SV + Blitecast interval; or infection hours and the Padmanabhan streak); the model citation link, the supporting model link and the Open-Meteo CC BY link.
+- Result page: potato and rice checkups with a GPS/EXIF location. Map page: when the crop filter is potato or rice, for the map centre once zoomed to district level (zoom ≥ 7; otherwise "zoom in"); it reloads when the map stops moving.
+- en + hi strings (`risk.*`), including the Blitecast intervals; the Privacy page now says a point rounded to ~5 km goes to Open-Meteo.
+
+**Tests and checks:**
+- Server Jest 249 (+56 in `diseaseRisk.test.js`), all on hand-made hourly series: P-day cardinal points; INDO exactly at the thresholds (14 °C → 52.5 and RH 75 → 525 are *not* favourable; 14.1 / 75.1 are), medium for runs 1–6, high at 7, a cold day resets the run, the night window; Wallin band edges in °F with rounding, the date a period is counted on, every Blitecast interval edge; wet-proxy edges; base wet hours; the first infection hour at 24 °C; 5-day mean 19.9 / 20 / 25 / 25.1; rain 3.9 vs 4.0; DIWH level edges; Padmanabhan streak edges; API: grid snapping, the per-cell-per-hour cache, 400s, 502, the checkup route 200 / 409 / 422 / 404 with no coordinates in any answer.
+- Client Vitest 38 (+4): six cells, today, "–", label, the "Why?" numbers, links; rice conditions; the error message; the result card shows it only for potato/rice with a location.
+- ml-service pytest 46, geo-service pytest 24 unchanged; client lint (only old warnings) + build OK.
+- **Browser, local stack with real Open-Meteo:** Map → Potato (Hindi UI) → the zoom hint at country zoom; at district zoom over central India: high for all 6 days, "Why?" = 60.2 P-days, night RH 672, 9 favourable days, Wallin SV 20 with 71.4 mm → 5-day interval. Rice at the same point: high, high, high, then low as the wet spell ends. At 375 px: no horizontal scroll, all six cells fit (45 px each).
+- Earlier real-weather sanity check: Shimla hills potato high; plains potato low (too hot, P-day sums 22–31); Cuttack and Kangra rice low (5-day mean above 25 °C). A known limit written in the doc: Yoshino was built in temperate Japan.
+
+**Needs a deploy:** server only (new routes), then a push for the client. Nothing new in env; Open-Meteo needs no key.
+

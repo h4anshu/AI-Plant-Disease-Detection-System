@@ -5,7 +5,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import terms from '../locales/terms.json';
 import { cropName, diseaseName } from '../locales/terms';
-import { getMapReports } from '../services/api';
+import { getDiseaseRisk, getMapReports } from '../services/api';
+import RiskStrip from '../components/RiskStrip';
 import { BINS, binLabel, colorFor } from './mapStyle';
 
 const CROPS = Object.keys(terms.crops);
@@ -16,7 +17,9 @@ const DAYS = [7, 30, 90]; // the only windows the server accepts (server/utils/g
 const TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 const INDIA = { center: [22.5, 79], zoom: 5 };
-const DOTS_BELOW_ZOOM = 8; // a 5 km^2 hexagon is a few pixels at state/country zoom: draw a dot on it too
+const DOTS_BELOW_ZOOM = 8;
+const RISK_CROPS = ['potato', 'rice']; // crops with a published weather model (docs/DISEASE_RISK.md)
+const RISK_MIN_ZOOM = 7; // at country zoom, 'the centre of the map' is not a place anyone farms // a 5 km^2 hexagon is a few pixels at state/country zoom: draw a dot on it too
 
 const select = 'w-full border border-ink/25 bg-parchment px-2 py-2 text-sm text-ink';
 const label = 'font-mono text-[10px] text-sage uppercase tracking-widest block mb-1';
@@ -29,6 +32,7 @@ const MapPage = () => {
   const [days, setDays] = useState(30);
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const [centre, setCentre] = useState(null); // { lat, lon, zoom } after the map settles
   const mapDiv = useRef(null);
   const map = useRef(null);
   const layer = useRef(null);
@@ -46,6 +50,9 @@ const MapPage = () => {
     map.current = L.map(mapDiv.current, { ...INDIA, minZoom: 4, maxZoom: 13, scrollWheelZoom: false });
     L.tileLayer(TILES, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map.current);
     map.current.on('zoomend', showDots);
+    const settle = () => { const c = map.current.getCenter(); setCentre({ lat: c.lat, lon: c.lng, zoom: map.current.getZoom() }); };
+    map.current.on('moveend', settle);
+    settle();
     return () => map.current.remove();
   }, []);
 
@@ -126,6 +133,18 @@ const MapPage = () => {
           </p>
         )}
       </div>
+
+      {RISK_CROPS.includes(crop) && centre && (
+        <div className="mt-4 border border-ink/15 p-3">
+          <p className="font-mono text-[10px] text-sage uppercase tracking-widest">{t('risk.mapCentre')}</p>
+          {centre.zoom >= RISK_MIN_ZOOM ? (
+            <RiskStrip load={() => getDiseaseRisk({ lat: centre.lat, lon: centre.lon, crop })}
+              reloadKey={`${crop}|${centre.lat.toFixed(2)}|${centre.lon.toFixed(2)}`} />
+          ) : (
+            <p className="text-xs text-ink/60 mt-1">{t('risk.zoomIn')}</p>
+          )}
+        </div>
+      )}
 
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
         <span className={label + ' mb-0'}>{t('map.legend')}</span>
