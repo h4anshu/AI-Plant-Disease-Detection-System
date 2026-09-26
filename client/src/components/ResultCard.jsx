@@ -1,3 +1,5 @@
+import Feedback from './Feedback';
+
 const severityStyles = {
   healthy: { border: 'border-field', text: 'text-field', label: 'HEALTHY' },
   early: { border: 'border-field', text: 'text-field', label: 'EARLY' },
@@ -153,6 +155,8 @@ const ResultCard = ({ result }) => {
           </p>
         </div>
       )}
+
+      {result._id && <Feedback predictionId={result._id} crop={crop} />}
     </div>
   );
 };

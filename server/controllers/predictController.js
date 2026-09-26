@@ -1,25 +1,27 @@
 import axios from "axios";
+import mongoose from "mongoose";
 import FormData from "form-data";
 import { uploadBuffer } from "../config/cloudinary.js";
-import PredictionModel from "../models/Prediction.js";
-import { getTreatment } from "../utils/treatmentMap.js";
+import PredictionModel, { FEEDBACK } from "../models/Prediction.js";
+import { getTreatment, treatmentMap } from "../utils/treatmentMap.js";
 import getYieldLoss from "../utils/yieldLoss.js";
 import { BadImage, cleanImage } from "../utils/image.js";
 import { GUEST_ID } from "../middleware/guestDevice.js";
+import logger, { logError } from "../utils/logger.js";
 
 const ML_TIMEOUT_MS = 60000;
 const RETRYABLE = new Set([429, 502, 503, 504]); // Cloud Run while an instance starts or is saturated
 
 // One retry after 1 s for connection errors and gateway answers; never after our own timeout, which
 // would make the user wait twice. The form is rebuilt each time: a sent form-data stream is used up.
-const callML = async (image, filename, crop) => {
+const callML = async (image, filename, crop, requestId) => {
   for (let attempt = 1; ; attempt++) {
     const formData = new FormData();
     formData.append('file', image, { filename });
     formData.append('crop', crop);
     try {
       return await axios.post(`${process.env.FASTAPI_URL}/predict-disease`, formData, {
-        headers: { ...formData.getHeaders(), 'x-ml-token': process.env.ML_SERVICE_TOKEN ?? '' },
+        headers: { ...formData.getHeaders(), 'x-ml-token': process.env.ML_SERVICE_TOKEN ?? '', 'x-request-id': requestId },
         timeout: ML_TIMEOUT_MS,
       });
     } catch (err) {
@@ -55,8 +57,9 @@ const predict = async (req, res) => {
     // 1. Send image to FastAPI ML service (first, so a failed ML call leaves no orphan upload).
     // It gets the original bytes so predictions match the parity-tested pipeline exactly.
     let mlResponse;
+    const mlStart = performance.now();
     try {
-      mlResponse = await callML(req.file.buffer, req.file.originalname, crop);
+      mlResponse = await callML(req.file.buffer, req.file.originalname, crop, req.id);
     } catch (mlError) {
       // the ML service says the request itself is bad: tell the user; anything else is our outage
       const mlStatus = mlError.response?.status;
@@ -66,13 +69,16 @@ const predict = async (req, res) => {
       if (mlStatus === 400) {
         return res.status(400).json({ message: 'Unsupported crop' });
       }
-      console.error('ML service error:', mlStatus ?? mlError.code, mlError.message);
+      logger.error({ requestId: req.id, mlStatus: mlStatus ?? null, code: mlError.code ?? null, error: mlError.message },
+        'ML service call failed');
       return res.status(502).json({ message: 'The diagnosis service is unavailable right now. Please try again shortly.' });
     }
 
     // status: "ok" | "uncertain" | "rejected_quality" | "not_leaf" (docs/OOD_GATE.md)
     const { status = 'ok', reasons = [], ood_score = null, quality = null, top3, model_version = null,
             disease, confidence, severity, gradcam } = mlResponse.data;
+
+    const mlLatencyMs = Math.round(performance.now() - mlStart);
 
     // 2. Upload the photo and the Grad-CAM PNG to Cloudinary; MongoDB keeps only their URLs
     // (a base64 heatmap is ~100 KB, which would fill the 512 MB free Atlas cluster in ~5,000 records)
@@ -106,33 +112,84 @@ const predict = async (req, res) => {
       gradcam: gradcamUrl
     });
 
+    // what the drift report and dashboards need; never the image, its URL or who sent it
+    logger.info({ requestId: req.id, crop, status, disease: disease ?? null, confidence: confidence ?? null,
+      diseaseSeverity: severity ?? null, oodScore: ood_score, modelVersion: model_version, mlLatencyMs }, 'prediction');
+
     // 6. Return full result to frontend
     res.status(201).json(prediction);
 
   } catch (error) {
-    console.error('Predict error:', error.message);
+    logError(req, 'Predict failed', error);
     res.status(500).json({ message: 'Prediction failed' });  // details stay in the server log
   }
 };
 
 const PAGE_SIZE = 50;
 
+// guests only reach their own browser's records (middleware/guestDevice.js); null = nothing of theirs
+const ownerFilter = (req) => {
+  if (req.user.id !== GUEST_ID) return { userId: req.user.id };
+  return req.deviceId ? { userId: GUEST_ID, deviceId: req.deviceId } : null;
+};
+
 // @route  GET /api/predict?before=<createdAt of the last record shown>  (newest first, 50 per page)
 const getHistory = async (req, res) => {
   try {
     const before = req.query.before ? new Date(req.query.before) : null;
     if (before && isNaN(before)) return res.status(400).json({ message: 'Invalid before date' });
-    // guests only see their own browser's records (middleware/guestDevice.js); no device id = no history
-    if (req.user.id === GUEST_ID && !req.deviceId) return res.status(200).json([]);
-    const filter = req.user.id === GUEST_ID ? { userId: GUEST_ID, deviceId: req.deviceId } : { userId: req.user.id };
+    const filter = ownerFilter(req);
+    if (!filter) return res.status(200).json([]);
     if (before) filter.createdAt = { $lt: before };
     // the list never shows the heatmap, and records from before the migration hold it as ~100 KB base64
     const predictions = await PredictionModel.find(filter).select('-gradcam').sort({ createdAt: -1 }).limit(PAGE_SIZE);
     res.status(200).json(predictions);
   } catch (error) {
-    console.error('History error:', error.message);
+    logError(req, 'History failed', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-export { predict , getHistory};
+// @route  GET /api/predict/classes -> { crop: [class, ...] }, the choices for "what was it really?"
+// (the treatment map has exactly the ML label maps' classes; tests/feedback.test.js checks that)
+const getClasses = (req, res) => {
+  res.json(Object.fromEntries(Object.entries(treatmentMap).map(([crop, t]) => [crop, Object.keys(t)])));
+};
+
+// @route  PATCH /api/predict/:id/feedback  { feedback: correct|incorrect|unsure, correctedLabel? }
+// Answering again replaces the earlier answer.
+const giveFeedback = async (req, res) => {
+  try {
+    const { feedback, correctedLabel = null } = req.body ?? {};
+    if (!FEEDBACK.includes(feedback)) {
+      return res.status(400).json({ message: `feedback must be one of ${FEEDBACK.join(', ')}` });
+    }
+    const owner = ownerFilter(req);
+    if (!owner || !mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ message: 'Prediction not found' });
+    const prediction = await PredictionModel.findOne({ _id: req.params.id, ...owner });
+    if (!prediction) return res.status(404).json({ message: 'Prediction not found' });
+
+    if (feedback === 'incorrect') {
+      const choices = [...Object.keys(treatmentMap[prediction.crop] ?? {}), 'Other'];
+      if (!choices.includes(correctedLabel)) {
+        return res.status(400).json({ message: 'correctedLabel must be one of the crop\'s classes or "Other"' });
+      }
+    } else if (correctedLabel !== null) {
+      return res.status(400).json({ message: 'correctedLabel is only allowed with feedback "incorrect"' });
+    }
+
+    prediction.feedback = feedback;
+    prediction.correctedLabel = feedback === 'incorrect' ? correctedLabel : null;
+    prediction.feedbackAt = new Date();
+    await prediction.save();
+    logger.info({ requestId: req.id, crop: prediction.crop, status: prediction.status,
+      predicted: prediction.disease ?? null, feedback, correctedLabel: prediction.correctedLabel,
+      modelVersion: prediction.modelVersion }, 'feedback');
+    res.json({ _id: prediction._id, feedback, correctedLabel: prediction.correctedLabel, feedbackAt: prediction.feedbackAt });
+  } catch (error) {
+    logError(req, 'Feedback failed', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export { predict, getHistory, getClasses, giveFeedback };

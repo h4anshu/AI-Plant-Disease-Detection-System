@@ -1,6 +1,7 @@
 import base64
 import io
 import json
+import logging
 from pathlib import Path
 
 import pytest
@@ -45,6 +46,51 @@ def test_shared_secret_is_required_when_set(bare_api, monkeypatch):
     r = bare_api.post("/predict-disease", data={"crop": "wheat"}, files={"file": ("a.jpg", b"x", "image/jpeg")},
                       headers={"X-ML-Token": "s3cret"})
     assert r.status_code == 415  # past the token check, stopped by the image check
+
+
+class _Records(logging.Handler):
+    def __init__(self):
+        super().__init__()
+        self.entries = []
+
+    def emit(self, record):
+        self.entries.append((record.getMessage(), getattr(record, "fields", {})))
+
+
+@pytest.fixture
+def ml_log():
+    handler = _Records()
+    logging.getLogger("ml").addHandler(handler)
+    yield handler.entries
+    logging.getLogger("ml").removeHandler(handler)
+
+
+def test_request_id_is_kept_and_logged(bare_api, ml_log):
+    r = bare_api.post("/predict-disease", data={"crop": "mango"}, files={"file": ("a.jpg", b"x", "image/jpeg")},
+                      headers={"x-request-id": "req-42"})
+    assert r.headers["x-request-id"] == "req-42"
+    assert ("request", {"requestId": "req-42", "method": "POST", "path": "/predict-disease", "status": 400,
+                        "latencyMs": ml_log[-1][1]["latencyMs"]}) == ml_log[-1]
+
+
+@needs_weights
+def test_prediction_is_logged_without_the_image(api, ml_log):
+    r = api.post("/predict-disease", data={"crop": "wheat"}, files={"file": ("a.jpg", fixture("wheat"), "image/jpeg")},
+                 headers={"x-request-id": "req-7"})
+    assert r.status_code == 200
+    fields = next(f for msg, f in ml_log if msg == "prediction")
+    assert fields["requestId"] == "req-7" and fields["crop"] == "wheat" and fields["status"] == "ok"
+    assert fields["disease"] == GOLDEN["wheat"]["disease"] and fields["modelVersion"]["head"]
+    assert "severity" not in fields and "diseaseSeverity" in fields  # "severity" is the log level
+    assert "gradcam" not in fields and len(json.dumps(fields)) < 1000  # no image or heatmap bytes
+
+
+def test_json_log_format():
+    from app import JsonFormatter
+    record = logging.LogRecord("ml", logging.INFO, "", 0, "prediction", None, None)
+    record.fields = {"crop": "wheat", "confidence": 0.9, "severity": "early", "message": "x"}  # must not win
+    entry = json.loads(JsonFormatter().format(record))
+    assert entry["severity"] == "INFO" and entry["message"] == "prediction" and entry["crop"] == "wheat"
 
 
 def test_non_image_upload_is_415(bare_api):

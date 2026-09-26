@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import UserModel from "../models/User.js";
+import { logError } from "../utils/logger.js";
 
 
 const register = async(req , res) => {
@@ -32,7 +33,7 @@ const register = async(req , res) => {
 
     });
     } catch (error) {
-        console.error('Auth error:', error.message);
+        logError(req, 'Auth failed', error);
         res.status(500).json({ message: 'Server error' });  // details stay in the server log
     }
 }
@@ -67,7 +68,7 @@ const login = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email }
     });
   } catch (error) {
-    console.error('Auth error:', error.message);
+    logError(req, 'Auth failed', error);
         res.status(500).json({ message: 'Server error' });  // details stay in the server log
   }
 };

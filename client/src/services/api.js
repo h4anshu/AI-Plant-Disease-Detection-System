@@ -24,6 +24,8 @@ api.interceptors.request.use((config) => {
     config.headers.authorization = token;
   }
   config.headers['x-device-id'] = getDeviceId();
+  // one id per request, logged by the server and the ML service (docs/MONITORING.md)
+  config.headers['x-request-id'] = crypto.randomUUID();
   return config;
 });
 
@@ -40,6 +42,10 @@ export const predictDisease = (formData) =>
 
 // newest first, 50 per page; pass the createdAt of the last record shown to get older ones
 export const getPredictionHistory = (before) => api.get('/predict', { params: before ? { before } : {} });
+
+// "Was this correct?": { feedback: 'correct' | 'incorrect' | 'unsure', correctedLabel? }
+export const sendFeedback = (id, body) => api.patch(`/predict/${id}/feedback`, body);
+export const getCropClasses = () => api.get('/predict/classes');
 
 
 export default api;

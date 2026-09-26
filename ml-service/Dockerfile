@@ -25,4 +25,5 @@ USER app
 EXPOSE 8000
 
 # Cloud Run passes the port in $PORT; 8000 locally. Shell form for the expansion, exec so uvicorn gets SIGTERM.
-CMD exec uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000}
+# No access log: app.py logs each request as JSON with its request id and without the client IP.
+CMD exec uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000} --no-access-log

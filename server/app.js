@@ -5,6 +5,7 @@ import multer from 'multer';
 import authRouter from './routes/auth.routes.js';
 import predictRouter from './routes/predict.routes.js';
 import { globalLimiter } from './middleware/rateLimit.js';
+import { logError, requestLogger } from './utils/logger.js';
 
 // The Express app without side effects (no DB connection, no listen) so tests can import it;
 // server.js connects to MongoDB and starts listening.
@@ -14,6 +15,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 //Middleware
+app.use(requestLogger);
 app.use(helmet());
 // Only the listed browser origins may call the API; unset (local dev, tests) = any origin
 const origins = process.env.CLIENT_ORIGINS?.split(',').map((o) => o.trim()).filter(Boolean);
@@ -42,7 +44,7 @@ app.use((err, req, res, next) => {
     if (err.type === 'entity.too.large' || err.type === 'entity.parse.failed') {
         return res.status(err.status).json({ message: 'Invalid request body' });
     }
-    console.error('Unhandled error:', err.message);
+    logError(req, 'Unhandled error', err);
     res.status(500).json({ message: 'Something went wrong' });
 });
 

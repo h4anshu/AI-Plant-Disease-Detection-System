@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, test } from '@jest/globals';
+import { afterAll, afterEach, beforeAll, describe, expect, jest, test } from '@jest/globals';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import nock from 'nock';
@@ -6,6 +6,7 @@ import request from 'supertest';
 import sharp from 'sharp';
 import app from '../app.js';
 import Prediction from '../models/Prediction.js';
+import logger from '../utils/logger.js';
 
 const GUEST_ID = '000000000000000000000000'; // guest-auth bypass in middleware/auth.js (login disabled)
 const DEVICE = '3f2b8c1e-9d4a-4e7b-8a6c-2f1e0d9c8b7a';
@@ -137,6 +138,28 @@ describe('POST /api/predict', () => {
     expect(JSON.stringify(res.body)).not.toMatch(/Traceback|secret/);
     expect(cloud.isDone()).toBe(false);
     expect(await Prediction.countDocuments()).toBe(0);
+  });
+
+  test('the request id follows the call to the ML service and back; the log has no image or device', async () => {
+    const info = jest.spyOn(logger, 'info');
+    const ml = nock('http://ml.test').matchHeader('x-request-id', 'req-abc').post('/predict-disease').reply(200, ML_OK);
+    mockCloudinary();
+    const res = await upload().set('x-request-id', 'req-abc');
+    expect(ml.isDone()).toBe(true);
+    expect(res.headers['x-request-id']).toBe('req-abc');
+    const [entry] = info.mock.calls.find(([, msg]) => msg === 'prediction');
+    expect(entry).toMatchObject({ requestId: 'req-abc', crop: 'blackgram', status: 'ok', disease: 'Yellow_Mosaic',
+      confidence: 0.98, modelVersion: { head: '1.0.0' } });
+    expect(entry.mlLatencyMs).toBeGreaterThanOrEqual(0);
+    expect(entry).toMatchObject({ diseaseSeverity: 'moderate' });
+    expect(entry).not.toHaveProperty('severity'); // Cloud Logging reads "severity" as the log level
+    expect(JSON.stringify(entry)).not.toMatch(/cloudinary|iVBOR|3f2b8c1e/);
+    info.mockRestore();
+  });
+
+  test('a malformed incoming request id is replaced by a fresh one', async () => {
+    const res = await request(app).get('/health').set('x-request-id', 'bad id with spaces');
+    expect(res.headers['x-request-id']).toMatch(/^[0-9a-f-]{36}$/);
   });
 
   test('a cold-start 503 from the ML service is retried once', async () => {

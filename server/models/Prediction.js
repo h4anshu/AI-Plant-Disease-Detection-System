@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 // status comes from the ML service's quality + out-of-distribution gate (docs/OOD_GATE.md).
 // Only "ok" results are diagnoses; records saved before the gate existed read as "ok".
 const STATUSES = ['ok', 'uncertain', 'rejected_quality', 'not_leaf'];
+export const FEEDBACK = ['correct', 'incorrect', 'unsure'];
 const hasPrediction = function () { return this.status === 'ok' || this.status === 'uncertain'; };
 
 const predictionSchema = new mongoose.Schema({
@@ -78,6 +79,22 @@ const predictionSchema = new mongoose.Schema({
     },
     gradcam: {
         type: String,
+        default: null
+    },
+    // "Was this correct?" from the user (docs/MONITORING.md). Guest answers are unverified: they feed
+    // the expert relabel queue (ml-service/train/export_relabel_queue.py), never training directly.
+    feedback: {
+        type: String,
+        enum: [...FEEDBACK, null],
+        default: null
+    },
+    // the user's pick from the crop's classes, or "Other"; only with feedback "incorrect"
+    correctedLabel: {
+        type: String,
+        default: null
+    },
+    feedbackAt: {
+        type: Date,
         default: null
     }
 }, {

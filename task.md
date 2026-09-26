@@ -291,3 +291,33 @@ What was done:
   - Cleanup policies are active on both repositories: keep the 6 newest versions (one ML push = image + attestation + index), delete older than 14 days.
   - Right after the deletion, `describe` still reported 1,221 MB for `plant-disease`; the layers of deleted images are garbage-collected asynchronously. Expected about 0.2 GB + 0.17 GB once collected.
   - Both services healthy after the cleanup.
+
+## Task 9 — Monitoring and the feedback loop
+
+Brief: structured logs with request ids, Sentry, uptime and drift report, "Was this correct?" feedback, and a relabel export. Done on `main` instead of `feat/monitoring-feedback`.
+
+Assessment first: feedback and relabeling are the most valuable part, since in-field accuracy was never measured. Sentry is needed only in the browser: on Cloud Run, Error Reporting already groups structured error logs for free. UptimeRobot pings also keep the instances warm, at no cost.
+
+What was done:
+- **Feedback**:
+  - `Prediction.feedback` (correct / incorrect / unsure), `correctedLabel`, `feedbackAt`.
+  - `PATCH /api/predict/:id/feedback`, scoped to the owner (a guest only reaches their own device's records; others get 404). Label validation: the crop's class or "Other", and only with "incorrect". Re-answering replaces the earlier answer.
+  - `GET /api/predict/classes` comes from the treatment map; a test checks it equals `ml-service/data/label_maps.json`.
+  - Client `Feedback.jsx` under a diagnosis: Yes / No / Not sure; "No" opens a native select with the crop's classes plus "Other".
+- **Relabel export**: `ml-service/train/export_relabel_queue.py` (pymongo 4.18.2 in `requirements-export.txt`). It exports incorrect/unsure feedback and uncertain predictions to CSV, with reviewer columns and no device ids. The reviewed-CSV-to-training steps are in `docs/MONITORING.md`.
+- **Logging**:
+  - Server: pino JSON (`severity`/`message`/`time` for Cloud Logging) and my own request-id middleware (pino-http's default serializers would log headers and IPs). The browser sends `x-request-id`; the server reuses or validates it and forwards it to ML. `prediction` and `feedback` log lines; errors carry `stack_trace` for Error Reporting.
+  - FastAPI: JSON formatter, request middleware, prediction log; uvicorn access log off (`--no-access-log`, it logged client IPs).
+- **Bug found in the local e2e run and fixed**: the prediction log field `severity` (disease severity, e.g. "early") overwrote the log-level `severity` in both services. Renamed to `diseaseSeverity`; the ML formatter now writes reserved keys last; tests assert both.
+- **Drift report**: `server/scripts/drift_report.js` (`driftReport()` + CLI; `--sample` runs on an in-memory DB). Per crop per day: count, mean confidence, uncertain and rejected shares, incorrect feedback. Flags a crop when it is more than 10 points below its 14-day baseline, needing at least 5 predictions on each side; exit code 2 when flagged.
+- **Sentry**: client only, lazy `import('@sentry/react')` only when `VITE_SENTRY_DSN` is set (no chunk built otherwise; 30 kB gzip chunk when set), `sendDefaultPii: false`.
+- `docs/MONITORING.md` covers log fields and queries, Error Reporting, Sentry setup, UptimeRobot monitors, the drift report and the relabel loop. README links it.
+
+Tests and checks:
+- New: Jest `feedback.test.js` (12 cases: classes = label maps, correct / incorrect / Other / replace, 5 invalid bodies, other device, no device, signed-in record, malformed id, log without image or device) and `drift.test.js` (2 cases); the predict tests check request-id propagation and log privacy. pytest: request id, JSON format, prediction log without image, `to_row`. Vitest: `Feedback.test.jsx` (3 cases).
+- Totals: pytest 46, Jest 43, Vitest 14; lint unchanged (10 old warnings); build OK.
+- **Local end-to-end** (nothing left the machine: in-memory MongoDB, a Cloudinary stand-in via the SDK's `upload_prefix`, local ML on 8010, server on 4010, client on 5180):
+  - predict wheat golden photo → BlackPoint → "No" → WheatBlast → PATCH 200 → thank-you note;
+  - the same request id appears in the server and ML logs;
+  - the drift report on that DB shows `feedbackIncorrect: 1`; the relabel export CSV has the row with the correction and model versions.
+- `npm audit` shows 3 old high findings (nanoid, react-router); split off as a separate task.
