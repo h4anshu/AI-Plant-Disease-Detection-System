@@ -53,13 +53,6 @@ def quality_verdict(q: dict, th: dict):
     return None, []
 
 
-def head_weights(head):
-    """(W1, b1, W2, b2) of a Dense(128, relu) -> Dropout -> Dense(softmax) head, for logits in numpy."""
-    dense = [l for l in head.layers if l.__class__.__name__ == "Dense"]
-    (w1, b1), (w2, b2) = dense[0].get_weights(), dense[-1].get_weights()
-    return w1, b1, w2, b2
-
-
 def logits_from_features(weights, feats: np.ndarray) -> np.ndarray:
     w1, b1, w2, b2 = weights
     return np.maximum(feats @ w1 + b1, 0.0) @ w2 + b2
@@ -94,14 +87,15 @@ def ood_scores(method: str, feats: np.ndarray, logits: np.ndarray, stats: dict =
 class Gate:
     """Loaded once at startup next to the models."""
 
-    def __init__(self, heads: dict):
+    def __init__(self, weights: dict):
+        """weights: crop -> (w1, b1, w2, b2) of the Dense(128, relu) -> Dropout -> Dense(softmax) head."""
         cfg = json.loads(THRESHOLDS_PATH.read_text(encoding="utf-8"))
         self.quality = cfg["quality"]["thresholds"]
         self.crops = cfg["crops"]
         npz = np.load(STATS_PATH)
         self.stats = {c: {k.split("/", 1)[1]: npz[k].astype(np.float32) for k in npz.files if k.startswith(f"{c}/")}
                       for c in self.crops}
-        self.weights = {c: head_weights(h) for c, h in heads.items()}
+        self.weights = weights
 
     def check_quality(self, image, resized):
         q = quality_metrics(image, resized)

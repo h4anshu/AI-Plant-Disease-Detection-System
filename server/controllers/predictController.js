@@ -43,7 +43,7 @@ const predict = async (req, res) => {
     }
 
     // status: "ok" | "uncertain" | "rejected_quality" | "not_leaf" (docs/OOD_GATE.md)
-    const { status = 'ok', reasons = [], ood_score = null, quality = null, top3,
+    const { status = 'ok', reasons = [], ood_score = null, quality = null, top3, model_version = null,
             disease, confidence, severity, gradcam } = mlResponse.data;
 
     // 2. Upload image to Cloudinary
@@ -71,6 +71,7 @@ const predict = async (req, res) => {
       oodScore: ood_score,
       quality,
       top3,
+      modelVersion: model_version,
       disease,
       confidence,
       severity,

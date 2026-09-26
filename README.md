@@ -29,7 +29,7 @@ The result — disease name, confidence, severity, treatment text, yield-loss %,
                                                                     └──────────────────────┘
 ```
 
-React handles the UI and talks to Express; Express handles auth, Cloudinary upload, and MongoDB persistence, and forwards the actual inference work to FastAPI. The three services are split because the ML dependencies (TensorFlow, a multi-hundred-MB model) don't belong in the same runtime as the web API, and because it lets the inference service scale or restart independently.
+React handles the UI and talks to Express; Express handles auth, Cloudinary upload, and MongoDB persistence, and forwards the actual inference work to FastAPI. The three services are split because the ML dependencies (ONNX Runtime, numpy and the model files) don't belong in the same runtime as the web API, and because it lets the inference service scale or restart independently.
 
 The model side uses one shared EfficientNetB0 backbone (ImageNet weights, frozen) with a separate small classification head per crop, instead of one flat 32-class model or an auto-detected crop. The backbone is never fine-tuned — it's used purely as a feature extractor, and each crop's head is a small Dense network trained independently on cached 1280-dim feature vectors. This was also a deliberate fix: an earlier attempt at fine-tuning the backbone per crop corrupted the shared weights across crops, since the backbone was being mutated by whichever crop trained last. Freezing it and caching features solved that, and also cut head-training time from roughly an hour per crop to seconds.
 
@@ -86,7 +86,7 @@ To restate the scope point from earlier: this is a lookup table, not a model. It
 |---|---|
 | Frontend | React 19.2, Vite 8.1, Tailwind CSS 4.3 (`@tailwindcss/vite`), Axios 1.18, react-router-dom 7.18 |
 | Backend | Node.js, Express 5.2 (ESM, `import`/`export`), Mongoose 9.8, JWT (`jsonwebtoken` 9.0 + `bcryptjs` 3.0), Multer 2.2, Cloudinary SDK 2.10 |
-| ML service | Python 3.11 (pinned), FastAPI, Uvicorn, TensorFlow/Keras, scikit-learn, scipy, Pillow, matplotlib (for Grad-CAM colormap) |
+| ML service | Python 3.11 (pinned), FastAPI, Uvicorn, ONNX Runtime, numpy, scipy, Pillow. TensorFlow/Keras, tf2onnx, scikit-learn and matplotlib only for training and the ONNX export ([docs/SERVING.md](docs/SERVING.md)) |
 | Model | EfficientNetB0 backbone (frozen, ImageNet weights) + one Dense(128)→Dropout(0.3)→Dense(softmax) head per crop |
 | Database | MongoDB Atlas |
 | Image storage | Cloudinary |
@@ -130,7 +130,8 @@ Three terminals:
 # ML service
 cd ml-service
 python -m venv venv && venv\Scripts\activate   # or source venv/bin/activate on Linux/macOS
-pip install -r requirements.txt
+pip install -r requirements.txt -r requirements-export.txt
+python train/export_onnx.py   # builds models/onnx/ from the .keras weights (once, and after any retrain)
 uvicorn app:app --port 8000
 
 # Express API
@@ -144,7 +145,7 @@ npm install
 npm run dev
 ```
 
-The FastAPI service loads the backbone and all ten heads once at startup (not per request) — expect a several-second delay before `/health` responds on first boot.
+The FastAPI service loads the ONNX backbone and all ten heads once at startup (not per request); `/health` responds after about 2-3 s and lists the version of every model from `models/model_registry.json`. It refuses to start if `models/onnx/` is older than the `.keras` weights — re-run the export. Serving details, the Keras↔ONNX parity check and the before/after benchmark are in [docs/SERVING.md](docs/SERVING.md).
 
 ## Running tests
 
@@ -154,7 +155,8 @@ Each package has its own suite; GitHub Actions (`.github/workflows/ci.yml`) runs
 # ML service: API contract, golden regression per crop (fixed held-out photo -> same class,
 # confidence within 0.02), severity, Grad-CAM PNG, quality/OOD gate
 cd ml-service
-pip install -r requirements.txt -r requirements-dev.txt
+pip install -r requirements.txt -r requirements-export.txt -r requirements-dev.txt
+python train/export_onnx.py
 pytest
 
 # Express API: Jest + supertest, mongodb-memory-server, Cloudinary/ML mocked with nock
@@ -168,7 +170,7 @@ npm install
 npm run lint && npm test && npm run build
 ```
 
-The golden tests need the model weights (tracked in git); without them they are skipped with a reason. After a head is retrained on purpose, regenerate the fixtures with `python tests/make_golden.py` and review the diff of `tests/golden_expected.json`.
+The golden tests need the ONNX files built from the tracked weights; without them they are skipped with a reason. `tests/test_registry.py` fails if a weight file changes without its version being bumped in `models/model_registry.json`. After a head is retrained on purpose, regenerate the fixtures with `python tests/make_golden.py` and review the diff of `tests/golden_expected.json`.
 
 ## API overview
 
@@ -188,8 +190,8 @@ Auth uses the raw JWT in the `Authorization` header, with no `Bearer` prefix —
 
 | Method | Route | Purpose |
 |---|---|---|
-| POST | `/predict-disease` | image + crop → disease, confidence, severity, Grad-CAM PNG (base64) |
-| GET | `/health` | Health check |
+| POST | `/predict-disease` | image + crop → disease, confidence, severity, Grad-CAM PNG (base64), `model_version` |
+| GET | `/health` | Health check + model registry summary |
 
 ## Known limitations
 

@@ -27,7 +27,8 @@ def fixture_bytes(path: Path) -> bytes:
 
 
 def main():
-    backbone, heads, label_maps, gate = load_models()
+    models = load_models()
+    label_maps = models.label_maps
     OUT.mkdir(parents=True, exist_ok=True)
     expected = {}
     for crop in ACTIVE_CROPS:
@@ -35,7 +36,7 @@ def main():
             done = False
             for path in sorted((ML / "data" / "test" / crop / cls).iterdir())[:25]:
                 raw = fixture_bytes(path)
-                out = predict_disease(backbone, heads, label_maps, gate, crop, raw)
+                out = predict_disease(models, crop, raw)
                 # a clear, correctly classified photo that passes the gate - stable across platforms
                 if out["status"] == "ok" and out["disease"] == cls and out["confidence"] >= 0.9:
                     name = f"{crop}.jpg"

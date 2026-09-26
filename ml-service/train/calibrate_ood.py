@@ -24,7 +24,7 @@ from sklearn.metrics import roc_auc_score
 ML = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ML))
 import gate  # noqa: E402
-from predict import ACTIVE_CROPS, IMG_SIZE, load_models  # noqa: E402
+from predict import ACTIVE_CROPS, IMG_SIZE, embed, load_models  # noqa: E402
 
 DATA = ML / "data"
 CACHE = DATA / "ood_cache"
@@ -83,7 +83,7 @@ def load(src):
         return None, None
 
 
-def features(name, sources, backbone):
+def features(name, sources, models):
     """Backbone features + quality metrics for a list of sources, cached by name and length."""
     CACHE.mkdir(parents=True, exist_ok=True)
     cache = CACHE / f"{name}.npz"
@@ -91,7 +91,6 @@ def features(name, sources, backbone):
         d = np.load(cache, allow_pickle=True)
         if len(d["feats"]) == len(sources):
             return d["feats"], list(d["quality"]), d["ok"]
-    from tensorflow.keras.applications.efficientnet import preprocess_input
     feats = np.zeros((len(sources), 1280), np.float32)
     quality, ok = [None] * len(sources), np.zeros(len(sources), bool)
     t0 = time.time()
@@ -103,8 +102,7 @@ def features(name, sources, backbone):
             for i, (a, q) in zip(chunk, loaded):
                 quality[i], ok[i] = q, a is not None
             if good:
-                x = preprocess_input(np.stack([a for _, a in good]).astype(np.float32))
-                feats[[i for i, _ in good]] = backbone.predict(x, batch_size=64, verbose=0)
+                feats[[i for i, _ in good]] = embed(models, np.stack([a for _, a in good]))[0]
     print(f"  features {name}: {len(sources)} images, {ok.sum()} decoded, {time.time() - t0:.0f}s", flush=True)
     np.savez(cache, feats=feats, quality=np.array(quality, dtype=object), ok=ok)
     return feats, quality, ok
@@ -138,8 +136,8 @@ def fpr_at_tpr(id_scores, ood, tpr=TPR):
 
 def main():
     rng = np.random.default_rng(SEED)
-    backbone, heads, label_maps, _ = load_models(with_gate=False)
-    weights = {c: gate.head_weights(heads[c]) for c in ACTIVE_CROPS}
+    models = load_models(with_gate=False)  # the ONNX serving models: calibration sees exactly what serving sees
+    label_maps, weights = models.label_maps, models.weights
 
     sets = {}
     for crop in ACTIVE_CROPS:
@@ -148,15 +146,15 @@ def main():
             if split == "train" and len(files) > TRAIN_CAP:
                 pick = np.sort(rng.choice(len(files), TRAIN_CAP, replace=False))
                 files, y = [files[i] for i in pick], y[pick]
-            f, q, ok = features(f"{crop}_{split}", files, backbone)
+            f, q, ok = features(f"{crop}_{split}", files, models)
             sets[(crop, split)] = {"feats": f[ok], "y": y[ok], "quality": [q[i] for i in np.nonzero(ok)[0]]}
     zf, pd_items = plantdoc_items()
-    f, q, ok = features("plantdoc", [(lambda n=n: zf.read(n)) for n, _ in pd_items], backbone)
+    f, q, ok = features("plantdoc", [(lambda n=n: zf.read(n)) for n, _ in pd_items], models)
     pd_species = np.array([s for _, s in pd_items])[ok]
     pd = {"feats": f[ok], "quality": [q[i] for i in np.nonzero(ok)[0]]}
     im_files = sorted(p for p in IMAGENETTE.rglob("*") if p.suffix.lower() in IMG_EXTS)
     im_files = [im_files[i] for i in np.sort(rng.choice(len(im_files), FAR_N, replace=False))]
-    f, q, ok = features("imagenette", im_files, backbone)
+    f, q, ok = features("imagenette", im_files, models)
     far = {"feats": f[ok], "quality": [q[i] for i in np.nonzero(ok)[0]]}
 
     # ---- quality cut-offs from train+val of every crop. Each cut-off sits at the most lenient crop's

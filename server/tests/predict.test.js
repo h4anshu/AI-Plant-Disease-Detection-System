@@ -48,6 +48,7 @@ const ML_OK = {
   status: 'ok', reasons: [], ood_score: 0.12,
   quality: { short_side: 512, blur: 900, brightness: 120, vegetation: 0.9 },
   disease: 'Yellow_Mosaic', confidence: 0.98, severity: 'moderate', gradcam: 'iVBORw0KGgo=', crop: 'blackgram',
+  model_version: { backbone: '1.0.0', head: '1.0.0', gate: '1.0.0' },
 };
 
 describe('POST /api/predict', () => {
@@ -81,7 +82,9 @@ describe('POST /api/predict', () => {
     });
     expect(res.body.treatment).toMatch(/whitefly/i);
     const saved = await Prediction.findById(res.body._id).lean();
-    expect(saved).toMatchObject({ status: 'ok', disease: 'Yellow_Mosaic', oodScore: 0.12 });
+    expect(saved).toMatchObject({ status: 'ok', disease: 'Yellow_Mosaic', oodScore: 0.12,
+      modelVersion: { backbone: '1.0.0', head: '1.0.0', gate: '1.0.0' } });
+    expect(res.body.modelVersion).toEqual({ backbone: '1.0.0', head: '1.0.0', gate: '1.0.0' });
   });
 
   test('uncertain result is saved without treatment or yield loss', async () => {
@@ -150,5 +153,6 @@ describe('GET /api/predict (history)', () => {
     expect(res.status).toBe(200);
     expect(res.body.map((p) => p.crop)).toEqual(['wheat', 'rice', 'maize']);
     expect(res.body.every((p) => p.status === 'ok')).toBe(true);
+    expect(res.body[2].modelVersion).toBeNull(); // saved before model versioning existed
   });
 });

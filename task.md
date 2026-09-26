@@ -171,3 +171,49 @@ git tag -a v0.2-10crops c91b408 -m "Baseline: 10 live crops, LF-normalised repo,
 - CI run 1 (`ac04bba`): ml-service ✅ 1.4 min (golden tests ran on Linux), server ✅ 0.3 min, client ❌ at `npm test` — vitest 5 / jsdom 30 / jest-dom need Node ≥ 22, job used 20 (local is 22). Fix `23ed4ee`: client job on Node 22 + `engines` in client/package.json; server job stays on Node 20 (= its Dockerfile).
 - CI run 2: **all three jobs green** — https://github.com/h4anshu/AI-Plant-Disease-Detection-System/actions/runs/36219238570 (ml-service 1.1 min, server 0.3, client 0.3; ~1.5 min wall clock in parallel).
 - Skipped / left as is: oxlint's 10 pre-existing warnings (disabled-login leftovers); GitHub's notice that actions/checkout@v4 & setup-node@v4 run on a deprecated Node 20 runtime (still works); no browser end-to-end test in CI (needs real Mongo/Cloudinary). Nothing had to be skipped in the suites themselves — weights are in git, so golden tests run in CI.
+
+---
+
+## Task 6 (continued) — Live site still broken after push: stale Cloud Run deploy (26 Sep 2026)
+
+**Goal:** user reported the production site (`ai-plant-disease-detection-system.vercel.app`) still showed "No token provided, authorization denied" after the auth fix was pushed.
+
+**What happened**
+1. Confirmed `chore/tests-ci` had already been merged into `main` (`main` was at `964bd67`) and `server/middleware/auth.js` on `main` already had the guest-bypass fix — so the fix genuinely was in the repo.
+2. Read the built JS bundle of the live Vercel frontend directly (fetched `index-*.js`, regex for `run.app`/`localhost` URLs) to confirm which backend it calls: `https://server-211927486412.asia-south1.run.app/api` — the Cloud Run service, as expected for prod (the earlier `client/.env` edit was local-only and correctly irrelevant here).
+3. `curl`'d that Cloud Run URL directly — still returned `401 {"message":"No token provided, authorization denied"}`, proving the *running container* was stale, not the frontend or the code.
+4. `gcloud run services list` showed the `server` service's last deploy was 2026-07-27, months before the auth fix — there is no CI/CD trigger wired to Cloud Run, so `git push` never redeploys it; deploys are manual (per README).
+5. Checked existing service config before touching anything: all 6 env vars already set (`MONGODB_URI`, `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `FASTAPI_URL`); `gcloud` was already authenticated for project `plant-disease-503711`.
+6. Asked the user for explicit confirmation before redeploying a production service; approved. Ran `gcloud run deploy server --source ./server --region asia-south1` (source-based deploy, no `--set-env-vars` so existing env vars carried over). New revision `server-00006-62k` deployed, serving 100% traffic.
+7. Verified: `curl` to the same endpoint now returns `200` with real guest prediction history (a prior test record with `userId: "000000000000000000000000"` was already in Mongo, confirming the guest-bypass path had worked locally/against prod DB before this).
+
+**Result:** live site's Analyze flow should now work without login. `ml-service` Cloud Run service was untouched (already current, last deployed alongside the new-crop heads).
+
+---
+
+## Task 6 — Model versioning + ONNX serving (26 Sep 2026, in progress)
+
+**Goal:** every prediction records which model made it (`model_registry.json`, `model_version` in API + saved records, registry on `/health`); ONNX Runtime for CPU serving in a smaller image without losing Grad-CAM; parity gate (same argmax on ≥ 99.9% of held-out images, max prob diff < 1e-3); benchmark TF vs ONNX in Docker; slim non-root Dockerfile with exact pins. Work directly on `main` (user preference, overrides the brief's `feat/versioning-onnx`).
+
+**Log**
+- Key finding for the Grad-CAM decision: the heads sit on global-average-pooling of the backbone's last conv map, so d(class prob)/d(conv map) has a closed form from the head weights (softmax → Dense → ReLU → Dense → GAP). Grad-CAM can run in numpy on a second ONNX backbone output (the conv map) — no TensorFlow in the serving image at all. To be verified against the TF implementation.
+- Export tooling: tf2onnx 1.17 + onnx 1.23 + onnxruntime 1.30 install into `.venv` next to TF 2.21 without conflicts (dry-run checked).
+
+---
+
+## Task 7 — Live site fix, round 2: stale token on a phone bypassed the guest fallback (26 Sep 2026)
+
+**Goal:** user's phone still got blocked on the live site after the Task 6 Cloud Run redeploy, with a different message this time: `"Token is invalid or expired"` (not "No token provided").
+
+**What happened**
+- The phone's browser had a real JWT saved in `localStorage` from before login was disabled (client's `api.js` interceptor always attaches it when present). `server/middleware/auth.js`'s guest bypass only fired on a **missing** token (`if(!token)`); a present-but-invalid/expired one still fell into the `jwt.verify` `catch` and returned a real `401`.
+- Fix: the `catch` block now also sets `req.user` to the guest ObjectId and calls `next()` instead of returning 401 — same reversible pattern (original 401 line commented directly below). One shared middleware, so this covers every route that uses it (`/predict`, `/predict` GET history), not just the one the phone happened to hit.
+- Committed `25d86a0` on `main`, pushed, redeployed Cloud Run (`gcloud run deploy server --source ./server --region asia-south1` → revision `server-00007-8w9`, 100% traffic).
+- Verified: `curl -H "Authorization: this-is-a-bad-token" .../api/predict` → `200` (was `401` before).
+
+**Note for later re-enabling login:** both guest-fallback spots in `auth.js` (missing token, invalid token) need their commented 401/original logic restored together, not just one.
+- Parity gate PASSED on all 4,536 held-out images: identical argmax 100%, max |prob diff| 4.1e-5 (limit 1e-3), OOD decisions 100% identical; numpy Grad-CAM vs TensorFlow: heatmap ≤ 0.006, final pixels ≤ 4/255. Tooling: `train/export_onnx.py` (from_keras — from_function left the normalisation constants as graph inputs; outputs renamed to image→features/conv, features→probs; each .onnx tagged with its source sha), `train/check_onnx_parity.py`, `model_registry.json` (all 1.0.0), `predict.py` on ONNX Runtime (no TensorFlow), `/health` returns the registry, `model_version` in every response and stored as `Prediction.modelVersion`; server tests updated. pytest 39 passed.
+- **Incident: C: drive hit 0 bytes free** during the Docker build of the old TensorFlow "before" image; Docker Desktop crashed (`read-only file system`). Cleanup (user asked to remove everything unused and report): pip cache 2.82 GB, npm cache 6.07 GB, WSL `~/staging` 5.5 GB + `~/tfgpu` 6.7 GB + WSL pip cache 3.7 GB (inside the WSL disk), Docker build cache 10.86 GB (inside Docker's disk), temporary git worktree. C: went 0 → 10.9 GB free. The two virtual disks (WSL `ext4.vhdx` 21.4 GB, Docker `docker_data.vhdx` 20.4 GB) do not shrink when files inside are deleted (WSL disk switched to sparse + fstrim, no blocks released) — reclaiming that space needs admin compaction or moving them to D:.
+- Docker benchmark (`train/bench_docker.py`, 2 CPU / 4 GB, same 6 crops, 2 runs each), deployed TF image `ml-service:v1` → new ONNX image: compressed size 924 → 184 MB (on disk 3.98 GB → 699 MB), cold start to first prediction 6.4-11.9 s → 2.6-4.3 s, RAM 588-615 → 148-161 MiB, p50 942-993 → 197-207 ms, p95 1,023-1,337 → 211-308 ms. The v1 image had no gate, ran as root and had unpinned requirements. The new image is multi-stage (TensorFlow only in the export stage), runs as non-root `app` and uses exact pins.
+- Grad-CAM decision: closed-form gradient in numpy (the head is only GAP → Dense-ReLU → Dense-softmax), over keeping TensorFlow in the image or exporting a gradient graph. Written up with the parity table and the benchmark in `docs/SERVING.md`. README updated (export step before running the service or tests; `/health` and `model_version`).
+- Tests: pytest 39 passed, Jest 10 passed, Vitest 9 passed. Committed on `main`, not pushed. Not deployed: Cloud Run still runs `ml-service:v1`.

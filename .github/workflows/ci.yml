@@ -26,9 +26,12 @@ jobs:
           cache: pip
           cache-dependency-path: |
             ml-service/requirements.txt
+            ml-service/requirements-export.txt
             ml-service/requirements-dev.txt
-      - run: pip install -r requirements.txt -r requirements-dev.txt
-      # model weights are tracked in git, so the golden regression tests run here too
+      - run: pip install -r requirements.txt -r requirements-export.txt -r requirements-dev.txt
+      # the service runs on ONNX files built from the tracked .keras weights (git-ignored, see docs/SERVING.md)
+      - run: python train/export_onnx.py
+      # golden regression + ONNX-vs-Keras parity on the committed fixtures run here too
       - run: pytest -p no:cacheprovider
 
   server:

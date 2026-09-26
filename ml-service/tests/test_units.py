@@ -42,21 +42,60 @@ def test_severity_accepts_any_mode_and_size():
     assert compute_severity(Image.new("L", (37, 1000), 128)) in {"early", "moderate", "severe"}
 
 
-# ---------------------------------------------------------------- gradcam
+# ---------------------------------------------------------------- gradcam (numpy, no TensorFlow)
+
+def _head(rng, k=4, c=16, hidden=8):
+    return (rng.normal(size=(c, hidden)).astype(np.float32), rng.normal(size=hidden).astype(np.float32),
+            rng.normal(size=(hidden, k)).astype(np.float32), rng.normal(size=k).astype(np.float32))
+
+
+def test_gradcam_gradient_matches_finite_differences():
+    """The closed-form d p_c / d A (softmax -> Dense -> ReLU -> Dense -> GAP) against numerical differentiation."""
+    import gradcam
+    rng = np.random.default_rng(0)
+    w1, b1, w2, b2 = _head(rng)
+    conv = rng.normal(size=(3, 3, 16)).astype(np.float64)
+
+    def prob(a, c=2):
+        z = np.maximum(a.mean((0, 1)) @ w1 + b1, 0) @ w2 + b2
+        e = np.exp(z - z.max())
+        return (e / e.sum())[c]
+
+    num = np.zeros_like(conv)
+    for idx in np.ndindex(conv.shape):
+        d = np.zeros_like(conv)
+        d[idx] = 1e-6
+        num[idx] = (prob(conv + d) - prob(conv - d)) / 2e-6
+    expected = np.maximum(conv @ num.mean((0, 1)), 0)
+    expected /= expected.max() + 1e-8
+    got = gradcam.heatmap(conv.astype(np.float32), conv.mean((0, 1)).astype(np.float32), (w1, b1, w2, b2), 2)
+    assert np.allclose(got, expected, atol=1e-4)
+
 
 def test_gradcam_returns_valid_png():
-    """Tiny fake backbone/head: exercises the tape -> heatmap -> overlay -> base64 PNG path without weights."""
-    import tensorflow as tf
-    from tensorflow.keras import Model, layers
-    inputs = tf.keras.Input(shape=(224, 224, 3))
-    backbone = Model(inputs, layers.Conv2D(4, 3, padding="same")(inputs))
-    head_in = tf.keras.Input(shape=(4,))
-    head = Model(head_in, layers.Dense(2, activation="softmax")(head_in))
-    img = Image.fromarray((np.random.default_rng(0).random((300, 400, 3)) * 255).astype("uint8"))
-    png = base64.b64decode(generate_gradcam(backbone, head, img, class_idx=1))
+    import gradcam
+    rng = np.random.default_rng(0)
+    conv = rng.random((7, 7, 16)).astype(np.float32)
+    img = Image.fromarray((rng.random((224, 224, 3)) * 255).astype("uint8"))
+    png = base64.b64decode(gradcam.generate_gradcam(conv, conv.mean((0, 1)), _head(rng), img, class_idx=1))
     assert png[:8] == PNG_SIGNATURE
     out = Image.open(__import__("io").BytesIO(png))
     assert out.size == (224, 224) and out.mode == "RGB"
+
+
+def test_jet_matches_matplotlib():
+    cm = pytest.importorskip("matplotlib.cm")
+    import gradcam
+    x = np.linspace(0, 1, 2049, dtype=np.float32)
+    assert np.allclose(gradcam.jet(x), cm.jet(x)[:, :3])
+
+
+def test_bilinear_resize_matches_tensorflow():
+    tf = pytest.importorskip("tensorflow")
+    import gradcam
+    a = np.random.default_rng(0).random((7, 7)).astype(np.float32)
+    ref = tf.image.resize(a[..., None], (224, 224)).numpy()[..., 0]
+    assert np.allclose(gradcam.resize_bilinear(a, 224), ref, atol=1e-6)
 
 
 # ---------------------------------------------------------------- quality / OOD gate
@@ -122,3 +161,26 @@ def test_committed_thresholds_cover_every_crop():
         # the calibration kept roughly 95% of the crop's own held-out photos
         assert 0.9 <= c["test_tpr_at_threshold"] <= 1.0
     assert max(cfg["quality"]["train_val_rejected_per_crop"].values()) < 0.02
+
+
+# ---------------------------------------------------------------- ONNX vs Keras (full gate: train/check_onnx_parity.py)
+
+def test_onnx_matches_keras_on_golden_fixtures():
+    """CI-sized parity check; the full held-out-split gate needs data/test/ and runs locally."""
+    keras = pytest.importorskip("tensorflow").keras
+    from conftest import HAVE_WEIGHTS
+    if not HAVE_WEIGHTS:
+        pytest.skip("ONNX models not built")
+    import io as _io
+    from pathlib import Path
+    from predict import MODELS, REGISTRY, embed, load_models
+    models = load_models(with_gate=False)
+    golden = json.loads((Path(__file__).parent / "golden_expected.json").read_text(encoding="utf-8"))
+    kb = keras.models.load_model(MODELS / REGISTRY["backbone"]["file"])
+    for crop, exp in golden.items():
+        raw = (Path(__file__).parent / "fixtures" / "golden" / exp["file"]).read_bytes()
+        x = np.expand_dims(np.asarray(Image.open(_io.BytesIO(raw)).convert("RGB").resize((224, 224))), 0)
+        khead = keras.models.load_model(MODELS / REGISTRY["heads"][crop]["file"])
+        kprobs = np.asarray(khead(kb(x.astype(np.float32), training=False), training=False))
+        oprobs = models.heads[crop].run(["probs"], {"features": embed(models, x)[0]})[0]
+        assert kprobs.argmax() == oprobs.argmax() and np.abs(kprobs - oprobs).max() < 1e-3, crop

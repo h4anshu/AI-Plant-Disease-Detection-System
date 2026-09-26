@@ -21,9 +21,13 @@ def fixture(crop):
     return (TESTS / "fixtures" / "golden" / GOLDEN[crop]["file"]).read_bytes()
 
 
-def test_health(bare_api):
+def test_health_reports_model_versions(bare_api):
     r = bare_api.get("/health")
-    assert r.status_code == 200 and r.json() == {"status": "ok"}
+    assert r.status_code == 200
+    body = r.json()
+    assert body["status"] == "ok"
+    assert body["models"]["backbone"]["version"] and body["models"]["gate"]
+    assert set(body["models"]["heads"]) == set(GOLDEN)
 
 
 def test_invalid_crop_is_400(bare_api):
@@ -52,6 +56,7 @@ def test_golden_prediction(api, crop):
     assert out["severity"] in {"healthy", "early", "moderate", "severe"}
     assert base64.b64decode(out["gradcam"])[:8] == PNG_SIGNATURE
     assert isinstance(out["ood_score"], float) and set(out["quality"]) == {"short_side", "blur", "brightness", "vegetation"}
+    assert set(out["model_version"]) == {"backbone", "head", "gate"}
 
 
 @needs_weights
@@ -61,7 +66,7 @@ def test_blurred_photo_is_rejected_without_diagnosis(api):
     img.save(buf, format="JPEG")
     out = post(api, "blackgram", buf.getvalue()).json()
     assert out["status"] == "rejected_quality" and "blurry" in out["reasons"]
-    assert out["ood_score"] is None
+    assert out["ood_score"] is None and out["model_version"]["head"]
     assert not {"disease", "gradcam", "severity", "top3"} & set(out)
 
 

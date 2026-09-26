@@ -8,31 +8,31 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
-from tensorflow.keras.applications.efficientnet import preprocess_input
 
 ML = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ML))
-from predict import ACTIVE_CROPS, IMG_SIZE, load_models, predict_disease  # noqa: E402
+from predict import ACTIVE_CROPS, IMG_SIZE, embed, load_models, predict_disease  # noqa: E402
 
-backbone, heads, label_maps, gate = load_models()
+models = load_models()
+label_maps, gate = models.label_maps, models.gate
 rng = np.random.default_rng(0)
 samples = []
 for crop in ACTIVE_CROPS:
     files = [p for d in (ML / "data" / "test" / crop).iterdir() if d.name in label_maps[crop] for p in d.iterdir()]
     samples += [(crop, files[i].read_bytes()) for i in rng.choice(len(files), 5, replace=False)]
 
-predict_disease(backbone, heads, label_maps, gate, *samples[0])  # warm-up (graph build, Grad-CAM model)
+predict_disease(models, *samples[0])  # warm-up
 gate_ms, total_ms = [], []
 for crop, raw in samples:
     image = Image.open(io.BytesIO(raw)).convert("RGB")
     resized = image.resize(IMG_SIZE)
-    feats = backbone(np.expand_dims(preprocess_input(np.array(resized, np.float32)), 0), training=False).numpy()
+    feats = embed(models, np.expand_dims(np.array(resized), 0))[0]
     t = time.perf_counter()
     gate.check_quality(image, resized)
     gate.ood(crop, feats)
     gate_ms.append((time.perf_counter() - t) * 1000)
     t = time.perf_counter()
-    predict_disease(backbone, heads, label_maps, gate, crop, raw)
+    predict_disease(models, crop, raw)
     total_ms.append((time.perf_counter() - t) * 1000)
 
 g, tot = np.array(gate_ms), np.array(total_ms)

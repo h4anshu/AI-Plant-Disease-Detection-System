@@ -37,6 +37,11 @@ const predictionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         default: null
     },
+    // which models produced this record: backbone/head/gate versions from ml-service/models/model_registry.json
+    modelVersion: {
+        type: { backbone: String, head: String, gate: String, _id: false },
+        default: null
+    },
     top3: {
         type: [{ disease: String, probability: Number, _id: false }],
         default: undefined

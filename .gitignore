@@ -33,6 +33,7 @@ Tea Leaf Dataset/
 *.pkl
 *.pth
 *.onnx
+ml-service/models/onnx/
 *.tflite
 *.pb
 *.savedmodel

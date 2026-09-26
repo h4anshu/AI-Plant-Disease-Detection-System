@@ -1,86 +1,72 @@
-"""Grad-CAM heatmap overlay, extracted from train/04_gradcam_diagnostic.ipynb
-(validated on wheat — see data/eda_figures/gradcam_wheat_diagnostic.png).
+"""Grad-CAM heatmap overlay without TensorFlow (docs/SERVING.md).
+
+Each head sits on global-average-pooling of the backbone's last conv map A (7x7x1280):
+    g = mean_ij A_ij,  h = relu(g W1 + b1),  p = softmax(h W2 + b2)
+so the gradient of the class probability p_c w.r.t. A has a closed form:
+    dp_c/dz = p_c (e_c - p),  dp_c/dg = W1 [(W2 dp_c/dz) * (g W1 + b1 > 0)],  dp_c/dA_ij = dp_c/dg / (H W)
+The rest mirrors the original TensorFlow implementation (validated on wheat, see
+train/04_gradcam_diagnostic.ipynb): channel weights = spatial mean of the gradient, ReLU, max-normalise,
+bilinear resize to 224 (TensorFlow's half-pixel rule), matplotlib's 'jet' colours, 60/40 overlay.
+train/check_onnx_parity.py compares it with the TensorFlow version.
 """
 import base64
 import io
 
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import Model, layers
-from tensorflow.keras.applications.efficientnet import preprocess_input
-import matplotlib.cm as cm
 from PIL import Image
 
 IMG_SIZE = (224, 224)
 
-_grad_models = {}  # (id(backbone), id(head_model)) -> grad_model, built once per crop head
+# matplotlib's 'jet' segment data -> the same 256-entry lookup table, so matplotlib isn't needed at runtime
+_JET = {
+    "red": ((0.00, 0.0), (0.35, 0.0), (0.66, 1.0), (0.89, 1.0), (1.00, 0.5)),
+    "green": ((0.000, 0.0), (0.125, 0.0), (0.375, 1.0), (0.640, 1.0), (0.910, 0.0), (1.000, 0.0)),
+    "blue": ((0.00, 0.5), (0.11, 1.0), (0.34, 1.0), (0.65, 0.0), (1.00, 0.0)),
+}
+_X = np.linspace(0.0, 1.0, 256)
+JET_LUT = np.stack([np.interp(_X, [p[0] for p in _JET[c]], [p[1] for p in _JET[c]]) for c in ("red", "green", "blue")], 1)
 
 
-def _last_spatial_layer_name(backbone):
-    for layer in reversed(backbone.layers):
-        try:
-            shape = layer.output.shape
-        except AttributeError:
-            continue
-        if shape is not None and len(shape) == 4:  # spatial (batch, H, W, channels)
-            return layer.name
-    raise ValueError("No spatial (4D) layer found in backbone")
+def jet(values: np.ndarray) -> np.ndarray:
+    """values in [0, 1] -> RGB in [0, 1], indexed exactly like matplotlib's Colormap.__call__."""
+    idx = (np.asarray(values, dtype=np.float32) * 256).astype(np.int64)
+    return JET_LUT[np.clip(idx, 0, 255)]
 
 
-def _get_grad_model(backbone, head_model):
-    key = (id(backbone), id(head_model))
-    grad_model = _grad_models.get(key)
-    if grad_model is None:
-        conv_output = backbone.get_layer(_last_spatial_layer_name(backbone)).output
-        gap = layers.GlobalAveragePooling2D()(conv_output)
-        final_output = head_model(gap)
-        grad_model = Model(inputs=backbone.input, outputs=[conv_output, final_output])
-        _grad_models[key] = grad_model
-    return grad_model
+def resize_bilinear(a: np.ndarray, size: int) -> np.ndarray:
+    """(h, w) float32 -> (size, size), matching tf.image.resize(method='bilinear') (half-pixel centres)."""
+    def axis(n_in):
+        x = (np.arange(size, dtype=np.float32) + 0.5) * np.float32(n_in / size) - 0.5
+        lo = np.floor(x)
+        return (np.clip(lo, 0, n_in - 1).astype(int), np.clip(np.ceil(x), 0, n_in - 1).astype(int),
+                (x - lo).astype(np.float32))
+    y0, y1, fy = axis(a.shape[0])
+    x0, x1, fx = axis(a.shape[1])
+    top = a[y0][:, x0] + (a[y0][:, x1] - a[y0][:, x0]) * fx
+    bottom = a[y1][:, x0] + (a[y1][:, x1] - a[y1][:, x0]) * fx
+    return top + (bottom - top) * fy[:, None]
 
 
-def generate_gradcam(backbone, head_model, image: Image.Image, class_idx: int) -> str:
-    """Return a base64-encoded PNG: `image` (any size) with the Grad-CAM heatmap for
-    `class_idx` overlaid, resized to 224x224.
-    """
-    grad_model = _get_grad_model(backbone, head_model)
+def heatmap(conv: np.ndarray, features: np.ndarray, weights, class_idx: int) -> np.ndarray:
+    """conv (H, W, C) and features (C,) of one image; weights = (w1, b1, w2, b2) of the crop head."""
+    w1, b1, w2, b2 = weights
+    pre = features @ w1 + b1
+    z = np.maximum(pre, 0) @ w2 + b2
+    p = np.exp(z - z.max())
+    p /= p.sum()
+    dz = -p[class_idx] * p
+    dz[class_idx] += p[class_idx]
+    dg = w1 @ ((w2 @ dz) * (pre > 0))
+    pooled = (dg / (conv.shape[0] * conv.shape[1])).astype(np.float32)
+    h = conv @ pooled
+    return (np.maximum(h, 0) / (h.max() + 1e-8)).astype(np.float32)
 
-    orig = np.array(image.convert("RGB").resize(IMG_SIZE))
-    batch = np.expand_dims(preprocess_input(orig.astype(np.float32)), axis=0)
 
-    with tf.GradientTape() as tape:
-        conv_outputs, predictions = grad_model(batch)
-        loss = predictions[:, class_idx]
-    grads = tape.gradient(loss, conv_outputs)
-    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
-    conv_outputs = conv_outputs[0]
-    heatmap = conv_outputs @ pooled_grads[..., tf.newaxis]
-    heatmap = tf.squeeze(heatmap)
-    heatmap = tf.maximum(heatmap, 0) / (tf.reduce_max(heatmap) + 1e-8)
-
-    heatmap_resized = tf.image.resize(heatmap[..., tf.newaxis], IMG_SIZE).numpy().squeeze()
-    heatmap_colored = cm.jet(heatmap_resized)[:, :, :3] * 255
-    overlay = (0.6 * orig + 0.4 * heatmap_colored).astype("uint8")
-
+def generate_gradcam(conv, features, weights, resized: Image.Image, class_idx: int) -> str:
+    """Base64 PNG: the 224x224 model input with the Grad-CAM heatmap for class_idx overlaid."""
+    orig = np.array(resized.convert("RGB"))
+    heat = resize_bilinear(heatmap(conv, features, weights, class_idx), IMG_SIZE[0])
+    overlay = (0.6 * orig + 0.4 * (jet(heat) * 255)).astype("uint8")
     buf = io.BytesIO()
     Image.fromarray(overlay).save(buf, format="PNG")
     return base64.b64encode(buf.getvalue()).decode("ascii")
-
-
-if __name__ == "__main__":
-    # ponytail check: tiny fake backbone/head (no imagenet download) exercises the
-    # tape/heatmap/overlay/base64 plumbing end-to-end.
-    inputs = tf.keras.Input(shape=(224, 224, 3))
-    conv = layers.Conv2D(4, 3, padding="same")(inputs)
-    fake_backbone = Model(inputs, conv)
-
-    head_inputs = tf.keras.Input(shape=(4,))
-    head_outputs = layers.Dense(2, activation="softmax")(head_inputs)
-    fake_head = Model(head_inputs, head_outputs)
-
-    img = Image.fromarray((np.random.rand(224, 224, 3) * 255).astype("uint8"))
-    png_b64 = generate_gradcam(fake_backbone, fake_head, img, class_idx=0)
-    decoded = base64.b64decode(png_b64)
-    assert decoded[:8] == b"\x89PNG\r\n\x1a\n"
-
-    print(f"gradcam.py self-check passed ({len(png_b64)} base64 chars)")

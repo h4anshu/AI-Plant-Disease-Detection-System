@@ -6,12 +6,12 @@ import pytest
 ML = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ML))
 
-BACKBONE = ML / "models" / "backbone" / "efficientnetb0_backbone.keras"
-# a Git-LFS pointer or a missing checkout would be tiny; the real backbone is ~17 MB
-HAVE_WEIGHTS = BACKBONE.exists() and BACKBONE.stat().st_size > 1_000_000
+BACKBONE_ONNX = ML / "models" / "onnx" / "backbone.onnx"
+# the serving models are ONNX files built from the tracked .keras weights (git-ignored)
+HAVE_WEIGHTS = BACKBONE_ONNX.exists() and BACKBONE_ONNX.stat().st_size > 1_000_000
 
 needs_weights = pytest.mark.skipif(
-    not HAVE_WEIGHTS, reason="model weights (ml-service/models/**/*.keras) are not in this checkout")
+    not HAVE_WEIGHTS, reason="ONNX models not built - run `python train/export_onnx.py` (needs requirements-export.txt)")
 
 
 @pytest.fixture(scope="session")

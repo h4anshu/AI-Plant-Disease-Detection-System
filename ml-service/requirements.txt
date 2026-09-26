@@ -1,9 +1,8 @@
-fastapi
-uvicorn[standard]
-tensorflow==2.21.0  # version that saved models/*.keras
-scikit-learn
-pillow
-numpy
-scipy
-matplotlib
-python-multipart
+# Serving only (ONNX Runtime, no TensorFlow) - exact versions tested together; see docs/SERVING.md
+fastapi==0.140.0
+uvicorn==0.51.0
+python-multipart==0.0.32
+onnxruntime==1.30.0
+numpy==2.4.6
+pillow==12.3.0
+scipy==1.17.1

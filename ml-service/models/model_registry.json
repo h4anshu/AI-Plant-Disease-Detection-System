@@ -1,0 +1,200 @@
+{
+  "schema": 1,
+  "versioning": "semver per artifact: MAJOR = class list or input contract changes, MINOR = retrained on new/changed data with the same classes, PATCH = re-export or threshold recalibration without new training. sha256 is of the tracked weight file; tests/test_registry.py fails if they drift.",
+  "backbone": {
+    "name": "efficientnetb0",
+    "version": "1.0.0",
+    "file": "backbone/efficientnetb0_backbone.keras",
+    "sha256": "fd67299ea94dd85a1368a7195dc6c07157134cd8bbc596d7daf065ae95d67482",
+    "training_data": "ImageNet-1k pretrained weights (Keras EfficientNetB0), frozen - never trained on crop data",
+    "metrics": null,
+    "date": "2026-07-26"
+  },
+  "heads": {
+    "wheat": {
+      "version": "1.0.0",
+      "file": "heads/wheat_head.keras",
+      "sha256": "510411bd140d198bf9080980b18d01b71495c61c93e17c5acf6c3558891509b5",
+      "classes": [
+        "BlackPoint",
+        "FusariumFootRot",
+        "HealthyLeaf",
+        "LeafBlight",
+        "WheatBlast"
+      ],
+      "training_data": [
+        "Mendeley wheat disease dataset (Original Dataset folder only)"
+      ],
+      "metrics": "metrics.json#wheat",
+      "date": "2026-07-26"
+    },
+    "rice": {
+      "version": "1.0.0",
+      "file": "heads/rice_head.keras",
+      "sha256": "8686d5315985f79f92429abf5fce5a3b85b6f0e970c00b15727233682c20f3d6",
+      "classes": [
+        "Bacterialblight",
+        "Blast",
+        "Brownspot",
+        "Healthy",
+        "Tungro"
+      ],
+      "training_data": [
+        "Mendeley Rice Leaf Disease Images (Sethy et al.)"
+      ],
+      "metrics": "metrics.json#rice",
+      "date": "2026-07-26"
+    },
+    "sugarcane": {
+      "version": "1.0.0",
+      "file": "heads/sugarcane_head.keras",
+      "sha256": "63aed4bc54c58e3eaecad6ec39f75a58c4485d9d5e25e600d72ae88327bd4fd7",
+      "classes": [
+        "Banded_Chlorosis",
+        "BrownRust",
+        "Brown_Spot",
+        "Dried_Leaves",
+        "Grassy_shoot",
+        "Healthy_Leaves",
+        "Pokkah_Boeng",
+        "Sett_Rot",
+        "Viral_Disease",
+        "Yellow_Leaf",
+        "smut"
+      ],
+      "training_data": [
+        "Mendeley sugarcane leaf dataset (11 classes)"
+      ],
+      "metrics": "metrics.json#sugarcane",
+      "date": "2026-07-26"
+    },
+    "potato": {
+      "version": "1.0.0",
+      "file": "heads/potato_head.keras",
+      "sha256": "176d000047623835351e3dfb28496b953e50bfed4c2c37cebc9b8c4a67c3454f",
+      "classes": [
+        "Early_blight",
+        "Late_blight",
+        "healthy"
+      ],
+      "training_data": [
+        "PlantVillage (potato classes)"
+      ],
+      "metrics": "metrics.json#potato",
+      "date": "2026-07-26"
+    },
+    "maize": {
+      "version": "1.0.0",
+      "file": "heads/maize_head.keras",
+      "sha256": "085fbc4a66c4bdc0e0bd2f53e0837fbef9590008a4cc442cf71d381cfdc9f412",
+      "classes": [
+        "Blight",
+        "Common_Rust",
+        "Gray_Leaf_Spot",
+        "Healthy"
+      ],
+      "training_data": [
+        "Kaggle Corn/Maize Leaf Disease Dataset (smaranjitghose)"
+      ],
+      "metrics": "metrics.json#maize",
+      "date": "2026-07-26"
+    },
+    "pigeonpea": {
+      "version": "1.0.0",
+      "file": "heads/pigeonpea_head.keras",
+      "sha256": "9c78f5e062978a93f47b8ef2072780e23f93c1d62358122fb20fe84f412f2b1d",
+      "classes": [
+        "Healthy",
+        "Leaf_Spot",
+        "Leaf_webber",
+        "Sterilic_mosaic"
+      ],
+      "training_data": [
+        "Mendeley: A novel pigeonpea leaf dataset"
+      ],
+      "metrics": "metrics.json#pigeonpea",
+      "date": "2026-07-26"
+    },
+    "groundnut": {
+      "version": "1.0.0",
+      "file": "heads/groundnut_head.keras",
+      "sha256": "0524e0f779e743f20d0305f1b35e4742c6161a640c1cdc40f6b40bfdd21d3c34",
+      "classes": [
+        "Alternaria_Leaf_Spot",
+        "Healthy",
+        "Leaf_Spot",
+        "Nutrition_Deficiency",
+        "Rosette",
+        "Rust"
+      ],
+      "training_data": [
+        "Mendeley: A novel groundnut leaf dataset (Purba Medinipur, West Bengal)",
+        "Mendeley: Multi-Crop Disease Dataset, groundnut part (Tamil Nadu)"
+      ],
+      "metrics": "metrics.json#groundnut",
+      "date": "2026-09-26"
+    },
+    "blackgram": {
+      "version": "1.0.0",
+      "file": "heads/blackgram_head.keras",
+      "sha256": "76a77bcb3c909df79e8364d8fda211953c8ea4253ba130790b9e9040298e8d97",
+      "classes": [
+        "Anthracnose",
+        "Healthy",
+        "Leaf_Crinkle",
+        "Powdery_Mildew",
+        "Yellow_Mosaic"
+      ],
+      "training_data": [
+        "Mendeley: Blackgram Plant Leaf Disease (BPLD), Andhra Pradesh"
+      ],
+      "metrics": "metrics.json#blackgram",
+      "date": "2026-09-26"
+    },
+    "apple": {
+      "version": "1.0.0",
+      "file": "heads/apple_head.keras",
+      "sha256": "1ed2fc52e7e72cb4e1d07d764814e0af7e81953f7d666c1edb7d3510be3f3544",
+      "classes": [
+        "Alternaria_Leaf_Blotch",
+        "Healthy",
+        "Mosaic"
+      ],
+      "training_data": [
+        "Mendeley: Indigenous Dataset for Apple Leaf Disease Detection (Jammu & Kashmir)"
+      ],
+      "metrics": "metrics.json#apple",
+      "date": "2026-09-26"
+    },
+    "banana": {
+      "version": "1.0.0",
+      "file": "heads/banana_head.keras",
+      "sha256": "2f1b27b012a633a87fbc3eb6af8cb8b638b25e0645c0380de83c10fc0cb66aad",
+      "classes": [
+        "Bract_Mosaic_Virus",
+        "Healthy",
+        "Insect_Pest",
+        "Moko_Wilt",
+        "Panama_Wilt",
+        "Pestalotiopsis_Leaf_Spot",
+        "Sigatoka_Leaf_Spot"
+      ],
+      "training_data": [
+        "Mendeley: Multi-Crop Disease Dataset, banana part (Tamil Nadu)"
+      ],
+      "metrics": "metrics.json#banana",
+      "date": "2026-09-26"
+    }
+  },
+  "gate": {
+    "name": "quality+ood",
+    "version": "1.0.0",
+    "files": {
+      "ood_thresholds.json": "ed78753742b1e84924fa963e3ca0457cf775314818a20bf23b87df75964c2297",
+      "ood_stats.npz": "6019f01c58af72e6ac352f8d184958c29df47b2691b81f7c54ac2c32a4d02800"
+    },
+    "training_data": "calibrated on each crop's train/val/test splits, PlantDoc (other species) and Imagenette val",
+    "metrics": "docs/OOD_GATE.md",
+    "date": "2026-09-26"
+  }
+}
