@@ -12,10 +12,10 @@ Added 26 Sep 2026. Tick an item off when it's done.
 - [ ] **Sentry for the browser:** create a free Sentry React project, turn on "Prevent Storing of IP Addresses", and set `VITE_SENTRY_DSN` in Vercel, then redeploy.
 
 **Carried over from earlier:**
-- [ ] **Deploy the server again, then push `main`.** Status on 26 Sep, 17:40 IST: ml-service (`00006`, monitoring) and server (`00011`) are live, and `main` is pushed up to `9513512` (Hindi). But the server was deployed before the Hindi commit, so live Hindi mode still shows English treatment advice. The disease-map commit `33d06ef` is not pushed. Next: `gcloud run deploy server --source server --region asia-south1` (brings Hindi advice + map API + delete), then push `main` (Vercel ships the map/privacy pages). The ML service needs no redeploy.
+- [ ] **Deploy the server again (and the new geo-service), then push `main`.** Status on 26 Sep, 17:40 IST: ml-service (`00006`, monitoring) and server (`00011`) are live, and `main` is pushed up to `9513512` (Hindi). But the server was deployed before the Hindi commit, so live Hindi mode still shows English treatment advice. The disease-map commit `33d06ef` is not pushed. Next: `gcloud run deploy server --source server --region asia-south1` (brings Hindi advice + map API + delete), then push `main` (Vercel ships the map/privacy pages). The ML service needs no redeploy.
 - [ ] **Agronomist review of the Hindi content:** 121 entries in `docs/TRANSLATION_REVIEW.csv` (10 crop names, 53 disease names, 4 severity labels, 54 treatment texts, all AI-drafted). Fill `hindi_corrected` / `reviewer`, then apply the corrections in `client/src/locales/terms.json` and `server/utils/treatmentMap.hi.js` with `needs_review: false`, and run `npm run translation-review` in `server/`. Until then the app shows a "not yet checked by an expert" note under Hindi advice.
 - [ ] **Secrets to Secret Manager** (optional): `docs/DEPLOY.md` Part C.
-- [ ] **Earth Engine setup for field health**, mostly done on 26 Sep 2026: registered (noncommercial, BBDU, Community tier), API on, sign-in via gcloud ADC works (test: 7 Sentinel-2 images), `geo-service` service account with both roles. daily EECU cap set to 18,000 EECU-s. **Still open:** an ALU answer (likely no, no GWCID), and **3 real field coordinates** (owners' consent). The field-health code starts after the coordinates.
+- [x] **Earth Engine setup for field health**, done 26 Sep 2026: registered (noncommercial, BBDU, Community tier), API on, sign-in via gcloud ADC works (test: 7 Sentinel-2 images), `geo-service` service account with both roles. daily EECU cap set to 18,000 EECU-s. **Still open:** an ALU answer (likely no, no GWCID), and **3 real field coordinates** (owners' consent). The field-health code starts after the coordinates.
 
 ---
 
@@ -439,3 +439,62 @@ Brief: consent-first location (GPS, EXIF fallback, skip); a private GeoJSON poin
 4. Privacy → delete → "Deleted 1 checkup", and the map is empty again.
 5. Demo mode: the seed refused an Atlas URI (exit 1), inserted 267 demo records locally; with `MAP_INCLUDE_DEMO`, 7 district cells are shown (the rest suppressed) under a Hindi demo warning.
 6. At 360 px in Hindi, the map, privacy page and consent box have no horizontal overflow.
+
+- **Deploy the geo-service** (steps in `docs/DEPLOY.md`, "Field health"): build + push the image, `gcloud run deploy geo-service --service-account geo-service@…`, then set `GEO_SERVICE_URL` / `GEO_SERVICE_TOKEN` on the server. Until then the button answers "Field health is not available" and nothing else changes.
+
+## Task 12 — Field health from space (Earth Engine)
+
+Brief: GEE setup doc; a field-health endpoint (ALU or 30 m buffer; S2 SR harmonized + SCL mask; per-date field NDVI/NDRE with ≥60% clear; a 1 km WorldCover-cropland neighbourhood; z-score + plain flag; Mongo cache; EECU logging); a client chart; mocked-EE tests + a geemap notebook; REDSI stretch; no credentials in git; cloudy kharif handled; the endpoint working for 3 real coordinates. Done on `main` instead of `feat/field-health`.
+
+**Setup with the user (26 Sep):**
+- Earth Engine registered noncommercial via BBDU, Community tier, on `plant-disease-503711`. The first attempt was on the wrong project (`crop-yield-prediction`), caught from a screenshot.
+- `earthengine authenticate` was blocked by Google, so local sign-in uses gcloud ADC with the earthengine scope.
+- `geo-service` service account with `earthengine.viewer` + `serviceUsageConsumer`; no key file anywhere; `.gitignore` blocks `*-key.json`.
+- Daily quota: EECU-seconds per day = 18,000 (the month ÷ 30). 7,200 would have been too tight.
+- ALU: not available (it needs a Workspace GWCID), so the 30 m buffer is used and reported as `geometry_source`.
+- Coordinates: the user picked points on Google Maps; each was checked against WorldCover. Anantapur's first point was grassland (4% cropland), so a cropland point 12 km SE was found with Earth Engine and the user confirmed it on the map.
+
+**Design:**
+- A **separate geo-service** (FastAPI, earthengine-api 1.7.45): Earth Engine calls take 2–30 s and use their own credentials; inside ml-service they would block the CPU-bound diagnosis workers.
+- The Express server owns the cache (it already has MongoDB); the geo-service stays stateless, with no DB secrets.
+- **POST** with the location in the body, because Cloud Run logs every URL. GET stays for the notebook.
+- Public route `GET /api/predict/:id/field-health`: owner-only, reads the private location from Mongo, so no coordinates appear in any public URL.
+- Cache: key = `sha256(lat, lon to 4 decimals, date, 120 d, crop)`, 30-day TTL. "Delete my data" removes the entries.
+- `fieldLimiter`: 10 per 10 min per IP.
+
+**Method** (`geo-service/field_health.py`, docs/FIELD_HEALTH.md):
+- One EE request per answer: per image, the field clear fraction (SCL 4/5/6/7) and mean NDVI (B8, B4), NDRE (B8A, B5), plus REDSI (B4/B5/B7, Zheng 2018 eq. 5; lower = more rust) for wheat only.
+- Ring 100 m – 1 km, WorldCover class 40, p25/p50/p75 + count.
+- Plain-Python `summarize`: merges same-day tiles (keeps the clearer), requires ≥60% clear, ≥50 ring pixels, robust z = (field − median)/(IQR/1.349).
+- Flags: `below` (2+ consecutive z ≤ −1, since the first), `below_once`, `normal`, `above`, `no_neighbours`, `no_clear`; stale if the last clear image is more than 20 days old.
+- The REDSI formula was verified from the paper (PMC5877331), not from memory.
+
+**Client**: `FieldHealth.jsx`
+- Loaded only on click, so no quota is spent unasked.
+- A dependency-free SVG chart: NDVI line, dashed NDRE, grey neighbours' band, a dot per clear image.
+- The flag sentence (clay when below), a stale note, and "the satellite shows stress, not which disease; the leaf photo tells which disease", the clear-image count and the 30 m-circle note.
+- A REDSI mini-chart for wheat labelled experimental; en + hi strings.
+
+**Real Earth Engine results** (window 29 May – 26 Sep 2026, all HTTP 200 in 2.4–7.4 s):
+
+| Field | Images | Clear | Latest NDVI | z | Verdict |
+|---|---|---|---|---|---|
+| Mullanpur Dakha paddy | 31 | 16 | 0.60 | 0.01 | normal |
+| Kolhapur sugarcane | 31 | 10 | 0.81 | 0.73 | normal |
+| Anantapur groundnut | 30 | 6 | 0.28 | 0.82 | normal |
+| Samrala | 55 | 29 | 0.65 | 0.10 | normal |
+| Ludhiana city field | 31 | 15 | 0.26 | −0.44 | normal (only 1.8–6.1 k cropland px) |
+| Kolhapur 1 Jul – 10 Aug | 11 | 0 | — | — | `no_clear` ("No clear satellite view") |
+
+- The Punjab series shows a real paddy cycle: transplanting flood in late June (NDVI 0.08), a monsoon gap mid-July to mid-August, a peak of 0.85 in September.
+- **Measured cost: about 3 EECU-seconds per check** (Cloud Monitoring, workload tag `field-health`: 24.3 EECU-s for ~9 calls). docs/GEE_SETUP.md updated with this.
+
+**Tests and checks:**
+- geo-service pytest 22: logic on a **recorded real EE answer** (paddy fixture, statistics only) and synthetic rows (same-day merge, cloudy skip, robust z, each flag, stale, REDSI only when asked); API tests for GET/POST, clamped future date, 6 invalid inputs, token, EE timeout → 502 / quota → 503, no credentials → 503.
+- Two failures found and fixed on the way: the endpoint built an EE geometry just to name the geometry source (it needed an initialised EE), so `query_rows` now returns it.
+- Server Jest 193 (+6): POST body + token, then cache hit; no location → 409; other device / no device / bad id → 404; geo 503/500 → friendly 503/502 with nothing cached; unconfigured → 503; delete purges the cache.
+- Client Vitest 33 (+5): loads only on click; verdict, chart and explanation; cloudy → no chart; wheat REDSI; error message; offered only with a location.
+- `geo-service/notebooks/explore_field.ipynb` (geemap): field/ring/cropland map layers, SCL, the index table, the same chart; executed end to end with outputs saved.
+- Browser, local stack at 360 px: rice checkup with location → "See this field from space" → real EE via local server + geo-service → "In line with neighbouring fields", NDVI/NDRE chart, 16 of 31 clear; Hindi renders (text checked, no overflow).
+- CI: new `geo-service` job (mocked EE, no credentials).
+- Totals: ml-service pytest 46 unaffected by the geemap install; lint + build OK.

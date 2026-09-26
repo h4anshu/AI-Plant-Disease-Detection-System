@@ -54,6 +54,18 @@ With the user's consent, a checkup can carry a location: the browser's GPS, or t
 - **Privacy page:** `/privacy` explains what is stored and public, and "delete my data" (`DELETE /api/predict`) removes a browser's records with their Cloudinary files.
 - **Demo data:** `server/scripts/seed_demo_map.js` writes fake points flagged `demo: true`, refuses any non-local database, and is shown only by a non-production server started with `MAP_INCLUDE_DEMO=true`.
 
+## Field health from space
+
+For a checkup with a location, "See this field from space" shows the field's Sentinel-2 **NDVI** and
+**NDRE** history over about one season (plus the experimental **REDSI** for wheat), next to the farmland
+within 1 km. It gives a plain verdict such as "below neighbouring fields since …", and says so plainly
+when monsoon clouds hid the field.
+- **Where it runs:** a separate `geo-service/` (FastAPI + Google Earth Engine, noncommercial tier).
+- **Cost:** about 3 EECU-seconds per check, and results are cached in MongoDB.
+- **Every index and choice explained for beginners:** [docs/FIELD_HEALTH.md](docs/FIELD_HEALTH.md).
+- **Setup:** [docs/GEE_SETUP.md](docs/GEE_SETUP.md).
+- **A visual walk-through:** `geo-service/notebooks/explore_field.ipynb`.
+
 ## Crops and disease coverage
 
 | Crop | Disease classes | Accuracy [95% CI] | Macro F1 | Weakest-class recall | Images evaluated | Evaluation |

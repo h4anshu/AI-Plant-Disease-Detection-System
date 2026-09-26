@@ -241,6 +241,43 @@ this change hold the heatmap inside MongoDB.
 - **Map tiles** come from the OpenStreetMap Foundation's volunteer servers, which is fine for low traffic with the attribution shown ([tile usage policy](https://operations.osmfoundation.org/policies/tiles/)). If the site grows, switch `TILES` in `client/src/pages/MapPage.jsx` to a commercial tile provider.
 - **New indexes** (`location` 2dsphere, `geoCell`) are created automatically by Mongoose on the first start. On Atlas M0 this is instant for this data size.
 
+## Field health: the geo-service (Earth Engine)
+
+Needs the Earth Engine setup from `docs/GEE_SETUP.md`: the project registered and the `geo-service`
+service account with its 2 roles. The service runs **as that service account**, so no key file is involved.
+Earth Engine calls mostly wait on Google, so 1 CPU and 512 MiB are enough.
+
+```powershell
+$REPO = "asia-south1-docker.pkg.dev/plant-disease-503711/plant-disease"; $TAG = git rev-parse --short HEAD
+```
+```powershell
+docker build -t "$REPO/geo-service:$TAG" geo-service
+```
+```powershell
+docker push "$REPO/geo-service:$TAG"
+```
+```powershell
+$G = python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+```powershell
+gcloud run deploy geo-service --image "$REPO/geo-service:$TAG" --region asia-south1 --service-account geo-service@plant-disease-503711.iam.gserviceaccount.com --cpu 1 --memory 512Mi --concurrency 8 --min-instances 0 --max-instances 2 --cpu-boost --timeout 120 --allow-unauthenticated --set-env-vars "EE_PROJECT=plant-disease-503711,GEO_SERVICE_TOKEN=$G"
+```
+Then point the server at it, **in the same PowerShell window** so `$G` is the same:
+```powershell
+$GEO_URL = gcloud run services describe geo-service --region asia-south1 --format="value(status.url)"
+```
+```powershell
+gcloud run services update server --region asia-south1 --update-env-vars "GEO_SERVICE_URL=$GEO_URL,GEO_SERVICE_TOKEN=$G"
+```
+
+- **Check:** `curl.exe -s "$GEO_URL/health"` should print `"earth_engine": true`. If it prints `false`,
+  check the geo-service logs; usually a role is missing on the service account.
+- **The public URL is fine:** `/field-health` refuses calls without the token.
+- **With Secret Manager** (Part C), store `$G` as a secret `geo-service-token` and use `--set-secrets`.
+  The `geo-service` account then needs `roles/secretmanager.secretAccessor` on that secret.
+- **Order doesn't matter:** until `GEO_SERVICE_URL` is set, the server answers the field-health button
+  with "Field health is not available", and nothing else changes.
+
 ## Rollback
 
 Every deploy creates a new revision; the old ones stay until the images are cleaned up.

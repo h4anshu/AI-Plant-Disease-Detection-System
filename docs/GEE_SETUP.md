@@ -33,10 +33,10 @@ one the app already runs in, `plant-disease-503711`.
    | Partner | 100,000 EECU-hours | an application, for high-impact sustainability work |
 
    This project already has billing (Cloud Run), so **Contributor** is available, and Community is
-   plenty to start. **Cost per call is measured, not guessed:** 2–3 tiny test queries already showed
-   about 400 EECU-seconds in the Quotas page, so a field check may cost tens to hundreds of
-   EECU-seconds. The service measures it (section 4) and caches every result, and this guide is
-   updated with the real number once it's known.
+   plenty to start. **Measured cost (26 Sep 2026): about 3 EECU-seconds per field check** (workload tag
+   `field-health` in Cloud Monitoring). So 150 EECU-hours = 540,000 EECU-seconds is enough for about
+   150,000 uncached checks a month, and repeat views come from the cache for free. (The Quotas page
+   showed ~400 EECU-seconds right after the first tests; that figure included interactive setup queries.)
 
    Going over the tier isn't a hard stop: the project gets *slower* until the month resets.
 4. Turn on the API:

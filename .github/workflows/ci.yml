@@ -34,6 +34,26 @@ jobs:
       # golden regression + ONNX-vs-Keras parity on the committed fixtures run here too
       - run: pytest -p no:cacheprovider
 
+  geo-service:
+    name: geo-service (pytest, mocked Earth Engine)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: geo-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11" # same as the Dockerfile
+          cache: pip
+          cache-dependency-path: |
+            geo-service/requirements.txt
+            geo-service/requirements-dev.txt
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      # no Earth Engine credentials in CI: the tests replay a recorded Earth Engine answer
+      - run: pytest -p no:cacheprovider
+
   server:
     name: server (Jest + supertest)
     runs-on: ubuntu-latest
