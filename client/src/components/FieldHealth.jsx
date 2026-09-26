@@ -43,6 +43,9 @@ export function SeriesChart({ rows, window, keys, bandKey, yMin, yMax, lang, lab
   );
 }
 
+// dates with the month's name: "9/6/2026" reads as 9 June in India but meant 6 September
+const longDate = (d, lang) => new Date(d).toLocaleDateString(lang === 'en' ? 'en-IN' : lang, { day: 'numeric', month: 'short', year: 'numeric' });
+
 // "How does the whole field look from space?" for a checkup with a consented location. Loaded only on
 // request: every uncached answer is an Earth Engine computation (docs/FIELD_HEALTH.md).
 const FieldHealth = ({ predictionId, crop }) => {
@@ -74,15 +77,15 @@ const FieldHealth = ({ predictionId, crop }) => {
 
   const d = state.data;
   const rows = d.series.filter((r) => r.used);
-  const flag = t(`field.flag.${d.flag.code}`, { date: d.flag.since && new Date(d.flag.since).toLocaleDateString(i18n.language) });
-  const worrying = d.flag.code === 'below' || d.flag.code === 'below_once';
+  const flag = t(`field.flag.${d.flag.code}`, { date: d.flag.since && longDate(d.flag.since, i18n.language) });
+  const worrying = ['below', 'below_once', 'not_farmland'].includes(d.flag.code);
 
   return (
     <section className="mt-5 pt-4 border-t border-ink/10" aria-labelledby="field-title">
       <p id="field-title" className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">{t('field.title')}</p>
       <p className={`text-sm leading-relaxed ${worrying ? 'text-clay font-medium' : 'text-ink/80'}`}>{flag}</p>
-      {d.flag.stale && d.last_clear_date && (
-        <p className="text-xs text-ink/60 mt-1">{t('field.stale', { date: new Date(d.last_clear_date).toLocaleDateString(i18n.language) })}</p>
+      {d.flag.stale && d.last_clear_date && d.flag.code !== 'not_farmland' && (
+        <p className="text-xs text-ink/60 mt-1">{t('field.stale', { date: longDate(d.last_clear_date, i18n.language) })}</p>
       )}
 
       {rows.length > 0 && (
@@ -108,7 +111,7 @@ const FieldHealth = ({ predictionId, crop }) => {
 
       <p className="text-xs text-ink/70 mt-3 border-l-2 border-sage pl-3">{t('field.explain')}</p>
       <p className="text-[11px] text-ink/50 mt-2">
-        {t('field.meta', { clear: d.clear_images, total: d.images, date: d.last_clear_date ? new Date(d.last_clear_date).toLocaleDateString(i18n.language) : '—' })}
+        {t('field.meta', { clear: d.clear_images, total: d.images, date: d.last_clear_date ? longDate(d.last_clear_date, i18n.language) : '—' })}
         {' '}{d.geometry_source === 'buffer_30m' ? t('field.circle') : t('field.boundary')}
       </p>
     </section>

@@ -16,6 +16,10 @@ import ee
 S2 = "COPERNICUS/S2_SR_HARMONIZED"  # Sentinel-2 surface reflectance, 10 m, ~5-day revisit, offsets harmonized
 WORLDCOVER = "ESA/WorldCover/v200"  # ESA WorldCover 2021, 10 m land cover
 CROPLAND = 40  # WorldCover class "Cropland"
+TREE_COVER = 10  # WorldCover class "Tree cover": where orchards (apple, banana) usually land
+# land-cover classes that count as "a field of this crop", for the field itself and its neighbours
+FARM_CLASSES = {"apple": [TREE_COVER, CROPLAND], "banana": [TREE_COVER, CROPLAND]}
+MIN_FIELD_FARMLAND = 0.5  # at least half the 30 m circle must be farmland, or the comparison means nothing
 
 # Sentinel-2 Scene Classification (SCL) classes counted as a clear view of the ground:
 # 4 vegetation, 5 bare soil, 6 water (a flooded paddy is still the field), 7 unclassified.
@@ -62,13 +66,21 @@ def _indices(img, with_redsi: bool):
     return ee.Image.cat(bands)
 
 
-def query_rows(lat: float, lon: float, start: Date, end: Date, with_redsi: bool = False) -> tuple[dict, str]:
+def farm_classes(crop: str | None) -> list[int]:
+    return FARM_CLASSES.get(crop, [CROPLAND])
+
+
+def query_rows(lat: float, lon: float, start: Date, end: Date, with_redsi: bool = False,
+               crop: str | None = None) -> tuple[dict, str, float | None]:
     """One Earth Engine request: per Sentinel-2 image, the field's clear fraction and mean indices, and
-    the neighbourhood's cropland percentiles. Returns (getInfo() FeatureCollection dict, geometry source)."""
+    the neighbourhood's farmland percentiles; plus how much of the field circle is farmland at all.
+    Returns (FeatureCollection dict, geometry source, field farmland fraction)."""
     field, source = field_geometry(lat, lon)
     point = ee.Geometry.Point([lon, lat])
     ring = point.buffer(RING_OUTER_M).difference(point.buffer(RING_INNER_M), 1)
-    cropland = ee.ImageCollection(WORLDCOVER).first().select("Map").eq(CROPLAND)
+    # "farmland" = the land-cover classes this crop grows on (cropland; orchards also tree cover)
+    classes = farm_classes(crop)
+    cropland = ee.ImageCollection(WORLDCOVER).first().select("Map").remap(classes, [1] * len(classes), 0)
     names = ["ndvi", "ndre"] + (["redsi"] if with_redsi else [])
     ring_reducer = ee.Reducer.percentile([25, 50, 75]).combine(ee.Reducer.count(), sharedInputs=True)
 
@@ -84,7 +96,12 @@ def query_rows(lat: float, lon: float, start: Date, end: Date, with_redsi: bool 
 
     images = (ee.ImageCollection(S2).filterBounds(field)
               .filterDate(start.isoformat(), (end + timedelta(days=1)).isoformat()))
-    return ee.FeatureCollection(images.map(per_image)).getInfo(), source
+    # a photo taken at home or in town puts the "field" on a roof or a road: check the circle itself
+    field_farmland = cropland.reduceRegion(ee.Reducer.mean(), field, SCALE_M).values().get(0)
+    # a property on the collection keeps it ONE request (a collection nested in a Dictionary comes back
+    # from getInfo() without its features)
+    rows = ee.FeatureCollection(images.map(per_image)).set("field_farmland", field_farmland).getInfo()
+    return rows, source, rows.get("properties", {}).get("field_farmland")
 
 
 # --- Plain Python side (tested with mocked Earth Engine output) ---------------------------------------
@@ -101,7 +118,8 @@ def _robust_z(value, p25, p50, p75):
     return (value - p50) / ((p75 - p25) / 1.349)
 
 
-def summarize(raw: dict, *, start: Date, end: Date, geometry_source: str, with_redsi: bool = False) -> dict:
+def summarize(raw: dict, *, start: Date, end: Date, geometry_source: str, with_redsi: bool = False,
+              field_farmland: float | None = None) -> dict:
     by_date: dict[str, dict] = {}
     for feature in raw.get("features", []):
         p = feature.get("properties", {})
@@ -141,11 +159,13 @@ def summarize(raw: dict, *, start: Date, end: Date, geometry_source: str, with_r
     used = [r for r in series if r["used"]]
     last_clear = used[-1]["date"] if used else None
     stale = last_clear is None or (end - Date.fromisoformat(last_clear)).days > STALE_DAYS
-    flag = _flag(used)
+    not_farmland = field_farmland is not None and field_farmland < MIN_FIELD_FARMLAND
+    flag = {"code": "not_farmland", "since": None} if not_farmland else _flag(used)
     flag["stale"] = stale
     return {
         "window": {"start": start.isoformat(), "end": end.isoformat()},
         "geometry_source": geometry_source,
+        "field_farmland": None if field_farmland is None else round(field_farmland, 2),
         "images": len(series),
         "clear_images": len(used),
         "last_clear_date": last_clear,
@@ -158,7 +178,8 @@ def summarize(raw: dict, *, start: Date, end: Date, geometry_source: str, with_r
             "ndre": "(B8A - B5) / (B8A + B5)",
             **({"redsi": "((705-665)*(B7-B4) - (783-665)*(B5-B4)) / (2*B4)  [experimental, wheat]"} if with_redsi else {}),
             "clear_scl_classes": CLEAR_SCL, "min_clear_fraction": MIN_CLEAR,
-            "neighbourhood": f"ESA WorldCover cropland pixels {RING_INNER_M}-{RING_OUTER_M} m around the field",
+            "neighbourhood": f"ESA WorldCover farmland pixels {RING_INNER_M}-{RING_OUTER_M} m around the field",
+            "min_field_farmland": MIN_FIELD_FARMLAND,
             "z": "(field NDVI - neighbours' median) / (IQR / 1.349)", "below_z": BELOW_Z,
         },
     }
@@ -194,6 +215,8 @@ def _summary(flag: dict, last_clear: str | None, end: Date) -> str:
         "above": "Greener than nearby fields.",
         "no_neighbours": "Not enough clear farmland nearby to compare with.",
         "no_clear": "No clear satellite view in this period (clouds).",
+        "not_farmland": ("This location does not look like farmland on the land-cover map, so it can't be "
+                         "compared with nearby fields. Check from inside the field."),
     }[flag["code"]]
     if flag["code"] != "no_clear" and flag["stale"] and last_clear:
         text += f" No clear image since {last_clear}, so this may be out of date."

@@ -32,6 +32,15 @@ test('loads only when asked, then shows the verdict, the chart and what the sate
   expect(screen.queryByText(/REDSI/)).toBeNull(); // wheat only
 });
 
+test('a location that is not farmland gets no verdict, and dates carry the month name', async () => {
+  api.reply = async () => answer({ code: 'not_farmland', since: null, stale: false }, { field_farmland: 0.1 });
+  render(<FieldHealth predictionId="p1" crop="rice" />);
+  fireEvent.click(screen.getByRole('button', { name: 'See this field from space' }));
+  expect(await screen.findByText(/doesn't look like farmland/)).toHaveClass('text-clay');
+  expect(screen.queryByText(/Below neighbouring/)).toBeNull();
+  expect(screen.getByText(/last clear image: 25 Sept 2026/)).toBeInTheDocument(); // not 9/25/2026
+});
+
 test('cloudy season: says so instead of drawing an empty chart', async () => {
   api.reply = async () => answer({ code: 'no_clear', since: null, stale: true },
     { series: [{ ...row('2026-07-20', null), used: false }], clear_images: 0, last_clear_date: null });

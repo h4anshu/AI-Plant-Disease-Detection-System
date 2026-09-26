@@ -2,10 +2,12 @@ import { createHash } from "node:crypto";
 import mongoose from "mongoose";
 
 export const FIELD_DAYS = 120; // Sentinel-2 history shown: about one crop season up to the checkup
+// bump when the geo-service method changes, so old answers are not served (2: farmland check, 26 Sep 2026)
+export const FIELD_METHOD_VERSION = 2;
 
 // location rounded to 4 decimals (~11 m, inside one field circle), with window and crop, hashed
 export const fieldCacheKey = (lat, lon, date, crop) =>
-  createHash('sha256').update([lat.toFixed(4), lon.toFixed(4), date, FIELD_DAYS, crop].join('|')).digest('hex');
+  createHash('sha256').update([FIELD_METHOD_VERSION, lat.toFixed(4), lon.toFixed(4), date, FIELD_DAYS, crop].join('|')).digest('hex');
 
 // key for a stored prediction (location [lon, lat], its date and crop)
 export const keyForPrediction = (p) =>

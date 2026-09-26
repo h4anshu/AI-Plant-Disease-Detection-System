@@ -42,6 +42,22 @@ def test_real_paddy_response():
     assert "redsi" in r["method"] and r["series"][-1].get("redsi") is not None
 
 
+def test_a_location_that_is_not_farmland_gets_no_verdict():
+    # a photo taken at home: the circle is a roof/road, NDVI stays ~0.1 all season, far under the fields
+    features = [row(f"2026-09-{d:02d}", ndvi=0.12, nb=(0.4, 0.6, 0.7)) for d in (6, 13, 24)]
+    r = run(*features, field_farmland=0.12)
+    assert r["flag"]["code"] == "not_farmland" and r["field_farmland"] == 0.12
+    assert "does not look like farmland" in r["summary"]
+    assert r["series"][0]["z"] < -1  # the numbers are still there for the chart; only the verdict is withheld
+    assert run(*features, field_farmland=0.9)["flag"]["code"] == "below"
+
+
+def test_orchard_crops_accept_tree_cover_as_farmland():
+    assert fh.farm_classes("apple") == [fh.TREE_COVER, fh.CROPLAND]
+    assert fh.farm_classes("banana") == [fh.TREE_COVER, fh.CROPLAND]
+    assert fh.farm_classes("wheat") == [fh.CROPLAND] and fh.farm_classes(None) == [fh.CROPLAND]
+
+
 def test_same_day_tiles_keep_the_clearer_view():
     r = run(row("2026-09-01", clear=0.3, ndvi=0.2), row("2026-09-01", clear=0.9, ndvi=0.75))
     assert r["images"] == 1
@@ -104,9 +120,9 @@ def client(monkeypatch):
     monkeypatch.setattr(app, "init_earth_engine", lambda: None)  # no credentials in tests
     calls = []
 
-    def fake_query(lat, lon, start, end, with_redsi=False):
-        calls.append({"lat": lat, "lon": lon, "start": start, "end": end, "with_redsi": with_redsi})
-        return FIXTURE, "buffer_30m"
+    def fake_query(lat, lon, start, end, with_redsi=False, crop=None):
+        calls.append({"lat": lat, "lon": lon, "start": start, "end": end, "with_redsi": with_redsi, "crop": crop})
+        return FIXTURE, "buffer_30m", 0.94
     monkeypatch.setattr(app.fh, "query_rows", fake_query)
     with TestClient(app.app) as c:
         c.calls = calls
@@ -117,7 +133,7 @@ def test_field_health_endpoint(client):
     r = client.get("/field-health", params={"lat": 30.858816, "lon": 75.666131, "date": "2026-09-26", "days": 120})
     assert r.status_code == 200
     body = r.json()
-    assert body["flag"]["code"] == "normal" and body["geometry_source"] == "buffer_30m"
+    assert body["flag"]["code"] == "normal" and body["geometry_source"] == "buffer_30m" and body["field_farmland"] == 0.94
     assert "30.8588" not in r.text and "75.6661" not in r.text  # the answer never carries the location
     assert client.calls[0]["start"] == date(2026, 5, 29) and client.calls[0]["with_redsi"] is False
 
@@ -131,7 +147,7 @@ def test_post_takes_the_location_in_the_body(client):
 
 def test_wheat_gets_redsi_and_future_dates_are_clamped(client):
     client.get("/field-health", params={"lat": 30.9, "lon": 75.8, "date": "2099-01-01", "crop": "wheat"})
-    assert client.calls[-1]["with_redsi"] is True
+    assert client.calls[-1]["with_redsi"] is True and client.calls[-1]["crop"] == "wheat"
     assert client.calls[-1]["end"] <= date.today()
 
 

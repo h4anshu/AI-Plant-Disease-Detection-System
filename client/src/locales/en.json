@@ -203,7 +203,8 @@
       "normal": "In line with neighbouring fields.",
       "above": "Greener than neighbouring fields.",
       "no_neighbours": "Not enough clear farmland nearby to compare with.",
-      "no_clear": "No clear satellite view in the last 4 months (clouds)."
+      "no_clear": "No clear satellite view in the last 4 months (clouds).",
+      "not_farmland": "This location doesn't look like farmland on the land-cover map, so it can't be compared with nearby fields. For this check, share your location while standing in the field."
     },
     "stale": "No clear image since {{date}} (clouds), so this may be out of date.",
     "chartLabel": "Greenness of your field and of nearby fields over time",

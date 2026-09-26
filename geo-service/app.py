@@ -117,12 +117,13 @@ def _field_health(request: Request, q: FieldQuery, x_geo_token: str):
     with_redsi = crop == "wheat"  # REDSI was developed for wheat yellow rust only
     t0 = time.perf_counter()
     try:
-        raw, geometry_source = fh.query_rows(lat, lon, start, end, with_redsi=with_redsi)
+        raw, geometry_source, field_farmland = fh.query_rows(lat, lon, start, end, with_redsi=with_redsi, crop=crop)
     except ee.EEException as err:
         quota = "quota" in str(err).lower() or "too many" in str(err).lower()
         log.warning("Earth Engine call failed", extra={"fields": {"requestId": rid, "quota": quota, "error": str(err)[:300]}})
         raise HTTPException(status_code=503 if quota else 502, detail="Earth Engine error")
-    result = fh.summarize(raw, start=start, end=end, geometry_source=geometry_source, with_redsi=with_redsi)
+    result = fh.summarize(raw, start=start, end=end, geometry_source=geometry_source, with_redsi=with_redsi,
+                          field_farmland=field_farmland)
     # never the coordinates; EECU per call is not returned by Earth Engine, so: time + workload tag
     log.info("field health", extra={"fields": {
         "requestId": rid, "workloadTag": WORKLOAD_TAG, "eeLatencyMs": round((time.perf_counter() - t0) * 1000),

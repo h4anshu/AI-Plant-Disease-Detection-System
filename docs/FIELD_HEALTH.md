@@ -38,6 +38,19 @@ Sentinel-2 pixels are **10 m × 10 m**.
   Indian field (typical holdings are about 1 ha). **Limit:** a point near a field edge can include some of
   the neighbouring field.
 
+### Is it a field at all?
+
+People sometimes photograph a leaf at home or in town. The shared location is then a roof, road or
+courtyard, and comparing it with nearby fields gives a confident but meaningless "below neighbours". A
+real case on 26 Sep 2026: NDVI stayed between 0.07 and 0.23 all season, and the app said "below since …".
+
+So the service first measures **how much of the 30 m circle is farmland on ESA WorldCover**.
+- **Under 50%:** no verdict, only "This location doesn't look like farmland… share your location while
+  standing in the field" (`flag.code = not_farmland`). The numbers and chart are still returned.
+- **Orchard crops:** apple and banana orchards are usually mapped as **tree cover** (class 10), so for
+  those crops tree cover counts as farmland, both for the field and for its neighbours.
+- The share is returned as `field_farmland`.
+
 ## 2. Which images: Sentinel-2 surface reflectance
 
 **Collection:** `COPERNICUS/S2_SR_HARMONIZED`.
@@ -100,8 +113,9 @@ A low NDVI means little by itself: every field is brown after harvest. What matt
 compared with similar fields nearby, on the same day*.
 - **Ring:** from **100 m to 1 km** around the point. The first 100 m are skipped because those pixels
   are often the same field.
-- **Only cropland:** pixels that **ESA WorldCover 2021** (`ESA/WorldCover/v200`, 10 m) labels
-  **class 40, Cropland**. Villages, roads, trees and water don't pull the baseline down.
+- **Only farmland:** pixels that **ESA WorldCover 2021** (`ESA/WorldCover/v200`, 10 m) labels
+  **class 40, Cropland**, plus class 10, Tree cover, for apple and banana orchards. Villages, roads and
+  water don't pull the baseline down.
 - **Same clear-pixel rule:** SCL classes 4–7 on the same date.
 - **On each date:** the **25th, 50th (median) and 75th percentile** of NDVI, NDRE and REDSI over those
   pixels. The app draws the 25th–75th range as the grey band.
@@ -128,6 +142,7 @@ cropland".
 | `above` | latest z ≥ +1 | "Greener than neighbouring fields" |
 | `no_neighbours` | no date had enough clear cropland around | "Not enough clear farmland nearby to compare with" |
 | `no_clear` | no clear date in the window | "No clear satellite view in the last 4 months (clouds)" |
+| `not_farmland` | under 50% of the 30 m circle is farmland (checked first) | "This location doesn't look like farmland…" |
 
 **Two dates are needed** before a field is called "below" because a single image can be off (thin haze
 that SCL missed, or the field was just irrigated). With about 5-day revisits, 2 dates means about 10 days

@@ -498,3 +498,14 @@ Brief: GEE setup doc; a field-health endpoint (ALU or 30 m buffer; S2 SR harmoni
 - Browser, local stack at 360 px: rice checkup with location → "See this field from space" → real EE via local server + geo-service → "In line with neighbouring fields", NDVI/NDRE chart, 16 of 31 clear; Hindi renders (text checked, no overflow).
 - CI: new `geo-service` job (mocked EE, no credentials).
 - Totals: ml-service pytest 46 unaffected by the geemap install; lint + build OK.
+
+**Live check by the user (26 Sep, 19:50 IST)**, a phone on the live site: the field-health card worked end to end (the verdict "Below neighbouring fields since 9/6/2026", chart, 6 of 31 clear). It revealed 2 problems, both fixed:
+1. **Not a field.** The "field" NDVI stayed at 0.07–0.23 all season, so the location was most likely a home or town, not a field. The "below" verdict was confident but meaningless.
+   - Fix: measure the farmland share of the 30 m circle (WorldCover) in the same single EE request; under 50% gives `not_farmland` with no verdict.
+   - Apple and banana count tree cover (class 10) as farmland, for the field and its ring.
+   - A bug found while testing this: a FeatureCollection nested in an `ee.Dictionary` comes back from getInfo() without features (every farm turned `no_clear` in 0.5 s). It's now a property on the FC, still one request.
+   - Real re-check: Mullanpur 0.94 → normal; Kolhapur 1.0 → normal; Anantapur 1.0 → normal; Ludhiana town centre 0.0 → `not_farmland`.
+2. **"9/6/2026" was ambiguous** (read as 9 June in India, meant 6 Sep). Dates are now `en-IN` with the month name ("6 Sept 2026").
+
+Also: the server cache key now includes `FIELD_METHOD_VERSION = 2`, so the old cached "below" answers are not served; the notebook is updated and re-run; FIELD_HEALTH.md has an "Is it a field at all?" section. Tests: geo 24, server 193, client 34.
+**Needs a redeploy:** geo-service (new logic) + server (cache version), then a push (client).
