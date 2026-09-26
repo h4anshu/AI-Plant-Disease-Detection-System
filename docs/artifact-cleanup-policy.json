@@ -1,8 +1,8 @@
 [
   {
-    "name": "keep-3-newest",
+    "name": "keep-6-newest",
     "action": { "type": "Keep" },
-    "mostRecentVersions": { "keepCount": 3 }
+    "mostRecentVersions": { "keepCount": 6 }
   },
   {
     "name": "delete-older-than-14-days",

@@ -15,7 +15,7 @@
 | Item | Usage at 1,000 predictions | Cost |
 |---|---|---|
 | Cloud Run | Worst case, every call a cold start (~4 s): ML 2 vCPU × 4 s × 1,000 = 8,000 vCPU-s and 1 GiB × 4,000 s = 4,000 GiB-s; the server is smaller still. That's under 5% of the free pool. | $0 |
-| Artifact Registry | 3 ML images (~184 MB each, sharing layers) plus 3 server images (~80 MB) with the cleanup policy below: about 0.5 GB | $0 (about $0.10/GB/month above 0.5 GB) |
+| Artifact Registry | 2 ML images (~184 MB each, sharing most layers) plus a few server images (~80–106 MB, sharing the Node base) with the cleanup policy below: under 0.5 GB | $0 (about $0.10/GB/month above 0.5 GB) |
 | Secret Manager | 4 secrets; each container start reads them once | $0 |
 | Atlas M0 | about 2 KB per record (heatmaps live in Cloudinary): about 2 MB/month | $0 |
 | Cloudinary | photo (≤ 1280 px, ~200 KB) + heatmap (~80 KB) = about 0.3 GB stored per month, plus views | $0 while the total stays under 25 GB. At this rate that's years. |
@@ -74,8 +74,9 @@ gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudb
 ```
 
 **A4. Image registry**, with a cleanup policy that keeps it inside the 0.5 GB free storage. The policy
-keeps the 3 newest images and deletes older ones after 14 days, so rollback targets stay available
-for two weeks:
+keeps the 6 newest versions and deletes older ones after 14 days, so rollback targets stay available
+for two weeks. One `docker push` of the ML image creates 3 versions (image, attestation and index), so
+6 versions means the current ML image plus one rollback:
 
 ```powershell
 gcloud artifacts repositories create plant-disease --repository-format=docker --location=$REGION
