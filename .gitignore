@@ -52,3 +52,8 @@ Thumbs.db
 
 # Local tool configs
 .claude/
+
+# service-account / API keys (docs/GEE_SETUP.md): never commit
+*-key.json
+*.private-key.json
+.private-key.json
