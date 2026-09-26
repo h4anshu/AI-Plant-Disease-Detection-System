@@ -45,14 +45,22 @@ one the app already runs in, `plant-disease-503711`.
 ## 2. Check that it works from your own account (about 5 minutes)
 
 This installs the Earth Engine Python library into the project's virtual environment and signs in
-**as you** (a browser window opens). No key file is created.
+**as you** (a browser window opens; choose the account that owns the project). No key file is
+created.
 
 ```powershell
 .venv\Scripts\python -m pip install earthengine-api
 ```
 ```powershell
-.venv\Scripts\earthengine authenticate
+gcloud auth application-default login --scopes="https://www.googleapis.com/auth/earthengine,https://www.googleapis.com/auth/cloud-platform"
 ```
+```powershell
+gcloud auth application-default set-quota-project plant-disease-503711
+```
+
+Why gcloud and not `earthengine authenticate`: Google can block that command's sign-in ("This app is
+blocked"). That happened on this project on 26 Sep 2026. Signing in through gcloud (Application
+Default Credentials) works, and the Earth Engine library picks it up automatically.
 ```powershell
 .venv\Scripts\python -c "import ee; ee.Initialize(project='plant-disease-503711'); print(ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED').filterBounds(ee.Geometry.Point(75.85, 30.90)).filterDate('2026-08-01', '2026-09-01').size().getInfo(), 'Sentinel-2 images')"
 ```
