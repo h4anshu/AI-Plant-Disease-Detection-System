@@ -321,3 +321,18 @@ Tests and checks:
   - the same request id appears in the server and ML logs;
   - the drift report on that DB shows `feedbackIncorrect: 1`; the relabel export CSV has the row with the correction and model versions.
 - `npm audit` shows 3 old high findings (nanoid, react-router); split off as a separate task.
+
+## Client dependency security fixes (npm audit)
+
+`npm audit --omit=dev` in `client/` reported 3 high-severity findings:
+- `nanoid` < 3.3.18 (custom generators can loop forever when size is 0), pulled in by vite → postcss;
+- `react-router` / `react-router-dom` 7.12.0–7.18.1 (RSC-mode CSRF bypass; the app doesn't use RSC mode but was still in range).
+
+Fixed with `npm audit fix`, patch releases only:
+- react-router and react-router-dom 7.18.1 → 7.18.4;
+- nanoid 3.3.16 → 3.3.19;
+- `package.json` minimum raised to `react-router-dom ^7.18.4`, so a lock-less install can't resolve a vulnerable version.
+
+`npm audit` (incl. dev) now reports 0 vulnerabilities. lint exit 0 (the 10 old warnings only), Vitest 4 files / 14 tests pass, build OK.
+
+Note: `npm audit fix --omit=dev` also prunes devDependencies from `node_modules` (oxlint disappeared). The lockfile was fine; `npm install` restored them. `npm ci` couldn't wipe `node_modules` while the running Vite dev server on :5173 held Tailwind's native `.node` file.
