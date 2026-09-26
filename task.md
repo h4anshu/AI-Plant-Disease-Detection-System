@@ -272,3 +272,15 @@ What was done:
   - new Jest: heatmap uploaded to Cloudinary and saved as a URL; a cold-start 503 retried once; a second 503 not retried; photo downsized to 1280×853; history drops `gradcam`, pages 50 + 5, bad `before` gives 400;
   - new Vitest: the waking-up note appears at 8 s and clears with the result;
   - totals: pytest 40, Jest 25, Vitest 11; client build OK; banner checked in the browser.
+- **Deployed by the user (26 Sep, ~16:05 IST).** My own deploy attempt was blocked by the auto-mode classifier (Production Deploy).
+  - `ml-service-00005-mcn` runs `ml-service:ba8e527`: 2 CPU, 1 GiB, concurrency 4, timeout 60, cpu-boost, max 3.
+  - `server-00010-nt6`: 1 CPU, 512 MiB, timeout 180, cpu-boost, max 3; env vars kept.
+  - CI green on `ba8e527`.
+- Live checks:
+  - ML /health 200 in 0.27 s (10 heads);
+  - /predict-disease without the token → 401;
+  - server /health 200;
+  - history `?before=nonsense` → 400 (the new code is live);
+  - Vercel bundle has the banner and the waking-up note.
+- Migration dry run against prod: 0 records still hold base64 (all old heatmaps now in Cloudinary).
+- Still optional (DEPLOY.md Part C): secrets → Secret Manager; registry cleanup policy (about 1.7 GB against 0.5 GB free).
