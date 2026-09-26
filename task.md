@@ -284,3 +284,10 @@ What was done:
   - Vercel bundle has the banner and the waking-up note.
 - Migration dry run against prod: 0 records still hold base64 (all old heatmaps now in Cloudinary).
 - Still optional (DEPLOY.md Part C): secrets → Secret Manager; registry cleanup policy (about 1.7 GB against 0.5 GB free).
+- **Live check by the user:** a wheat photo on the live site gave HealthyLeaf 98.4% with treatment and the heatmap (served from Cloudinary). Works end to end.
+- **Registry cleanup (run by the user, 26 Sep; I only prepared the list, since deleting is irreversible):**
+  - Deleted: ML `v1` (923 MB) and `v2`, the July server `v1`, and 3 older source-deploy server builds.
+  - Kept: the live images plus one rollback each — ML `ba8e527` and `v3`; server `15d89f3` and `aba1923`.
+  - Cleanup policies are active on both repositories: keep the 6 newest versions (one ML push = image + attestation + index), delete older than 14 days.
+  - Right after the deletion, `describe` still reported 1,221 MB for `plant-disease`; the layers of deleted images are garbage-collected asynchronously. Expected about 0.2 GB + 0.17 GB once collected.
+  - Both services healthy after the cleanup.
