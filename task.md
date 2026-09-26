@@ -2,6 +2,19 @@
 
 Running record of work on the AI Plant Disease Detection System: what was done, how, and why. Newest entries at the bottom of each section; each task lists its outcome and where the evidence lives.
 
+## Pending (user to do later)
+
+Added 26 Sep 2026. Tick an item off when it's done.
+
+**Monitoring setup** (optional, about 10 minutes; steps in `docs/MONITORING.md`):
+- [ ] **UptimeRobot:** 3 free monitors (ML `/health`, server `/health`, website). You get an email when the site goes down, and the 5-minute pings keep the Cloud Run services warm, so there are fewer cold starts.
+- [ ] **Error Reporting emails:** Google Cloud Console → Error Reporting → Configure notifications.
+- [ ] **Sentry for the browser:** create a free Sentry React project, turn on "Prevent Storing of IP Addresses", and set `VITE_SENTRY_DSN` in Vercel, then redeploy.
+
+**Carried over from earlier:**
+- [ ] **Deploy monitoring + feedback, then push `main`.** Deploy ml-service (build + push the image, `gcloud run deploy`) and the server (`gcloud run deploy server --source server`) **before** pushing. Otherwise Vercel ships the feedback buttons ahead of the server endpoints. Commands are in the Task 9 hand-off; local commits `4f00939` and `9dd9a40` are waiting.
+- [ ] **Secrets to Secret Manager** (optional): `docs/DEPLOY.md` Part C.
+
 ---
 
 ## Task 1 — Environment: GPU training setup (25 Sep 2026)
