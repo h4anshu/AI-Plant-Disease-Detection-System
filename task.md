@@ -13,6 +13,7 @@ Added 26 Sep 2026. Tick an item off when it's done.
 
 **Carried over from earlier:**
 - [ ] **Deploy the server again (and the new geo-service), then push `main`.** Status on 26 Sep, 17:40 IST: ml-service (`00006`, monitoring) and server (`00011`) are live, and `main` is pushed up to `9513512` (Hindi). But the server was deployed before the Hindi commit, so live Hindi mode still shows English treatment advice. The disease-map commit `33d06ef` is not pushed. Next: `gcloud run deploy server --source server --region asia-south1` (brings Hindi advice + map API + delete), then push `main` (Vercel ships the map/privacy pages). The ML service needs no redeploy.
+- [ ] **Deploy the geo-service** (steps in `docs/DEPLOY.md`, "Field health"): build + push the image, `gcloud run deploy geo-service --service-account geo-service@…`, then set `GEO_SERVICE_URL` / `GEO_SERVICE_TOKEN` on the server. Until then the button answers "Field health is not available" and nothing else changes.
 - [ ] **Agronomist review of the Hindi content:** 121 entries in `docs/TRANSLATION_REVIEW.csv` (10 crop names, 53 disease names, 4 severity labels, 54 treatment texts, all AI-drafted). Fill `hindi_corrected` / `reviewer`, then apply the corrections in `client/src/locales/terms.json` and `server/utils/treatmentMap.hi.js` with `needs_review: false`, and run `npm run translation-review` in `server/`. Until then the app shows a "not yet checked by an expert" note under Hindi advice.
 - [ ] **Secrets to Secret Manager** (optional): `docs/DEPLOY.md` Part C.
 - [x] **Earth Engine setup for field health**, done 26 Sep 2026: registered (noncommercial, BBDU, Community tier), API on, sign-in via gcloud ADC works (test: 7 Sentinel-2 images), `geo-service` service account with both roles. daily EECU cap set to 18,000 EECU-s. **Still open:** an ALU answer (likely no, no GWCID), and **3 real field coordinates** (owners' consent). The field-health code starts after the coordinates.
@@ -440,7 +441,6 @@ Brief: consent-first location (GPS, EXIF fallback, skip); a private GeoJSON poin
 5. Demo mode: the seed refused an Atlas URI (exit 1), inserted 267 demo records locally; with `MAP_INCLUDE_DEMO`, 7 district cells are shown (the rest suppressed) under a Hindi demo warning.
 6. At 360 px in Hindi, the map, privacy page and consent box have no horizontal overflow.
 
-- **Deploy the geo-service** (steps in `docs/DEPLOY.md`, "Field health"): build + push the image, `gcloud run deploy geo-service --service-account geo-service@…`, then set `GEO_SERVICE_URL` / `GEO_SERVICE_TOKEN` on the server. Until then the button answers "Field health is not available" and nothing else changes.
 
 ## Task 12 — Field health from space (Earth Engine)
 
