@@ -35,20 +35,20 @@ The crop is selected by the user, not inferred from the image. That's intentiona
 
 ## Crops and disease coverage
 
-| Crop | Disease classes | Test accuracy | Test set size |
-|---|---|---|---|
-| Wheat | 5 | 99.58% | ~240 |
-| Rice | 5 | 99.68% | 927 |
-| Sugarcane | 11 | 92.31% | 1,014 |
-| Potato | 3 | 98.76% | 323 |
-| Maize | 4 | 94.28% | 629 |
-| Pigeonpea | 4 | 79.05% | 148 |
-| Groundnut | 6 | 92.7% (5-fold grouped CV) | 2,367 |
-| Blackgram | 5 | 96.2% (5-fold grouped CV) | 1,007 |
-| Apple | 3 | 94.9% (5-fold grouped CV) | 332 |
-| Banana | 7 | 96.8% (5-fold grouped CV) | 4,634 |
+| Crop | Disease classes | Accuracy [95% CI] | Macro F1 | Weakest-class recall | Images evaluated | Evaluation |
+|---|---|---|---|---|---|---|
+| Wheat | 5 | 99.58% [98.8–100.0] | 0.996 | 98.3% | 240 | holdout split |
+| Rice | 5 | 99.78% [99.5–100.0] | 0.994 | 94.7% | 927 | holdout split |
+| Sugarcane | 11 | 92.70% [91.0–94.3] | 0.890 | 52.1% | 1,014 | holdout split |
+| Potato | 3 | 98.14% [96.6–99.4] | 0.964 | 96.0% | 323 | holdout split |
+| Maize | 4 | 94.28% [92.4–96.0] | 0.925 | 79.1% | 629 | holdout split |
+| Pigeonpea | 4 | 81.08% [74.3–87.8] | 0.839 | 63.6% | 148 | holdout split |
+| Groundnut | 6 | 92.69% [91.6–93.7] | 0.934 | 89.6% | 2,367 | 5-fold grouped CV |
+| Blackgram | 5 | 96.23% [95.0–97.4] | 0.962 | 94.4% | 1,007 | 5-fold grouped CV |
+| Apple | 3 | 94.88% [92.5–97.0] | 0.951 | 93.3% | 332 | 5-fold grouped CV |
+| Banana | 7 | 96.76% [96.3–97.3] | 0.957 | 91.8% | 4,634 | 5-fold grouped CV |
 
-The four crops added in Sep 2026 are scored differently from the original six: 5-fold cross-validation over every *independent* image, with near-duplicate and augmented copies of the same leaf never split across train and test. Several source datasets hide 7–80 augmented copies per leaf, which a plain random split turns into inflated accuracy. Seventeen other candidate crops were analysed and rejected or left for a product decision; see [ml-service/NEW_CROPS_REPORT.md](ml-service/NEW_CROPS_REPORT.md).
+Numbers come from [ml-service/models/metrics.json](ml-service/models/metrics.json). The two evaluation methods are not directly comparable: "holdout split" scores one random 15% test split (the original six crops), while "5-fold grouped CV" tests every independent image once and never lets near-duplicate or augmented copies of the same leaf sit on both sides of the split, so it is the stricter of the two. Seventeen other candidate crops were analysed and not shipped; see [ml-service/NEW_CROPS_REPORT.md](ml-service/NEW_CROPS_REPORT.md).
 
 Pigeonpea is the weakest crop by a wide margin, and the reason is unglamorous: it has the smallest dataset of the six (973 raw images total, versus 16,000+ for wheat). Sugarcane's lower accuracy relative to wheat/rice/potato is a more normal effect of having the most classes (11) with real inter-disease visual overlap, not a dataset-size problem.
 
@@ -169,7 +169,7 @@ Auth uses the raw JWT in the `Authorization` header, with no `Bearer` prefix —
 
 - No automated tests exist — no unit, integration, or end-to-end suite. Verification so far has been manual, via curl against running services.
 - Severity grading is a 44%-agreement heuristic against expert-labeled ground truth, not a validated clinical measurement (see above).
-- Pigeonpea's 79.05% test accuracy is the weakest of the six crops, directly tied to its small dataset (973 images).
+- Pigeonpea's 81.08% test accuracy is the weakest of the six original crops, directly tied to its small dataset (973 images).
 - Training data leans heavily toward controlled/lab-style photography — uniform backgrounds, staged lighting. How the models perform on photos taken by an actual farmer's phone in a field, with variable lighting and background clutter, hasn't been separately measured.
 - Yield-loss is a static lookup table, not a trained model — see the scope note above. There's no soil, weather, or variety input anywhere in the pipeline.
 - Data augmentation is defined in the preprocessing notebook but isn't actually applied during training, since the cached-feature-extraction approach reads from raw images before augmentation would happen. Head training would likely benefit from it, particularly for pigeonpea.

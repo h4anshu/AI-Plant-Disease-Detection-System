@@ -1,0 +1,239 @@
+{
+  "note": "holdout split = one random 15% test split (original 6 crops); 5-fold grouped CV = every independent image tested once, near-duplicate/augmented copies of a leaf never split across train and test (see NEW_CROPS_REPORT.md). The two are not directly comparable.",
+  "crops": [
+    {
+      "crop": "wheat",
+      "classes": [
+        "BlackPoint",
+        "FusariumFootRot",
+        "HealthyLeaf",
+        "LeafBlight",
+        "WheatBlast"
+      ],
+      "n_test": 240,
+      "accuracy": 0.9958,
+      "ci95": [
+        0.9875,
+        1.0
+      ],
+      "macro_f1": 0.9957,
+      "min_class_recall": 0.9833,
+      "eval_method": "holdout split",
+      "source_datasets": [
+        "Mendeley wheat disease dataset (Original Dataset folder only)"
+      ],
+      "date": "2026-07-26"
+    },
+    {
+      "crop": "rice",
+      "classes": [
+        "Bacterialblight",
+        "Blast",
+        "Brownspot",
+        "Healthy",
+        "Tungro"
+      ],
+      "n_test": 927,
+      "accuracy": 0.9978,
+      "ci95": [
+        0.9946,
+        1.0
+      ],
+      "macro_f1": 0.9937,
+      "min_class_recall": 0.9474,
+      "eval_method": "holdout split",
+      "source_datasets": [
+        "Mendeley Rice Leaf Disease Images (Sethy et al.)"
+      ],
+      "date": "2026-07-26"
+    },
+    {
+      "crop": "sugarcane",
+      "classes": [
+        "Banded_Chlorosis",
+        "BrownRust",
+        "Brown_Spot",
+        "Dried_Leaves",
+        "Grassy_shoot",
+        "Healthy_Leaves",
+        "Pokkah_Boeng",
+        "Sett_Rot",
+        "Viral_Disease",
+        "Yellow_Leaf",
+        "smut"
+      ],
+      "n_test": 1014,
+      "accuracy": 0.927,
+      "ci95": [
+        0.9103,
+        0.9428
+      ],
+      "macro_f1": 0.8902,
+      "min_class_recall": 0.5208,
+      "eval_method": "holdout split",
+      "source_datasets": [
+        "Mendeley sugarcane leaf dataset (11 classes)"
+      ],
+      "date": "2026-07-26"
+    },
+    {
+      "crop": "potato",
+      "classes": [
+        "Early_blight",
+        "Late_blight",
+        "healthy"
+      ],
+      "n_test": 323,
+      "accuracy": 0.9814,
+      "ci95": [
+        0.9659,
+        0.9938
+      ],
+      "macro_f1": 0.9643,
+      "min_class_recall": 0.96,
+      "eval_method": "holdout split",
+      "source_datasets": [
+        "PlantVillage (potato classes)"
+      ],
+      "date": "2026-07-26"
+    },
+    {
+      "crop": "maize",
+      "classes": [
+        "Blight",
+        "Common_Rust",
+        "Gray_Leaf_Spot",
+        "Healthy"
+      ],
+      "n_test": 629,
+      "accuracy": 0.9428,
+      "ci95": [
+        0.9237,
+        0.9603
+      ],
+      "macro_f1": 0.9254,
+      "min_class_recall": 0.7907,
+      "eval_method": "holdout split",
+      "source_datasets": [
+        "Kaggle Corn/Maize Leaf Disease Dataset (smaranjitghose)"
+      ],
+      "date": "2026-07-26"
+    },
+    {
+      "crop": "pigeonpea",
+      "classes": [
+        "Healthy",
+        "Leaf_Spot",
+        "Leaf_webber",
+        "Sterilic_mosaic"
+      ],
+      "n_test": 148,
+      "accuracy": 0.8108,
+      "ci95": [
+        0.7432,
+        0.8784
+      ],
+      "macro_f1": 0.8387,
+      "min_class_recall": 0.6364,
+      "eval_method": "holdout split",
+      "source_datasets": [
+        "Mendeley: A novel pigeonpea leaf dataset"
+      ],
+      "date": "2026-07-26"
+    },
+    {
+      "crop": "groundnut",
+      "classes": [
+        "Alternaria_Leaf_Spot",
+        "Healthy",
+        "Leaf_Spot",
+        "Nutrition_Deficiency",
+        "Rosette",
+        "Rust"
+      ],
+      "n_test": 2367,
+      "accuracy": 0.9269,
+      "ci95": [
+        0.9159,
+        0.9366
+      ],
+      "macro_f1": 0.9336,
+      "min_class_recall": 0.896,
+      "eval_method": "5-fold grouped CV",
+      "source_datasets": [
+        "Mendeley: A novel groundnut leaf dataset (Purba Medinipur, West Bengal)",
+        "Mendeley: Multi-Crop Disease Dataset, groundnut part (Tamil Nadu)"
+      ],
+      "date": "2026-09-26"
+    },
+    {
+      "crop": "blackgram",
+      "classes": [
+        "Anthracnose",
+        "Healthy",
+        "Leaf_Crinkle",
+        "Powdery_Mildew",
+        "Yellow_Mosaic"
+      ],
+      "n_test": 1007,
+      "accuracy": 0.9623,
+      "ci95": [
+        0.9503,
+        0.9742
+      ],
+      "macro_f1": 0.9615,
+      "min_class_recall": 0.9444,
+      "eval_method": "5-fold grouped CV",
+      "source_datasets": [
+        "Mendeley: Blackgram Plant Leaf Disease (BPLD), Andhra Pradesh"
+      ],
+      "date": "2026-09-26"
+    },
+    {
+      "crop": "apple",
+      "classes": [
+        "Alternaria_Leaf_Blotch",
+        "Healthy",
+        "Mosaic"
+      ],
+      "n_test": 332,
+      "accuracy": 0.9488,
+      "ci95": [
+        0.9247,
+        0.9699
+      ],
+      "macro_f1": 0.9511,
+      "min_class_recall": 0.9333,
+      "eval_method": "5-fold grouped CV",
+      "source_datasets": [
+        "Mendeley: Indigenous Dataset for Apple Leaf Disease Detection (Jammu & Kashmir)"
+      ],
+      "date": "2026-09-26"
+    },
+    {
+      "crop": "banana",
+      "classes": [
+        "Bract_Mosaic_Virus",
+        "Healthy",
+        "Insect_Pest",
+        "Moko_Wilt",
+        "Panama_Wilt",
+        "Pestalotiopsis_Leaf_Spot",
+        "Sigatoka_Leaf_Spot"
+      ],
+      "n_test": 4634,
+      "accuracy": 0.9676,
+      "ci95": [
+        0.9627,
+        0.9726
+      ],
+      "macro_f1": 0.9569,
+      "min_class_recall": 0.9185,
+      "eval_method": "5-fold grouped CV",
+      "source_datasets": [
+        "Mendeley: Multi-Crop Disease Dataset, banana part (Tamil Nadu)"
+      ],
+      "date": "2026-09-26"
+    }
+  ]
+}

@@ -970,11 +970,20 @@ def promote(crop):
         cur = json.load(open(p))
         cur[crop] = value
         json.dump(cur, open(p, "w"), indent=2)
-    p = MODELS / "new_crops_results.json"
-    allres = json.load(open(p)) if p.exists() else {}
-    allres[crop] = {k: res[k] for k in ("classes", "test_acc", "test_n", "test_acc_95ci", "macro_f1",
-                                        "min_class_recall", "per_class", "external_test", "sources_used")}
-    json.dump(allres, open(p, "w"), indent=2)
+    # models/metrics.json is the single metrics file for every live crop (README table is built from it)
+    cv, cm = res["cv"], np.array(res["cv"]["confusion"], float)
+    prec, rec = np.diag(cm) / np.maximum(cm.sum(0), 1), np.diag(cm) / np.maximum(cm.sum(1), 1)
+    f1 = np.where(prec + rec > 0, 2 * prec * rec / np.maximum(prec + rec, 1e-12), 0)
+    srcs = [Path(s.get("archive") or s.get("yolo") or s["dir"]).stem for s in CROPS[crop]
+            if s["id"] in res["sources_used"]]
+    entry = dict(crop=crop, classes=sorted(res["classes"], key=res["classes"].get), n_test=cv["n"],
+                 accuracy=cv["acc"], ci95=cv["acc_95ci"], macro_f1=round(float(f1.mean()), 4),
+                 min_class_recall=cv["min_recall"], eval_method="5-fold grouped CV",
+                 source_datasets=sorted(set(srcs)), date=time.strftime("%Y-%m-%d"))
+    p = MODELS / "metrics.json"
+    metrics = json.load(open(p))
+    metrics["crops"] = [m for m in metrics["crops"] if m["crop"] != crop] + [entry]
+    json.dump(metrics, open(p, "w"), indent=2)
     sh(f"promoted {crop}")
 
 

@@ -73,7 +73,7 @@ ml-service/gradcam.py
 ml-service/requirements.txt
 ml-service/models/backbone/efficientnetb0_backbone.keras
 ml-service/models/heads/{maize,pigeonpea,potato,rice,sugarcane,wheat}_head.keras
-ml-service/models/test_results.csv, test_results.json, training_history.json
+ml-service/models/metrics.json (all crops; replaces test_results.csv/.json), training_history.json
 ml-service/data/label_maps.json, class_weights.json, dataset_index.csv,
               split_report.json, raw_placement_report.json, audit_report.json,
               severity_labels.json, wheat_severity_labels.csv, PlantDiseaseData.zip
