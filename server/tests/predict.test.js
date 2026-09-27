@@ -129,6 +129,21 @@ describe('POST /api/predict', () => {
     expect(res.body.treatmentNeedsReview).toBeUndefined();
   });
 
+  test('the photo date (captured_at) is kept only when believable; the reason is kept otherwise', async () => {
+    const ist = (daysAgo) => new Date(Date.now() + 5.5 * 3600e3 - daysAgo * 86400e3).toISOString().slice(0, 10);
+    const send = async (value) => {
+      mockML(200, ML_OK);
+      mockCloudinary();
+      const res = await upload().field('captured_at', value);
+      expect(res.status).toBe(201);
+      return Prediction.findById(res.body._id).lean();
+    };
+    expect(await send(ist(10))).toMatchObject({ capturedAt: ist(10), capturedAtRejected: null });
+    expect(await send(ist(-2))).toMatchObject({ capturedAt: null, capturedAtRejected: 'future' });
+    expect(await send(ist(61))).toMatchObject({ capturedAt: null, capturedAtRejected: 'too_old' });
+    expect(await send('yesterday')).toMatchObject({ capturedAt: null, capturedAtRejected: 'invalid' });
+  });
+
   test('uncertain result is saved without treatment or yield loss', async () => {
     mockML(200, { ...ML_OK, status: 'uncertain', reasons: ['unfamiliar_image'], ood_score: 3.2,
       top3: [{ disease: 'Yellow_Mosaic', probability: 0.5 }, { disease: 'Healthy', probability: 0.3 },

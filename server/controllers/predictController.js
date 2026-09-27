@@ -4,6 +4,8 @@ import FormData from "form-data";
 import cloudinary, { publicIdFromUrl, uploadBuffer } from "../config/cloudinary.js";
 import PredictionModel, { FEEDBACK } from "../models/Prediction.js";
 import FieldHealthCache, { keyForPrediction } from "../models/FieldHealthCache.js";
+import SoilCache from "../models/SoilCache.js";
+import { parseCapturedAt, soilCacheKey } from "../utils/context.js";
 import { getTreatment, LANGUAGES, localizedTreatment, treatmentMap } from "../utils/treatmentMap.js";
 import getYieldLoss, { yieldLossTable } from "../utils/yieldLoss.js";
 import Report from "../models/Report.js";
@@ -80,6 +82,9 @@ const predict = async (req, res) => {
       throw err;
     }
 
+    // the photo's EXIF date, if believable; the context layer uses it as the weather reference date
+    const captured = parseCapturedAt(req.body.captured_at);
+
     // 0. Check the real file type and size; the stored copy is downsized and has no EXIF (GPS etc.)
     let publicImage;
     try {
@@ -132,6 +137,7 @@ const predict = async (req, res) => {
       userId: req.user.id,
       deviceId: req.deviceId,
       ...place,
+      ...captured,
       imageUrl,
       crop,
       status,
@@ -179,7 +185,8 @@ const getHistory = async (req, res) => {
     if (!filter) return res.status(200).json([]);
     if (before) filter.createdAt = { $lt: before };
     // the list never shows the heatmap, and records from before the migration hold it as ~100 KB base64
-    const predictions = await PredictionModel.find(filter).select('-gradcam').sort({ createdAt: -1 }).limit(PAGE_SIZE);
+    // nor the context snapshot (~5 KB each; GET /api/predict/:id/context serves it)
+    const predictions = await PredictionModel.find(filter).select('-gradcam -context').sort({ createdAt: -1 }).limit(PAGE_SIZE);
     res.status(200).json(predictions.map((p) => toResponse(req, res, p)));
   } catch (error) {
     logError(req, 'History failed', error);
@@ -242,6 +249,8 @@ const deleteMine = async (req, res) => {
     const { deletedCount } = await PredictionModel.deleteMany(owner);
     // cached satellite answers for those fields go too (their keys are hashes of the location)
     await FieldHealthCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map(keyForPrediction) } });
+    // and the soil answers cached for those cells (a hash of a ~250 m cell can be reversed by trying them all)
+    await SoilCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map((d) => soilCacheKey(d.location.coordinates[1], d.location.coordinates[0])) } });
     // and their reports: the verify link then answers 404
     await Report.deleteMany({ predictionId: { $in: docs.map((d) => d._id) } });
     // a failed image delete leaves an orphan file, never a record: logged so it can be removed by hand

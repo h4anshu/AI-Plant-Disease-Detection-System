@@ -5,7 +5,7 @@ import UploadBox from '../components/UploadBox';
 import ResultCard from '../components/ResultCard';
 import LocationConsent from '../components/LocationConsent';
 import { predictDisease } from '../services/api';
-import { getLocation, readConsent, saveConsent } from '../services/location';
+import { getCapturedDate, getLocation, readConsent, saveConsent } from '../services/location';
 
 // Both Cloud Run services scale to zero: the first check after a quiet spell also starts them
 export const SLOW_AFTER_MS = 8000;
@@ -47,6 +47,9 @@ const Predict = () => {
       const place = consent === 'granted' ? await getLocation(file) : { location_source: 'none' };
       setLocating(false);
       for (const [key, value] of Object.entries(place)) formData.append(key, String(value));
+      // with a location, the photo's date lets the context layer use the weather of that day
+      const captured = place.location_source !== 'none' ? await getCapturedDate(file) : null;
+      if (captured) formData.append('captured_at', captured);
       const res = await predictDisease(formData);
       setResult(res.data);
     } catch (err) {

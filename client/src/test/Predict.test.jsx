@@ -6,8 +6,9 @@ import { MemoryRouter } from 'react-router-dom';
 // and that chained copy is reported as an unhandled rejection even though the component catches it
 const api = vi.hoisted(() => ({ calls: [], reply: null }));
 vi.mock('../services/api', () => ({ predictDisease: (formData) => { api.calls.push(formData); return api.reply(); } }));
-const geo = vi.hoisted(() => ({ place: { location_source: 'none' }, asked: 0 }));
-vi.mock('../services/location', async (orig) => ({ ...(await orig()), getLocation: async () => { geo.asked++; return geo.place; } }));
+const geo = vi.hoisted(() => ({ place: { location_source: 'none' }, asked: 0, dated: 0 }));
+vi.mock('../services/location', async (orig) => ({ ...(await orig()), getLocation: async () => { geo.asked++; return geo.place; },
+  getCapturedDate: async () => { geo.dated++; return '2026-09-20'; } }));
 import Predict, { SLOW_AFTER_MS } from '../pages/Predict';
 
 const render = (ui) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
@@ -76,7 +77,7 @@ describe('Predict page', () => {
     fireEvent.click(screen.getByRole('button', { name: /analyze/i }));
     await screen.findByRole('heading', { name: 'No leaf found' });
     expect(Object.fromEntries([...api.calls[0].entries()].filter(([k]) => k !== 'image')))
-      .toEqual({ crop: 'wheat', lat: '30.9', lon: '75.85', accuracy_m: '12', location_source: 'gps' });
+      .toEqual({ crop: 'wheat', lat: '30.9', lon: '75.85', accuracy_m: '12', location_source: 'gps', captured_at: '2026-09-20' });
     expect(localStorage.getItem('locationConsent')).toBe('granted');
     unmount();
 
@@ -90,6 +91,8 @@ describe('Predict page', () => {
     expect(api.calls[1].get('location_source')).toBe('none');
     expect(api.calls[1].get('lat')).toBeNull();
     expect(geo.asked).toBe(1); // never read without consent
+    expect(api.calls[1].get('captured_at')).toBeNull(); // the photo date only goes with a location
+    expect(geo.dated).toBe(1);
   });
 
   test('shows the server message when the request fails', async () => {

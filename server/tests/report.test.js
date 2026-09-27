@@ -1,6 +1,6 @@
 // PDF field report (docs/REPORT.md): the content snapshot, tracing of every value to an API field,
 // fonts that can draw every character, the tamper hash, and the routes.
-import { afterAll, afterEach, beforeAll, describe, expect, test } from '@jest/globals';
+import { afterAll, afterEach, beforeAll, describe, expect, jest, test } from '@jest/globals';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import mongoose from 'mongoose';
@@ -16,7 +16,8 @@ import { WeatherCache } from '../services/openMeteo.js';
 import { parseLocation } from '../utils/geo.js';
 import { buildReport, contentHash, sourceRows } from '../utils/reportContent.js';
 import { missingGlyphs, renderReport, runs } from '../utils/reportPdf.js';
-import { fieldHealth, input, prediction } from './reportFixtures.js';
+import { fieldHealth, input, prediction, snapshot } from './reportFixtures.js';
+import logger from '../utils/logger.js';
 
 const pages = (pdf) => (pdf.toString('latin1').match(/\/Type \/Page\b/g) ?? []).length;
 const sections = (c) => Object.fromEntries(c.sections.map((s) => [s.id, s]));
@@ -31,7 +32,7 @@ describe('report content', () => {
     const c = buildReport(input());
     const rows = sourceRows(c);
     expect(rows.length).toBeGreaterThan(25);
-    for (const r of rows) expect(r.source).toMatch(/^(GET \/api\/predict(\/:id\/(field-health|disease-risk))? › |stored checkup |report record › )/);
+    for (const r of rows) expect(r.source).toMatch(/^(GET \/api\/predict(\/:id\/(field-health|disease-risk|context))? › |stored checkup |report record › )/);
   });
 
   test('the numbers are the API numbers, formatted', () => {
@@ -40,7 +41,10 @@ describe('report content', () => {
     const sure = buildReport(input({ prediction: { ...prediction, confidence: 0.99986 } }));
     expect(value(sure, 'diagnosis', 'Model confidence')).toBe('> 99.9%'); // never a certain-looking 100.0%
     expect(value(c, 'diagnosis', 'Estimated yield loss if untreated')).toBe('25% (high confidence)');
-    expect(value(c, 'diagnosis', 'Other possibilities')).toBe('Brownspot 5.1%, Healthy 1.2%');
+    // other possibilities only on an uncertain result (every checkup has a top-3 now)
+    expect(value(c, 'diagnosis', 'Other possibilities')).toBeUndefined();
+    const unsure = buildReport(input({ prediction: { ...prediction, status: 'uncertain' } }));
+    expect(value(unsure, 'diagnosis', 'Other possibilities')).toBe('Brownspot 5.1%, Healthy 1.2%');
     expect(value(c, 'field', 'Verdict')).toBe('Below neighbouring fields since 13 Sept 2026.');
     expect(value(c, 'field', 'Last clear image')).toBe('18 Sept 2026');
     expect(value(c, 'field', 'Clear images')).toBe('4 of 31');
@@ -50,6 +54,17 @@ describe('report content', () => {
     expect(value(c, 'risk', 'Infection hours today')).toBe('4 (3 = medium, 6 = high)');
     expect(sections(c).risk.days.map((d) => d.levelText)).toEqual(['Low', 'Medium', 'Medium', 'High', 'High', '–']);
     expect(c.header.find((r) => r.label === 'Checkup date').value).toBe('20 Sept 2026, 11:00 IST'); // 05:30 UTC
+  });
+
+  test('the environment section shows the stored numbers, the card of the farmer, and "not computed" without a snapshot', () => {
+    const c = buildReport(input({ context: { ...input().context, soilTest: { ph: 6.4, zn: 0.9, sampleDate: '2024-01-10', enteredAt: 'x' },
+      soilTestNote: 'older_than_retest_interval' } }));
+    expect(value(c, 'context', 'Rain in the 30 days before, vs 2001–2020')).toBe('21% of normal (23.6 mm vs 110.2 mm; ERA5-Land, 21 Aug 2026 – 19 Sept 2026)');
+    expect(value(c, 'context', 'Soil, 0–30 cm (SoilGrids model, 250 m; not a soil test)')).toBe('loam; pH 7.8; organic carbon 9.7 g/kg; total N 8.1 g/kg');
+    expect(value(c, 'context', 'Soil Health Card (entered by the farmer)')).toBe('pH 6.4, Zn 0.9 ppm; 10 Jan 2024; the card is more than 2 years old');
+    expect(value(c, 'context', 'Reference date')).toBe('20 Sept 2026 (date the photo was taken)');
+    expect(sections(buildReport(input({ context: null }))).context.notes[0]).toMatch(/^Not computed yet/);
+    expect(sections(buildReport(input({ location: null }))).context).toBeUndefined(); // no location, no context section
   });
 
   test('the location is rounded to 0.01° and the exact point appears nowhere', () => {
@@ -107,13 +122,13 @@ describe('report PDF', () => {
     expect(runs('24 सित॰')).toEqual([{ font: 'D', text: '24 सित॰' }]);
   });
 
-  test.each(['en', 'hi'])('A4 PDF of at most 3 pages (%s)', async (lang) => {
+  test.each(['en', 'hi'])('A4 PDF of at most 4 pages (%s)', async (lang) => {
     const img = await sharp({ create: { width: 40, height: 30, channels: 3, background: '#6a4' } }).jpeg().toBuffer();
     const c = buildReport(input({ lang }));
     const pdf = await renderReport(c, { photo: img, gradcam: img, map: img }, contentHash(c));
     expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
     expect(pdf.toString('latin1')).toMatch(/\/MediaBox \[0 0 595\.28 841\.89\]/);
-    expect(pages(pdf)).toBeLessThanOrEqual(3);
+    expect(pages(pdf)).toBeLessThanOrEqual(4); // 4 since the environment context section (report version 2)
   });
 });
 
@@ -199,6 +214,22 @@ describe('report API', () => {
     } finally {
       delete process.env.GEO_SERVICE_URL;
     }
+  });
+
+  test('the environment context comes from the stored snapshot only: no geo-service or context weather call', async () => {
+    const p = await Prediction.create({ ...base, ...loc, context: snapshot });
+    images();
+    tiles();
+    nock('http://meteo.test').get('/v1/forecast').query(true).reply(503); // the risk strip's own call only
+    process.env.GEO_SERVICE_URL = 'http://geo.test'; // any call there would fail: no interceptor, no network
+    const info = jest.spyOn(logger, 'info');
+    try {
+      expect((await get(p._id)).status).toBe(200);
+    } finally {
+      delete process.env.GEO_SERVICE_URL;
+    }
+    expect(info.mock.calls.find(([, msg]) => msg === 'report')[0]).toMatchObject({ context: true });
+    info.mockRestore();
   });
 
   test('without a location: no map, weather or satellite calls at all', async () => {

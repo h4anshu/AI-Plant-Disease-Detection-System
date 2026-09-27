@@ -21,10 +21,12 @@ import google.auth
 from fastapi import FastAPI, Header, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
+import context as cx
 import field_health as fh
 
 PROJECT = os.environ.get("EE_PROJECT", "plant-disease-503711")
 WORKLOAD_TAG = "field-health"  # EECU usage per tag: Cloud Monitoring, docs/GEE_SETUP.md section 4
+CONTEXT_TAG = "context"
 _state = {"ee": False}
 
 
@@ -98,11 +100,27 @@ def field_health_get(request: Request,
     return _field_health(request, FieldQuery(lat=lat, lon=lon, date=date, days=days, crop=crop), x_geo_token)
 
 
-def _field_health(request: Request, q: FieldQuery, x_geo_token: str):
-    lat, lon, date, days, crop = q.lat, q.lon, q.date, q.days, q.crop
+def _check_token(x_geo_token: str):
     token = os.environ.get("GEO_SERVICE_TOKEN")
     if token and not hmac.compare_digest(x_geo_token.encode(), token.encode()):
         raise HTTPException(status_code=401, detail="unauthorized")
+
+
+def _request_id(request: Request) -> str:
+    rid = request.headers.get("x-request-id", "")
+    return rid if REQUEST_ID.fullmatch(rid) else str(uuid.uuid4())
+
+
+def _ee_error(err: Exception, rid: str, what: str):
+    """Quota / rate limits -> 503 (try later), anything else from Earth Engine -> 502. Never the coordinates."""
+    quota = "quota" in str(err).lower() or "too many" in str(err).lower()
+    log.warning(f"Earth Engine call failed ({what})", extra={"fields": {"requestId": rid, "quota": quota, "error": str(err)[:300]}})
+    raise HTTPException(status_code=503 if quota else 502, detail="Earth Engine error")
+
+
+def _field_health(request: Request, q: FieldQuery, x_geo_token: str):
+    lat, lon, date, days, crop = q.lat, q.lon, q.date, q.days, q.crop
+    _check_token(x_geo_token)
     today = datetime.now(timezone.utc).date()
     try:
         end = min(Date.fromisoformat(date), today) if date else today
@@ -112,16 +130,13 @@ def _field_health(request: Request, q: FieldQuery, x_geo_token: str):
     if not _state["ee"]:
         raise HTTPException(status_code=503, detail="Earth Engine is not available")
 
-    rid = request.headers.get("x-request-id", "")
-    rid = rid if REQUEST_ID.fullmatch(rid) else str(uuid.uuid4())
+    rid = _request_id(request)
     with_redsi = crop == "wheat"  # REDSI was developed for wheat yellow rust only
     t0 = time.perf_counter()
     try:
         raw, geometry_source, field_farmland = fh.query_rows(lat, lon, start, end, with_redsi=with_redsi, crop=crop)
     except ee.EEException as err:
-        quota = "quota" in str(err).lower() or "too many" in str(err).lower()
-        log.warning("Earth Engine call failed", extra={"fields": {"requestId": rid, "quota": quota, "error": str(err)[:300]}})
-        raise HTTPException(status_code=503 if quota else 502, detail="Earth Engine error")
+        _ee_error(err, rid, "field health")
     result = fh.summarize(raw, start=start, end=end, geometry_source=geometry_source, with_redsi=with_redsi,
                           field_farmland=field_farmland)
     # never the coordinates; EECU per call is not returned by Earth Engine, so: time + workload tag
@@ -129,4 +144,48 @@ def _field_health(request: Request, q: FieldQuery, x_geo_token: str):
         "requestId": rid, "workloadTag": WORKLOAD_TAG, "eeLatencyMs": round((time.perf_counter() - t0) * 1000),
         "days": days, "crop": crop, "images": result["images"], "clearImages": result["clear_images"],
         "flag": result["flag"]["code"], "geometrySource": result["geometry_source"]}})
+    return result
+
+
+class ContextQuery(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    soil: bool = True
+    rain_ref: str | None = None  # reference date: rainfall of the 30 days before it vs 2001-2020
+    era5_start: str | None = None  # ERA5-Land daily weather for [start, end], when Open-Meteo can't cover it
+    era5_end: str | None = None
+
+
+def _day(value: str | None, name: str) -> Date | None:
+    if value is None:
+        return None
+    try:
+        return Date.fromisoformat(value)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"{name} must be YYYY-MM-DD")
+
+
+# Context for a checkup (docs/CONTEXT_LAYER.md): SoilGrids soil, the rainfall anomaly and optional ERA5-Land
+# days, in ONE Earth Engine request (+ a once-a-day lookup of the newest CHIRPS / ERA5-Land dates).
+# POST only: the location stays out of Cloud Run's request logs.
+@app.post("/context")
+def context(request: Request, q: ContextQuery, x_geo_token: str = Header("")):
+    _check_token(x_geo_token)
+    rain_ref, start, end = _day(q.rain_ref, "rain_ref"), _day(q.era5_start, "era5_start"), _day(q.era5_end, "era5_end")
+    if (start is None) != (end is None) or (start and (end < start or (end - start).days > 60)):
+        raise HTTPException(status_code=400, detail="era5_start and era5_end must both be set, at most 60 days apart")
+    if not _state["ee"]:
+        raise HTTPException(status_code=503, detail="Earth Engine is not available")
+    rid = _request_id(request)
+    t0 = time.perf_counter()
+    try:
+        with ee.data.workloadTagContext(CONTEXT_TAG):
+            latest = cx.latest_dates() if rain_ref else {}
+            result = cx.query(q.lat, q.lon, soil=q.soil, rain_ref=rain_ref, era5=(start, end) if start else None, latest=latest)
+    except ee.EEException as err:
+        _ee_error(err, rid, "context")
+    log.info("context", extra={"fields": {
+        "requestId": rid, "workloadTag": CONTEXT_TAG, "eeLatencyMs": round((time.perf_counter() - t0) * 1000),
+        "parts": result["parts"], "soil": result["soil"] is not None,
+        "rain": (result["rain_anomaly"] or {}).get("status"), "era5Days": len(result["era5"] or [])}})
     return result

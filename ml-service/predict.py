@@ -124,8 +124,9 @@ def predict_disease(models: Models, crop: str, image_bytes: bytes) -> dict:
         "gradcam": gradcam_png,
         "crop": crop,
         "model_version": model_version,
+        # always the three most likely classes: the context layer explains the alternatives too
+        # (docs/CONTEXT_LAYER.md); the app shows them only for uncertain results
+        "top3": [{"disease": idx_to_class[int(i)], "probability": round(float(probs[i]), 4)}
+                 for i in np.argsort(probs)[::-1][:3]],
     }
-    if uncertain:
-        top = np.argsort(probs)[::-1][:3]
-        result["top3"] = [{"disease": idx_to_class[int(i)], "probability": round(float(probs[i]), 4)} for i in top]
     return result

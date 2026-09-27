@@ -18,6 +18,10 @@ export const predictLimiter = limiter(Number(process.env.PREDICT_RATE_LIMIT) || 
 export const fieldLimiter = limiter(Number(process.env.FIELD_RATE_LIMIT) || 10, 10,
   'Too many satellite checks from this device. Please wait a few minutes.');
 
+// the context card is loaded once per located result (weather + one geo-service call when not yet built)
+export const contextLimiter = limiter(Number(process.env.CONTEXT_RATE_LIMIT) || 30, 10,
+  'Too many context checks from this device. Please wait a few minutes.');
+
 // weather-based risk: cheap (Open-Meteo, cached per hour) but keep one browser from walking the map
 export const riskLimiter = limiter(Number(process.env.RISK_RATE_LIMIT) || 60, 10,
   'Too many risk checks from this device. Please wait a few minutes.');

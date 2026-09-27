@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import axios from "axios";
 import mongoose from "mongoose";
 
@@ -17,24 +18,38 @@ const weatherCacheSchema = new mongoose.Schema({
 });
 export const WeatherCache = mongoose.models.WeatherCache || mongoose.model('WeatherCache', weatherCacheSchema);
 
+const HOURLY = 'temperature_2m,relative_humidity_2m,precipitation';
+
+// the key is a hash: the cache holds no readable location (grid cell + time window)
+async function hourly(plainKey, params) {
+  const key = createHash('sha256').update(plainKey).digest('hex');
+  const cached = await WeatherCache.findOne({ key }).lean();
+  if (cached) return cached.data;
+  const { data } = await axios.get(URL(), { params: { hourly: HOURLY, timezone: 'auto', ...params }, timeout: 15000 });
+  const w = { time: data.hourly.time, temp: data.hourly.temperature_2m, rh: data.hourly.relative_humidity_2m,
+    rain: data.hourly.precipitation, utcOffsetSeconds: data.utc_offset_seconds, timezone: data.timezone };
+  await WeatherCache.updateOne({ key }, { $set: { data: w, createdAt: new Date() } }, { upsert: true });
+  return w;
+}
+
 // Hourly temperature, RH and rain for the past 14 days + today + 4 days, in local time (day 4 completes the
 // night of the last outlook day). 14 past days
 // because INDO-BLIGHTCAST needs 13 (docs/DISEASE_RISK.md).
 export async function getWeather(lat, lon, now = new Date()) {
   const la = snap(lat).toFixed(2);
   const lo = snap(lon).toFixed(2);
-  const key = `${la},${lo}|${now.toISOString().slice(0, 13)}`;
-  const cached = await WeatherCache.findOne({ key }).lean();
-  if (cached) return cached.data;
-  const { data } = await axios.get(URL(), {
-    params: { latitude: la, longitude: lo, hourly: 'temperature_2m,relative_humidity_2m,precipitation',
-      past_days: 14, forecast_days: 5, timezone: 'auto' }, // +1 day: the 3rd outlook day's night
-    timeout: 15000,
-  });
-  const w = { time: data.hourly.time, temp: data.hourly.temperature_2m, rh: data.hourly.relative_humidity_2m,
-    rain: data.hourly.precipitation, utcOffsetSeconds: data.utc_offset_seconds, timezone: data.timezone };
-  await WeatherCache.updateOne({ key }, { $set: { data: w, createdAt: new Date() } }, { upsert: true });
-  return w;
+  return hourly(`${la},${lo}|${now.toISOString().slice(0, 13)}`,
+    { latitude: la, longitude: lo, past_days: 14, forecast_days: 5 }); // +1 day: the 3rd outlook day's night
+}
+
+// The same hourly data for a fixed local date range [start, end] (context snapshots of an older photo date).
+// Open-Meteo serves up to 92 days back on this endpoint (docs: past_days "Integer (0-92)"; start_date
+// beyond that is refused, checked 27 Sep 2026); older dates use ERA5-Land via the geo-service.
+export async function getWeatherRange(lat, lon, start, end, now = new Date()) {
+  const la = snap(lat).toFixed(2);
+  const lo = snap(lon).toFixed(2);
+  return hourly(`${la},${lo}|${start}..${end}|${now.toISOString().slice(0, 13)}`,
+    { latitude: la, longitude: lo, start_date: start, end_date: end });
 }
 
 export const localToday = (utcOffsetSeconds, now = new Date()) =>

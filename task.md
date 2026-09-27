@@ -20,6 +20,13 @@ Added 26 Sep 2026. Tick an item off when it's done.
 - [x] **Deploy the server for the PDF report (Task 14), then push `main`:** Done 26 Sep 2026: server `00016` (no watermark env), `main` pushed at `c98b5d0`, Vercel bundle has the button (en + hi); verified live end to end (Task 14, "Live"). Original step: `gcloud run deploy server --source server --region asia-south1` (no new env vars needed; `REPORT_WATERMARK` must stay unset in production), then `git push origin main` for Vercel. Check: a checkup → "Download report (PDF)", then open the verify link printed on its last page.
 - [ ] **Hindi report strings** (`report.*` in `client/src/locales/hi.json` and the `hi` labels in `server/utils/reportContent.js`, AI-drafted): include them in the agronomist review.
 - [ ] **Hindi disease-risk strings** (`risk.*` in `client/src/locales/hi.json`, AI-drafted): include them in the agronomist review.
+- [ ] **Deploy the context layer (Task 15), in this order, then push `main`:**
+  1. **geo-service** (new `POST /context`): `$REPO = "asia-south1-docker.pkg.dev/plant-disease-503711/plant-disease"; $TAG = git rev-parse --short HEAD`, then `docker build -t "$REPO/geo-service:$TAG" geo-service`, `docker push "$REPO/geo-service:$TAG"`, `gcloud run deploy geo-service --image "$REPO/geo-service:$TAG" --region asia-south1` (existing service account, token and env vars carry over). Check: `/health` still `earth_engine: true`.
+  2. **ml-service** (top-3 on every answer; backward compatible): `docker build -t "$REPO/ml-service:$TAG" ml-service`, `docker push "$REPO/ml-service:$TAG"`, `gcloud run deploy ml-service --image "$REPO/ml-service:$TAG" --region asia-south1`.
+  3. **server** (`/context`, soil-test route, report v2): `gcloud run deploy server --source server --region asia-south1`. No new env vars are needed. `FUSION_MODE` must stay unset (or `explain`): the server refuses to start with anything else in production. Optional: `CONTEXT_RATE_LIMIT` (default 30 per 10 min).
+  4. `git push origin main` → Vercel builds the client with the context card (push last: the new card calls `/context`).
+  - Check: a checkup with location shows "Weather, soil and season here" with numbers within a few seconds; opening it again is instant; "Download report (PDF)" has the Environment context section; Privacy has the new paragraph; Cloud Monitoring shows the workload tag `context` at ~4 EECU-s per new checkup.
+- [ ] **Hindi context strings** (`context.*` and `privacy.context*` in `client/src/locales/hi.json`, the Hindi `ctx` labels in `server/utils/reportContent.js`, AI-drafted): include them in the agronomist review.
 - [ ] **Agronomist review of the disease rules** (Task 15): 62 rows in `docs/RULES_REVIEW.csv` (40 rules + 22 classes without rules). Fill `reviewer` / `verdict` (ok, change, reject) / `corrected_value`, then `cd server && npm run rules-review -- --apply <file>`. Steps in `docs/DISEASE_RULES.md`. Until then the app marks every rule "not yet checked by an expert".
 - [x] **Earth Engine setup for field health**, done 26 Sep 2026: registered (noncommercial, BBDU, Community tier), API on, sign-in via gcloud ADC works (test: 7 Sentinel-2 images), `geo-service` service account with both roles. daily EECU cap set to 18,000 EECU-s. **Still open:** an ALU answer (likely no, no GWCID), and **3 real field coordinates** (owners' consent). The field-health code starts after the coordinates.
 
@@ -700,3 +707,73 @@ Brief: prompt 12 (context snapshot per located checkup: weather, rain anomaly, S
   - `docs/RULES_REVIEW.csv` (62 rows);
   - `npm run rules-review` writes it; `-- --apply <csv>` applies an agronomist's ok / change / reject verdicts and stamps the reviewer.
 - Tests: `server/tests/knowledge.test.js` (104 tests: all 53 classes, factors/units/windows/sources, models reused, no rule reads modelled N/OC, CSV fresh, apply round-trip and bad input). Server suite 371 passed.
+
+### Phases C–E: build, checks, docs (27 Sep 2026)
+
+**geo-service**
+- `context.py`:
+  - SoilGrids: 8 properties × 3 depths; ISRIC conversion factors; 0–30 cm thickness-weighted mean; USDA texture class, from the Soil Survey Manual 2017 ch. 3 definitions, opened and quoted.
+  - Rain vs 2001–2020: CHIRPS if it covers the 30 days, else ERA5-Land ending ≤ 10 days before (R2), else unknown.
+  - ERA5-Land daily rows: K→°C, m→mm with negatives clipped, RH from FAO-56 eqs. 10/11/14.
+  - Latest dates via a windowed `aggregate_max`, cached per day.
+- `POST /context` in `app.py`: shares the token / request-id / Earth Engine error mapping with `/field-health` (refactored into helpers); workload tag `context`; logs without coordinates. The Dockerfile now copies `context.py`, which would otherwise have broken the image.
+- Recorded real Earth Engine fixture: `tests/fixtures/ee_context_punjab_2026-09-27.json` (numbers only).
+- pytest 62 (+38).
+
+**Server**
+- `utils/environmentFit.js`: pure rule engine.
+  - 70% day coverage per window; exact thirds for the levels (0.67/0.33 missed an exact 2/3, found by a test); ≥ half the weight missing → unknown.
+  - `combine: any` for nutrient deficiency; `model_ref` → the stored model level; missing reasons as codes so the app can translate them.
+- `utils/context.js` (pure) and `services/contextSnapshot.js` (I/O):
+  - reference date: EXIF `captured_at` if believable, else the checkup's IST date;
+  - weather: Open-Meteo hourly (the same cached query as the risk strip when the date is today, a date range for older EXIF dates) or ERA5-Land days for checkups older than 92 days;
+  - one geo-service call (soil only when its ~250 m cell isn't cached);
+  - the cached field-health verdict and the season;
+  - the published model's level for the reference day;
+  - provenance: sources, attributions, measured EECU.
+  - All or nothing; stored once, immutable until `CONTEXT_VERSION` changes.
+- `GET /api/predict/:id/context` (owner-only, `contextLimiter` 30/10 min) and `PATCH /api/predict/:id/soil-test` (farmer's card values, validated, private).
+- `captured_at` on predict (`parseCapturedAt`).
+- **Bug found:** JavaScript accepts 30 February as a date, so a strict round-trip check (`isIsoDate`) is used for dates.
+- History no longer carries the ~5 KB snapshot.
+- "Delete my data" also deletes the cached soil of the user's cells.
+- Weather cache keys are now hashed. Brief rule 7; they held the 0.05° point in plain text.
+- ml-service returns `top3` with every diagnosis. The PDF shows other possibilities only for uncertain results.
+- Fusion offline only:
+  - `utils/fusion.js` implements p·f^α renormalised; it never touches `ok`.
+  - `scripts/eval_fusion.js` prints "insufficient data" below 200 labelled checkups.
+  - The server refuses `FUSION_MODE` ≠ explain in production.
+- PDF: "Environment context" section from the stored snapshot only, en + hi, report version 2. The PDF can now be 4 pages (test limit raised from 3).
+- Jest 437 (+66 incl. `environmentFit` 36, `context` 19, `fusion`/eval/sanity 8, report +3, predict +1).
+
+**Client**
+- `ContextCard.jsx`: loads once, also under StrictMode; states loading / favourable / mixed / unfavourable / can't tell / error.
+  - Content: rules shown as value vs threshold with ▲/▽ plus screen-reader text; weather, rain, soil ("modelled") and season lines; the draft note; the "explains, never changes" note; the Soil Health Card form; sources and attributions.
+  - Uncertain results show every leaning's fit, labelled "not a diagnosis".
+- EXIF date (`getCapturedDate`) is sent only with a location.
+- Privacy page has a new section. en + hi.
+- **Bug found in the browser check:** Hindi uses the plural "one" form for 0, so three Hindi strings hard-coding "1" (including the Task 11 delete message) said "1" for zero. Fixed with `{{count}}`, plus a test for every Hindi `_one` string.
+- Vitest 54 (+14). Lint: the same 11 old warnings. Build OK. ml-service pytest 46 (golden tests now check top-3).
+
+**Measured**
+- Earth Engine cost (Cloud Monitoring, 5 calls per request shape):
+  - soil ~0.05 EECU-s; rain vs normal ~1.6 (CHIRPS) or ~4.0 (ERA5-Land); 17 ERA5 days ~0.8; latest dates ~0.01.
+  - **A new checkup today ≈ 4.1 EECU-s** (ERA5 rain, since CHIRPS lags 4 weeks) → ~4,400 new located checkups/day under the 18,000 cap. Repeat views cost 0.
+  - Earlier Phase A probe numbers (0.38) were for simpler queries; the plan doc now says so.
+- Open-Meteo: 0 or 1 call per checkup.
+
+**Local end-to-end run** (real Earth Engine via the local geo-service, real Open-Meteo, in-memory DB, local ML):
+- rice golden photo at the Mullanpur test field → "Favours it" for bacterial blight: 7-day 28.2 °C (25–34), RH 74.6% (> 70), weather 24.4–32 °C, rain 21% of normal (ERA5-Land to 19 Sep), loam pH 7.8.
+- One `/context` request, 971 ms. No coordinates in the server or geo-service logs.
+- Hindi at 360 px: no horizontal overflow.
+- Soil Health Card saved from the form.
+- PDF: the Environment context section's numbers equal the API answer, 3 pages.
+- "Delete my data" → 2 deleted, `/context` 404.
+- The temporary `client/public/__e2e` photo was removed.
+
+**Sanity check (report only):**
+- DS-09 groundnut, Purba Medinipur, Jan–Apr 2022/2023. `geo-service/sanity_check.py` (ERA5-Land hourly + CHIRPS) → `docs/sanity/DS-09.json` → `node scripts/sanity_rules.js`.
+- Rust favourable on most days; leaf spot favourable in Jan–Feb 2022 but not Mar–Apr → its 12 h wetness threshold is flagged for the reviewer (rule note + CSV).
+- The other datasets have no documented dates.
+
+**Docs:** `docs/CONTEXT_LAYER.md` (every factor, formula, source, cost and limit in plain words), `docs/DISEASE_RULES.md` (thirds), `docs/REPORT.md` (v2), README section, plan status.

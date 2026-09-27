@@ -122,6 +122,15 @@ const predictionSchema = new mongoose.Schema({
         default: null,
         index: true
     },
+    // The photo's own date from EXIF (client/src/services/location.js), kept only when believable
+    // (utils/context.js parseCapturedAt: not in the future, at most 60 days old); otherwise why it was not.
+    capturedAt: { type: String, default: null },
+    capturedAtRejected: { type: String, enum: ['invalid', 'future', 'too_old', null], default: null },
+    // Environment context (docs/CONTEXT_LAYER.md): built once on first view, then never changed unless
+    // utils/context.js CONTEXT_VERSION is bumped. It holds no coordinates.
+    context: { type: mongoose.Schema.Types.Mixed, default: undefined },
+    // Soil Health Card numbers the farmer typed in (controllers/contextController.js parseSoilTest); private
+    soilTest: { type: mongoose.Schema.Types.Mixed, default: undefined },
     // fake points from scripts/seed_demo_map.js (local databases only); the live map never includes them
     demo: {
         type: Boolean,

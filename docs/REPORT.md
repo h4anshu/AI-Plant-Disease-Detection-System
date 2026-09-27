@@ -14,10 +14,11 @@ insurer or bank should treat it as supporting information, not evidence of loss.
 |---|---|---|
 | Header | report id, generated (IST), checkup date (IST), checkup id, model version | report record; `GET /api/predict` → `createdAt`, `_id`, `modelVersion` |
 | Photo + Grad-CAM | the stored photo (resized, EXIF removed) and the heatmap | `imageUrl`, `gradcam` |
-| Diagnosis | crop, disease, confidence, status, other possibilities, severity, yield loss with its confidence tag and source note | `crop`, `disease`, `confidence`, `status`, `top3`, `severity`, `yieldLossPercent`, `yieldLossConfidence` |
+| Diagnosis | crop, disease, confidence, status, other possibilities (uncertain results only, since report version 2), severity, yield loss with its confidence tag and source note | `crop`, `disease`, `confidence`, `status`, `top3`, `severity`, `yieldLossPercent`, `yieldLossConfidence` |
 | Location | rounded to 0.01° (about 1 km), GPS or photo, accuracy, a small map with a 1 km circle | the private stored location (never in an API answer); `locationSource` |
 | Field from space | verdict, last clear image, clear images, window, latest NDVI/NDRE, neighbours' range, farmland share, the NDVI/NDRE chart | `GET /api/predict/:id/field-health` (cached answer only) |
 | Weather risk | 6 days (past 2, today, next 3) and today's conditions, for potato and rice | `GET /api/predict/:id/disease-risk` |
+| Environment context (report version 2) | fit with the diagnosis and up to 3 rules with numbers vs thresholds and sources; reference date; 14-day weather; rain vs normal; modelled soil; the farmer's Soil Health Card values; season; the draft note and attributions. Only from the stored snapshot: "not computed yet" if the checkup was never opened with its location in the app | `GET /api/predict/:id/context` (docs/CONTEXT_LAYER.md) |
 | Treatment | the advice in the report's language, with the "not yet checked by an expert" note for Hindi | `treatment`, `treatmentNeedsReview` |
 | Limitations | AI diagnosis may be wrong; lookup-based loss; heuristic severity; satellite shows stress not disease; risk is an indicator; not an official assessment (not a PMFBY crop-cutting experiment) | fixed text |
 | Where each value comes from | every value's label with its API route and field | the `source` of each row |
@@ -138,7 +139,7 @@ node scripts/sample_report.js http://localhost:4010/api
   - each missing part gets its note.
 - **Hash:** the hash is stable under key order and changes on any edit.
 - **Glyphs:** a glyph exists for every character, and the server's copy of the terms equals the app's.
-- **The PDF itself:** it is A4, at most 3 pages, in both languages.
+- **The PDF itself:** it is A4, at most 4 pages since the environment context section (report version 2; 3 before), in both languages.
 - **Routes:**
   - the owner gets the PDF, and the stored `pdfSha256` equals the SHA-256 of the bytes;
   - the verify answer carries no private data;

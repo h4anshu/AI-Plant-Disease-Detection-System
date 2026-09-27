@@ -75,13 +75,29 @@ supporting evidence. It is a risk indicator, not a forecast of infection.
 - **Where:** the result page (checkups with a location) and the map page (map centre, district zoom).
 - **Every rule, source and limit:** [docs/DISEASE_RISK.md](docs/DISEASE_RISK.md).
 
+## Weather, soil and season around a checkup (context layer)
+
+For every checkup with a location, the app collects a sourced snapshot once:
+- the weather of the 14 days up to the photo date (Open-Meteo; ERA5-Land for older dates);
+- the rainfall compared with 2001–2020 (CHIRPS, or ERA5-Land when CHIRPS is not out yet);
+- the modelled soil (SoilGrids 250 m, labelled "not a soil test");
+- the cached satellite verdict and the season.
+
+It then explains whether these **fit** the diagnosed disease and the other likely classes, with the
+numbers against cited thresholds. It never changes the diagnosis.
+- Farmers can add their own Soil Health Card values; nutrient checks use only those.
+- All 53 classes have a sourced rule or a written reason why not; every rule is a draft until an
+  agronomist reviews `docs/RULES_REVIEW.csv`.
+- **How it works, in plain words:** [docs/CONTEXT_LAYER.md](docs/CONTEXT_LAYER.md).
+- **Every rule and its source:** [docs/DISEASE_RULES.md](docs/DISEASE_RULES.md).
+
 ## Field report (PDF)
 
 "Download report (PDF)" on a result gives a printable A4 summary of the checkup:
 - the photo and Grad-CAM;
 - the diagnosis, severity and yield-loss estimate with its confidence tag;
 - the rounded location with a small map;
-- the satellite view and the weather risk;
+- the satellite view, the weather risk and the environment context (from the stored snapshot);
 - the treatment advice and a limitations box.
 
 The last page lists the API field behind every value, and there is a SHA-256 with a public verify link

@@ -2,13 +2,13 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BINS, binLabel, colorFor } from '../pages/mapStyle';
 
-const exif = vi.hoisted(() => ({ gps: null }));
-vi.mock('exifr', () => ({ gps: async () => exif.gps }));
+const exif = vi.hoisted(() => ({ gps: null, parse: null }));
+vi.mock('exifr', () => ({ gps: async () => exif.gps, parse: async () => exif.parse?.() }));
 const api = vi.hoisted(() => ({ deleted: 0, calls: 0, fail: false }));
 vi.mock('../services/api', () => ({
   deleteMyData: async () => { api.calls++; if (api.fail) throw new Error('x'); return { data: { deleted: api.deleted } }; },
 }));
-import { getLocation } from '../services/location';
+import { getCapturedDate, getLocation } from '../services/location';
 import Privacy from '../pages/Privacy';
 
 const geolocation = (outcome) => {
@@ -16,7 +16,7 @@ const geolocation = (outcome) => {
     getCurrentPosition: (ok, fail) => (outcome ? ok({ coords: outcome }) : fail({ code: 1 })),
   } });
 };
-afterEach(() => { exif.gps = null; delete navigator.geolocation; });
+afterEach(() => { exif.gps = null; exif.parse = null; delete navigator.geolocation; });
 
 describe('getLocation (only called after consent)', () => {
   const photo = new File(['x'], 'leaf.jpg', { type: 'image/jpeg' });
@@ -35,6 +35,21 @@ describe('getLocation (only called after consent)', () => {
 
   test('neither -> none (no browser geolocation, photo without GPS)', async () => {
     expect(await getLocation(photo)).toEqual({ location_source: 'none' });
+  });
+});
+
+describe('getCapturedDate (the photo date for the weather window)', () => {
+  const photo = new File(['x'], 'leaf.jpg', { type: 'image/jpeg' });
+  test('EXIF DateTimeOriginal as a local YYYY-MM-DD', async () => {
+    exif.parse = () => ({ DateTimeOriginal: new Date(2026, 8, 20, 23, 45) }); // 20 Sep, late evening local time
+    expect(await getCapturedDate(photo)).toBe('2026-09-20');
+  });
+  test('no date, a broken date or unreadable EXIF -> null', async () => {
+    expect(await getCapturedDate(photo)).toBeNull();
+    exif.parse = () => ({ DateTimeOriginal: new Date('nonsense') });
+    expect(await getCapturedDate(photo)).toBeNull();
+    exif.parse = () => { throw new Error('corrupt'); };
+    expect(await getCapturedDate(photo)).toBeNull();
   });
 });
 

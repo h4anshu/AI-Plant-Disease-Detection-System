@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 const api = vi.hoisted(() => ({ reply: null, calls: [] }));
 vi.mock('../services/api', () => ({
+  getPredictionContext: () => new Promise(() => {}),
   getFieldHealth: async (id) => { api.calls.push(id); return api.reply(); },
   getPredictionRisk: () => new Promise(() => {}), // RiskStrip.test.jsx covers it
 }));

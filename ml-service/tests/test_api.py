@@ -114,6 +114,9 @@ def test_golden_prediction(api, crop):
     assert base64.b64decode(out["gradcam"])[:8] == PNG_SIGNATURE
     assert isinstance(out["ood_score"], float) and set(out["quality"]) == {"short_side", "blur", "brightness", "vegetation"}
     assert set(out["model_version"]) == {"backbone", "head", "gate"}
+    # top-3 comes with every diagnosis now (context layer), headed by the diagnosis itself
+    assert len(out["top3"]) == 3 and out["top3"][0]["disease"] == out["disease"]
+    assert out["top3"][0]["probability"] == pytest.approx(out["confidence"], abs=1e-4)
 
 
 @needs_weights

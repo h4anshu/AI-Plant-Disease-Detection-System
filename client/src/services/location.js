@@ -27,6 +27,20 @@ const fromExif = async (file) => {
   return null;
 };
 
+// The photo's own date (EXIF DateTimeOriginal) as YYYY-MM-DD in the phone's local time, or null. The server
+// uses it as the weather reference date when it is believable (not in the future, at most 60 days old).
+export async function getCapturedDate(file) {
+  try {
+    const exifr = await import('exifr');
+    const tags = await (exifr.parse ?? exifr.default.parse)(file, ['DateTimeOriginal']);
+    const d = tags?.DateTimeOriginal;
+    if (!(d instanceof Date) || Number.isNaN(d.getTime())) return null;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  } catch {
+    return null; // no or unreadable EXIF
+  }
+}
+
 export async function getLocation(file) {
   return (await fromGps()) ?? (file && (await fromExif(file))) ?? { location_source: 'none' };
 }

@@ -60,6 +60,12 @@ export const getFieldHealth = (id) => api.get(`/predict/${id}/field-health`, { t
 // One-click PDF report of a checkup (docs/REPORT.md)
 export const getReport = (id, lang) => api.get(`/predict/${id}/report.pdf`, { params: { lang }, responseType: 'blob', timeout: 60000 });
 
+// Environment context of a checkup (docs/CONTEXT_LAYER.md): weather, soil, season and how they fit the
+// diagnosis. The first call builds it (weather + Earth Engine), so it may take a few seconds.
+export const getPredictionContext = (id) => api.get(`/predict/${id}/context`, { timeout: 120000 });
+// the farmer's own Soil Health Card numbers for that checkup
+export const putSoilTest = (id, body) => api.patch(`/predict/${id}/soil-test`, body);
+
 export const getPredictionRisk = (id) => api.get(`/predict/${id}/disease-risk`);
 export const getDiseaseRisk = (params) => api.get('/disease-risk', { params });
 

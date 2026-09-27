@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { deleteMyData } from '../services/api';
 
-const SECTIONS = ['stored', 'public', 'location'];
+const SECTIONS = ['stored', 'public', 'location', 'context'];
 
 // What is stored, what is public, and "delete my data" (DELETE /api/predict for this browser)
 const Privacy = () => {

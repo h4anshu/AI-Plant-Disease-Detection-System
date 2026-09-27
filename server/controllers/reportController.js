@@ -11,6 +11,8 @@ import { ATTRIBUTION, getWeather, localToday } from "../services/openMeteo.js";
 import { staticMap } from "../services/staticMap.js";
 import { buildReport, contentHash, REPORT_LANGUAGES, sha256 } from "../utils/reportContent.js";
 import { renderReport } from "../utils/reportPdf.js";
+import { contextFit } from "../utils/environmentFit.js";
+import { soilTestNote } from "./contextController.js";
 import logger, { logError } from "../utils/logger.js";
 
 // Photo / heatmap as a JPEG PDFKit can embed. Records from before the Cloudinary migration hold base64.
@@ -63,6 +65,9 @@ export const getReport = async (req, res) => {
     const generatedAt = new Date();
     const content = buildReport({
       reportId, generatedAt, lang, prediction, location, fieldHealth: cached?.result ?? null, risk,
+      // the stored environment snapshot only: a report never starts a weather or Earth Engine lookup
+      context: doc.context ? { snapshot: doc.context, fit: contextFit(doc, doc.context, doc.soilTest ?? null),
+        soilTest: doc.soilTest ?? null, soilTestNote: soilTestNote(doc.soilTest, doc.context.reference.date) } : null,
       images: { photo: sha256(photo), gradcam: sha256(gradcam), map: sha256(map) },
       verifyUrl: `${req.protocol}://${req.get('host')}/api/reports/${reportId}`,
       watermark: process.env.REPORT_WATERMARK || null,
@@ -75,7 +80,7 @@ export const getReport = async (req, res) => {
         severity: doc.severity, yieldLossPercent: doc.yieldLossPercent, yieldLossConfidence: prediction.yieldLossConfidence,
         checkupAt: doc.createdAt, modelVersion: doc.modelVersion ?? null } });
 
-    logger.info({ requestId: req.id, crop: doc.crop, lang, bytes: pdf.length, fieldHealth: Boolean(cached),
+    logger.info({ requestId: req.id, crop: doc.crop, lang, bytes: pdf.length, fieldHealth: Boolean(cached), context: Boolean(doc.context),
       risk: risk ? !risk.unavailable : null, map: Boolean(map), reportMs: Math.round(performance.now() - start) }, 'report');
     res.set({ 'Content-Type': 'application/pdf', 'Cache-Control': 'no-store',
       'Content-Disposition': `attachment; filename="plantguard-report-${reportId}.pdf"` });

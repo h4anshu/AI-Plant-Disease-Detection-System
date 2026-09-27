@@ -3,6 +3,7 @@ import Feedback from './Feedback';
 import FieldHealth from './FieldHealth';
 import RiskStrip from './RiskStrip';
 import ReportButton from './ReportButton';
+import ContextCard from './ContextCard';
 import { getPredictionRisk } from '../services/api';
 import { cropName, diseaseName, severityName } from '../locales/terms';
 
@@ -49,6 +50,10 @@ const RetakeCard = ({ result, title, message }) => {
       <ul className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-ink/70">
         {GENERAL_TIPS.map((k) => <li key={k}>· {t(`result.generalTips.${k}`)}</li>)}
       </ul>
+
+      {result.status === 'uncertain' && result._id && ['gps', 'exif'].includes(result.locationSource) && (
+        <ContextCard result={result} leanings />
+      )}
 
       {result.status === 'uncertain' && result.top3?.length > 0 && (
         <details className="mt-5 text-xs text-ink/60">
@@ -160,6 +165,8 @@ const ResultCard = ({ result }) => {
       {result._id && ['gps', 'exif'].includes(result.locationSource) && ['potato', 'rice'].includes(crop) && (
         <RiskStrip load={() => getPredictionRisk(result._id)} reloadKey={result._id} />
       )}
+
+      {result._id && ['gps', 'exif'].includes(result.locationSource) && <ContextCard result={result} />}
 
       {result._id && ['gps', 'exif'].includes(result.locationSource) && <FieldHealth predictionId={result._id} crop={crop} />}
 

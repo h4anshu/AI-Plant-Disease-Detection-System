@@ -3,6 +3,13 @@
 Status: **approved 27 Sep 2026**, with the decisions below. Everything under "Checked live" was measured
 on 27 Sep 2026.
 
+**Built 27 Sep 2026:** see [CONTEXT_LAYER.md](CONTEXT_LAYER.md). The EECU numbers in section 2 below came from
+simpler probe queries. The final requests cost more; the measured table is in CONTEXT_LAYER.md section 9
+(a new checkup ≈ 4.1 EECU-s, dominated by the ERA5-Land rainfall normal). Other changes:
+- The rainy-day count was dropped: no rule needs it, and the IMD definition could not be opened on an IMD page.
+- Level cut-offs are exact thirds.
+- The PDF can now be 4 pages.
+
 ## Decisions (27 Sep 2026)
 
 - **R1, soil:**

@@ -83,3 +83,19 @@ test('API calls ask for the current language', async () => {
   await i18n.changeLanguage('hi');
   expect(addHeaders({ headers: {} }).headers['Accept-Language']).toBe('hi');
 });
+
+test('Hindi "one" plural forms print the count: Hindi uses the "one" form for 0 too', async () => {
+  const { default: i18n } = await import('../i18n');
+  await i18n.changeLanguage('hi');
+  try {
+    expect(i18n.t('privacy.done', { count: 0 })).toBe('इस ब्राउज़र की 0 जाँच मिटा दी गई।');
+    expect(i18n.t('context.wetDays', { count: 0 })).toMatch(/^0 दिन/);
+    const hi = JSON.parse(JSON.stringify(i18n.getResourceBundle('hi', 'translation')));
+    const ones = [];
+    const walk = (o, path) => Object.entries(o).forEach(([k, v]) => (typeof v === 'object' ? walk(v, `${path}${k}.`) : k.endsWith('_one') && ones.push([path + k, v])));
+    walk(hi, '');
+    for (const [key, text] of ones) expect([key, text.includes('{{count}}')]).toEqual([key, true]);
+  } finally {
+    await i18n.changeLanguage('en');
+  }
+});

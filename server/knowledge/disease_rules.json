@@ -427,7 +427,8 @@
         { "id": "groundnut.Leaf_Spot.1", "factor": "tmean", "op": "lt", "value": 30, "unit": "°C", "window_days": 7,
           "role": "favourable", "weight": 1, "source_id": "pande2004-lls" },
         { "id": "groundnut.Leaf_Spot.2", "factor": "wetDays", "hours": 12, "op": "ge", "value": 1, "unit": "days", "window_days": 7,
-          "role": "favourable", "weight": 2, "source_id": "pande2004-lls" }
+          "role": "favourable", "weight": 2, "source_id": "pande2004-lls",
+          "reading": "12 h is where the paper's severity curve rises. REVIEW: the sanity check (docs/CONTEXT_LAYER.md section 11) found this unfavourable in March-April at Purba Medinipur, when leaf-spot photos were still being taken; 6-8 h may be closer to field reality." }
       ],
       "model_ref": null,
       "sources": [

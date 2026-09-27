@@ -75,11 +75,6 @@ exports[`report content snapshot (en) 1`] = `
           "value": "Confident diagnosis",
         },
         {
-          "label": "Other possibilities",
-          "source": "GET /api/predict › top3[].disease, top3[].probability",
-          "value": "Brownspot 5.1%, Healthy 1.2%",
-        },
-        {
           "label": "Severity (from this photo)",
           "source": "GET /api/predict › severity",
           "value": "moderate",
@@ -296,6 +291,50 @@ exports[`report content snapshot (en) 1`] = `
       "title": "Weather risk: rice blast",
     },
     {
+      "id": "context",
+      "notes": [
+        "The disease conditions were collected with AI help from cited sources and are not yet checked by an expert.",
+        "This section explains the diagnosis; it never changed it. Weather is from weather models (about 5 km), not measured in the field.",
+        "Context computed 20 Sept 2026, 11:01 IST (snapshot version 1).",
+        "Weather data by Open-Meteo.com (CC BY 4.0)",
+        "Soil: ISRIC SoilGrids 250 m (CC BY 4.0)",
+        "Generated using Copernicus Climate Change Service information 2026 (ERA5-Land)",
+      ],
+      "rows": [
+        {
+          "label": "Fit with Blast",
+          "source": "GET /api/predict/:id/context › fit.diagnosed.level",
+          "value": "Mixed; published model Yoshino infection hours: Medium on the reference day",
+        },
+        {
+          "label": "Reference date",
+          "source": "GET /api/predict/:id/context › context.reference",
+          "value": "20 Sept 2026 (date the photo was taken)",
+        },
+        {
+          "label": "Weather (14 days to the reference date)",
+          "source": "GET /api/predict/:id/context › context.weather.summary",
+          "value": "22–31 °C on average, humidity 84%, rain 28 mm; 0 days with 12+ h at humidity 90%+ (Open-Meteo)",
+        },
+        {
+          "label": "Rain in the 30 days before, vs 2001–2020",
+          "source": "GET /api/predict/:id/context › context.rainAnomaly",
+          "value": "21% of normal (23.6 mm vs 110.2 mm; ERA5-Land, 21 Aug 2026 – 19 Sept 2026)",
+        },
+        {
+          "label": "Soil, 0–30 cm (SoilGrids model, 250 m; not a soil test)",
+          "source": "GET /api/predict/:id/context › context.soil",
+          "value": "loam; pH 7.8; organic carbon 9.7 g/kg; total N 8.1 g/kg",
+        },
+        {
+          "label": "Season",
+          "source": "GET /api/predict/:id/context › context.season.names",
+          "value": "Kharif",
+        },
+      ],
+      "title": "Environment context (weather, soil, season)",
+    },
+    {
       "id": "treatment",
       "notes": [],
       "source": "GET /api/predict › treatment",
@@ -320,7 +359,7 @@ exports[`report content snapshot (en) 1`] = `
     "text": "To check this report, open https://api.example/api/reports/PG-TESTREPORT01 : it shows the same hashes and the key values. The SHA-256 of this PDF file must match "pdfSha256" there.",
     "url": "https://api.example/api/reports/PG-TESTREPORT01",
   },
-  "version": 1,
+  "version": 2,
   "watermark": null,
 }
 `;
@@ -398,11 +437,6 @@ exports[`report content snapshot (hi) 1`] = `
           "label": "परिणाम की स्थिति",
           "source": "GET /api/predict › status",
           "value": "भरोसेमंद निदान",
-        },
-        {
-          "label": "अन्य संभावनाएँ",
-          "source": "GET /api/predict › top3[].disease, top3[].probability",
-          "value": "भूरा धब्बा 5.1%, स्वस्थ 1.2%",
         },
         {
           "label": "गंभीरता (इस फ़ोटो से)",
@@ -621,6 +655,50 @@ exports[`report content snapshot (hi) 1`] = `
       "title": "मौसम से ख़तरा: धान का झोंका रोग",
     },
     {
+      "id": "context",
+      "notes": [
+        "रोग की स्थितियाँ AI की मदद से उद्धृत स्रोतों से जुटाई गई हैं और अभी किसी विशेषज्ञ ने नहीं जाँची हैं।",
+        "यह भाग निदान को समझाता है; इसने उसे कभी नहीं बदला। मौसम मौसम-मॉडल (लगभग 5 किमी) से है, खेत में मापा नहीं गया।",
+        "संदर्भ 20 सित॰ 2026, 11:01 IST को बना (स्नैपशॉट संस्करण 1)।",
+        "Weather data by Open-Meteo.com (CC BY 4.0)",
+        "Soil: ISRIC SoilGrids 250 m (CC BY 4.0)",
+        "Generated using Copernicus Climate Change Service information 2026 (ERA5-Land)",
+      ],
+      "rows": [
+        {
+          "label": "झोंका (ब्लास्ट) से मेल",
+          "source": "GET /api/predict/:id/context › fit.diagnosed.level",
+          "value": "मिला-जुला; प्रकाशित मॉडल Yoshino infection hours: संदर्भ दिन पर मध्यम",
+        },
+        {
+          "label": "संदर्भ तारीख",
+          "source": "GET /api/predict/:id/context › context.reference",
+          "value": "20 सित॰ 2026 (फ़ोटो खींचने की तारीख)",
+        },
+        {
+          "label": "मौसम (संदर्भ तारीख तक 14 दिन)",
+          "source": "GET /api/predict/:id/context › context.weather.summary",
+          "value": "औसतन 22–31 °C, नमी 84%, बारिश 28 मिमी; 0 दिन 12+ घंटे 90%+ नमी (Open-Meteo)",
+        },
+        {
+          "label": "पिछले 30 दिनों की बारिश, 2001–2020 से तुलना",
+          "source": "GET /api/predict/:id/context › context.rainAnomaly",
+          "value": "सामान्य का 21% (23.6 मिमी बनाम 110.2 मिमी; ERA5-Land, 21 अग॰ 2026 – 19 सित॰ 2026)",
+        },
+        {
+          "label": "मिट्टी, 0–30 सेमी (SoilGrids मॉडल, 250 मीटर; मिट्टी की जाँच नहीं)",
+          "source": "GET /api/predict/:id/context › context.soil",
+          "value": "दोमट; pH 7.8; जैविक कार्बन 9.7 ग्रा/किग्रा; कुल N 8.1 ग्रा/किग्रा",
+        },
+        {
+          "label": "फ़सल-मौसम",
+          "source": "GET /api/predict/:id/context › context.season.names",
+          "value": "खरीफ़",
+        },
+      ],
+      "title": "पर्यावरण संदर्भ (मौसम, मिट्टी, फ़सल-मौसम)",
+    },
+    {
       "id": "treatment",
       "notes": [],
       "source": "GET /api/predict › treatment",
@@ -645,7 +723,7 @@ exports[`report content snapshot (hi) 1`] = `
     "text": "इस रिपोर्ट की जाँच के लिए https://api.example/api/reports/PG-TESTREPORT01 खोलें: वहाँ यही हैश और मुख्य मान दिखते हैं। इस PDF फ़ाइल का SHA-256 वहाँ के "pdfSha256" से मेल खाना चाहिए।",
     "url": "https://api.example/api/reports/PG-TESTREPORT01",
   },
-  "version": 1,
+  "version": 2,
   "watermark": null,
 }
 `;

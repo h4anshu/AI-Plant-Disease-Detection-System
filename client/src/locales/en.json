@@ -189,7 +189,9 @@
     "cancel": "Cancel",
     "failed": "Could not delete your data. Please try again.",
     "done_one": "Deleted 1 checkup from this browser.",
-    "done_other": "Deleted {{count}} checkups from this browser."
+    "done_other": "Deleted {{count}} checkups from this browser.",
+    "contextTitle": "Weather and soil for a checkup",
+    "context": "The first time you open a checkup that has a location, our server looks up the weather around the photo date (Open-Meteo, the same point rounded to about 5 km), the rainfall compared with normal and a modelled soil map (through Google Earth Engine, which is sent only the centre of a square of about 250 m around your point, never the exact location). The result is saved with the checkup, without coordinates. Soil Health Card values you type in are saved with that checkup only. \"Delete my data\" removes all of it."
   },
   "field": {
     "show": "See this field from space",
@@ -259,5 +261,122 @@
     "failed": "Could not make the report. Please try again.",
     "what": "A printable A4 summary of this checkup with its limits, for your records, an FPO, a bank or an insurer. Not an official loss assessment.",
     "whatLocation": "A printable A4 summary of this checkup with its limits, for your records, an FPO, a bank or an insurer. It includes the satellite view only if you opened it above. Not an official loss assessment."
+  },
+  "context": {
+    "title": "Weather, soil and season here",
+    "loading": "Checking the weather and soil at this place…",
+    "failed": "Weather and soil information is unavailable right now.",
+    "level": {
+      "favourable": "Favours it",
+      "neutral": "Mixed",
+      "unfavourable": "Doesn't favour it",
+      "unknown": "Can't tell"
+    },
+    "fit": {
+      "favourable": "Recent weather and soil here favour {{disease}}.",
+      "neutral": "Recent weather and soil here partly fit {{disease}}.",
+      "unfavourable": "Recent weather and soil here don't favour {{disease}}.",
+      "unknown": "Not enough information to compare {{disease}} with the conditions here."
+    },
+    "reason": {
+      "healthy": "The leaf looks healthy, so there is nothing to compare.",
+      "no_rules": "No published conditions with numbers were found for this disease.",
+      "needs_hourly_weather": "The published model needs hourly weather, which isn't available for this date.",
+      "not_enough_weather": "Not enough weather data for the published model on this date."
+    },
+    "model": "Published model ({{name}}): {{level}} on this day.",
+    "leanings": "How the conditions here fit each possibility (this is not a diagnosis):",
+    "factor": {
+      "tmean": "Average temperature",
+      "tmin": "Average night (minimum) temperature",
+      "tmeanMin": "Coldest day",
+      "rhMean": "Average humidity",
+      "wetDays": "Days with {{hours}}+ hours of humidity 90% or more",
+      "soil.ph": "Soil pH",
+      "season": "Season",
+      "soilTest.availableN": "Available nitrogen",
+      "soilTest.availableP": "Available phosphorus",
+      "soilTest.availableK": "Available potash",
+      "soilTest.ocPct": "Organic carbon",
+      "soilTest.zn": "Zinc",
+      "soilTest.fe": "Iron",
+      "soilTest.s": "Sulphur"
+    },
+    "window_one": ", last day",
+    "window_other": ", last {{count}} days",
+    "op": {
+      "between": "{{a}}–{{b}} {{unit}}",
+      "lt": "below {{v}} {{unit}}",
+      "le": "{{v}} {{unit}} or less",
+      "gt": "above {{v}} {{unit}}",
+      "ge": "{{v}} {{unit}} or more"
+    },
+    "rule": "(favourable: {{rule}})",
+    "supports": "points towards this disease",
+    "against": "points away from this disease",
+    "modelled": "modelled soil map",
+    "fromCard": "your Soil Health Card",
+    "missing": {
+      "needs_soil_test": "needs your Soil Health Card value",
+      "no_soil_data": "no soil data for this place",
+      "too_few_days": "too few days with weather data",
+      "needs_hourly_humidity": "needs hourly humidity, not available for this date",
+      "no_season": "unknown",
+      "unknown_factor": "unknown",
+      "other": "not available"
+    },
+    "weather": "Weather {{from}} – {{to}}: {{tmin}}–{{tmax}} °C on average, humidity {{rh}}%, rain {{rain}} mm.",
+    "wetDays_one": "1 day with 12+ very humid hours.",
+    "wetDays_other": "{{count}} days with 12+ very humid hours.",
+    "exifDate": "(dates from when the photo was taken)",
+    "rain": "Rain in the 30 days to {{to}}: {{pct}}% of normal ({{src}}, compared with 2001–2020).",
+    "rainUnknown": "Rain compared with normal: not available yet for these dates.",
+    "soil": "Soil (modelled map at 250 m, not a test of your field): {{texture}}, pH {{ph}}, organic carbon {{soc}} g/kg, total nitrogen {{n}} g/kg.",
+    "noSoil": "No soil map data for this place (often towns, rivers or roads).",
+    "cardEntered": "Your Soil Health Card values are used for the nutrient checks.",
+    "cardOld": "Your card is more than 2 years old; a new test may give different values.",
+    "seasonLine": "Season: {{season}}.",
+    "season": {
+      "kharif": "Kharif",
+      "rabi": "Rabi",
+      "zaid": "Zaid (summer)"
+    },
+    "texture": {
+      "sand": "sand",
+      "loamy sand": "loamy sand",
+      "sandy loam": "sandy loam",
+      "loam": "loam",
+      "silt loam": "silt loam",
+      "silt": "silt",
+      "sandy clay loam": "sandy clay loam",
+      "clay loam": "clay loam",
+      "silty clay loam": "silty clay loam",
+      "sandy clay": "sandy clay",
+      "silty clay": "silty clay",
+      "clay": "clay"
+    },
+    "field": "Field from space:",
+    "draft": "These conditions were collected with AI help from cited sources and are not yet checked by an expert.",
+    "explainOnly": "This explains the diagnosis; it never changes it. Weather comes from weather models (about 5 km), not from your field.",
+    "sources": "Sources",
+    "card": {
+      "open": "Have a Soil Health Card? Add its values",
+      "why": "The nutrient checks use only real soil test values. Type the numbers from your card; leave out what you don't have.",
+      "field": {
+        "ph": "pH",
+        "ocPct": "Organic carbon (%)",
+        "availableN": "Available N (kg/ha)",
+        "availableP": "Available P (kg/ha)",
+        "availableK": "Available K (kg/ha)",
+        "zn": "Zinc (ppm)",
+        "fe": "Iron (ppm)",
+        "s": "Sulphur (ppm)",
+        "sampleDate": "Date the sample was taken"
+      },
+      "private": "Only the numbers are saved with this checkup, never your name or card number. \"Delete my data\" removes them.",
+      "save": "Save",
+      "saved": "Saved. The check above now uses your card.",
+      "failed": "Could not save the values."
+    }
   }
 }

@@ -8,6 +8,11 @@ if (process.env.NODE_ENV === 'production') required.push('CLIENT_ORIGINS', 'ML_S
 // field health is optional; once its service is configured, it needs its secret too
 if (process.env.NODE_ENV === 'production' && process.env.GEO_SERVICE_URL) required.push('GEO_SERVICE_TOKEN');
 const missing = required.filter((name) => !process.env[name]);
+// Fusion only ever runs offline (scripts/eval_fusion.js); production explains, it never re-ranks (docs/CONTEXT_LAYER.md)
+if (process.env.NODE_ENV === 'production' && (process.env.FUSION_MODE ?? 'explain') !== 'explain') {
+    console.error('FUSION_MODE must be "explain" in production');
+    process.exit(1);
+}
 if (missing.length) {
     console.error(`Missing required environment variables: ${missing.join(', ')} (see server/.env.example)`);
     process.exit(1);

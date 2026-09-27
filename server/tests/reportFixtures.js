@@ -1,6 +1,7 @@
 // Hand-made inputs for the report tests: a rice blast checkup as the API returns it, a cached
 // field-health answer and a weather-risk answer, with fixed ids and times so snapshots are stable.
 import { MODELS } from '../utils/diseaseRisk.js';
+import { contextFit } from '../utils/environmentFit.js';
 import { treatmentMap } from '../utils/treatmentMap.js';
 
 export const prediction = {
@@ -35,9 +36,28 @@ export const risk = {
   weatherSource: 'Weather data by Open-Meteo.com (CC BY 4.0)',
 };
 
+
+// a stored environment snapshot (GET /api/predict/:id/context), fixed numbers
+const ctxDays = [...Array(17)].map((_, i) => {
+  const d = new Date(Date.UTC(2026, 8, 7 + i)).toISOString().slice(0, 10);
+  return { date: d, source: 'open-meteo', forecast: i > 13, tmin: 22, tmean: 26.5, tmax: 31, rhMean: 84, rhMax: 97, hoursRh90: 9, rain: 2 };
+});
+export const snapshot = {
+  version: 1, computedAt: '2026-09-20T05:31:00.000Z', reference: { date: '2026-09-20', source: 'exif' },
+  weather: { source: 'open-meteo', grid: '0.05° (~5 km)', timezone: 'Asia/Kolkata', days: ctxDays, gaps: [],
+    summary: { days: 14, daysWithData: 14, tminMean: 22, tmeanMean: 26.5, tmaxMean: 31, rhMean: 84, hoursRh90: 126, wetDays12: 0, rainMm: 28 } },
+  rainAnomaly: { status: 'ok', source: 'era5-land', windowStart: '2026-08-21', windowEnd: '2026-09-19', rainMm: 23.6, normalMm: 110.2, percentOfNormal: 21, baseline: '2001-2020' },
+  soil: { texture: 'loam', topsoil0to30: { phH2O: 7.78, nitrogenGkg: 8.1, socGkg: 9.65, clayPct: 25.62, sandPct: 38.52, siltPct: 35.88 } },
+  fieldHealth: { status: 'not_requested' }, season: { names: ['kharif'], source_id: 'ies-seasons' },
+  riskModel: { name: 'Yoshino infection hours', date: '2026-09-20', level: 'medium', conditions: { infectionHours: 4 } },
+  provenance: { sources: [], attributions: ['Weather data by Open-Meteo.com (CC BY 4.0)', 'Soil: ISRIC SoilGrids 250 m (CC BY 4.0)',
+    'Generated using Copernicus Climate Change Service information 2026 (ERA5-Land)'], geoParts: ['rain', 'soil'], eecuEstimate: 0.42 },
+};
+export const context = { snapshot, fit: contextFit(prediction, snapshot, null), soilTest: null, soilTestNote: null };
+
 export const images = { photo: 'a'.repeat(64), gradcam: 'b'.repeat(64), map: 'c'.repeat(64) };
 
 export const input = (over = {}) => ({
   reportId: 'PG-TESTREPORT01', generatedAt: '2026-09-26T09:15:00.000Z', lang: 'en', prediction, location,
-  fieldHealth, risk, images, verifyUrl: 'https://api.example/api/reports/PG-TESTREPORT01', ...over,
+  fieldHealth, risk, context, images, verifyUrl: 'https://api.example/api/reports/PG-TESTREPORT01', ...over,
 });

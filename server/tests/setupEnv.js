@@ -11,3 +11,4 @@ process.env.RISK_RATE_LIMIT = '1000';
 process.env.OSM_TILE_URL = 'http://tiles.test/{z}/{x}/{y}.png';
 process.env.REPORT_RATE_LIMIT = '1000';
 process.env.OPEN_METEO_URL = 'http://meteo.test/v1/forecast';
+process.env.CONTEXT_RATE_LIMIT = '1000';

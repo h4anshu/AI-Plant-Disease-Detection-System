@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 
 const terms = JSON.parse(readFileSync(new URL('../assets/terms.json', import.meta.url), 'utf8'));
-export const REPORT_VERSION = 1;
+export const REPORT_VERSION = 2; // 2: environment context section; other possibilities only for uncertain results
 export const REPORT_LANGUAGES = ['en', 'hi'];
 
 const pick = (entry, lang, fallback) => entry?.[lang] || entry?.en || fallback;
@@ -71,6 +71,30 @@ const L = {
       'The weather risk is an indicator from published models, not a forecast of infection.',
       'This is not an official crop-loss assessment (for example, not a PMFBY crop-cutting experiment).',
     ],
+    ctx: {
+      title: 'Environment context (weather, soil, season)',
+      notComputed: 'Not computed yet: the environment context is made when the checkup is first opened in the app with its location. This report does not fetch it.',
+      fit: 'Fit with {{disease}}', level: { favourable: 'Conditions favour it', neutral: 'Mixed', unfavourable: 'Conditions do not favour it', unknown: 'Cannot tell' },
+      reason: { healthy: 'healthy leaf: nothing to compare', no_rules: 'no published conditions with numbers for this disease',
+        missing_data: 'not enough data', needs_hourly_weather: 'the published model needs hourly weather', not_enough_weather: 'not enough weather data' },
+      model: 'published model {{name}}: {{level}} on the reference day',
+      rule: '{{actual}} (favourable: {{rule}}), source: {{source}}',
+      factor: { tmean: 'Average temperature', tmin: 'Average minimum temperature', tmeanMin: 'Coldest daily mean', rhMean: 'Average humidity',
+        wetDays: 'Days with {{hours}}+ h at humidity 90%+', 'soil.ph': 'Soil pH', season: 'Season',
+        'soilTest.availableN': 'Available N (card)', 'soilTest.availableP': 'Available P (card)', 'soilTest.availableK': 'Available K (card)',
+        'soilTest.ocPct': 'Organic carbon (card)', 'soilTest.zn': 'Zinc (card)', 'soilTest.fe': 'Iron (card)', 'soilTest.s': 'Sulphur (card)' },
+      window: ', last {{n}} days',
+      op: { lt: 'below {{v}}', le: 'at most {{v}}', gt: 'above {{v}}', ge: 'at least {{v}}' },
+      reference: 'Reference date', refSource: { exif: 'date the photo was taken', created_at: 'date of the checkup' },
+      weather: 'Weather (14 days to the reference date)', weatherValue: '{{tmin}}–{{tmax}} °C on average, humidity {{rh}}%, rain {{rain}} mm; {{wet}} days with 12+ h at humidity 90%+ ({{src}})',
+      rain: 'Rain in the 30 days before, vs 2001–2020', rainValue: '{{pct}}% of normal ({{rain}} mm vs {{normal}} mm; {{src}}, {{from}} – {{to}})', rainUnknown: 'not available for these dates',
+      soil: 'Soil, 0–30 cm (SoilGrids model, 250 m; not a soil test)', soilValue: '{{texture}}; pH {{ph}}; organic carbon {{soc}} g/kg; total N {{n}} g/kg', noSoil: 'no soil map data for this place',
+      card: 'Soil Health Card (entered by the farmer)', cardOld: 'the card is more than 2 years old',
+      season: 'Season', seasons: { kharif: 'Kharif', rabi: 'Rabi', zaid: 'Zaid (summer)' },
+      draft: 'The disease conditions were collected with AI help from cited sources and are not yet checked by an expert.',
+      explain: 'This section explains the diagnosis; it never changed it. Weather is from weather models (about 5 km), not measured in the field.',
+      computed: 'Context computed {{date}} (snapshot version {{v}}).',
+    },
     sourcesTitle: 'Where each value comes from',
     integrity: 'Tamper evidence', hash: 'SHA-256 of the report content',
     verify: 'To check this report, open {{url}} : it shows the same hashes and the key values. The SHA-256 of this PDF file must match "pdfSha256" there.',
@@ -133,6 +157,31 @@ const L = {
       'मौसम से ख़तरा प्रकाशित मॉडलों पर आधारित संकेत है, संक्रमण का पूर्वानुमान नहीं।',
       'यह फसल नुकसान का आधिकारिक आकलन नहीं है (जैसे PMFBY का फसल-कटाई प्रयोग नहीं)।',
     ],
+    ctx: {
+      title: 'पर्यावरण संदर्भ (मौसम, मिट्टी, फ़सल-मौसम)',
+      notComputed: 'अभी नहीं बना: पर्यावरण संदर्भ तब बनता है जब जाँच को उसकी लोकेशन के साथ ऐप में पहली बार खोला जाता है। यह रिपोर्ट उसे नहीं लाती।',
+      fit: '{{disease}} से मेल', level: { favourable: 'स्थितियाँ अनुकूल हैं', neutral: 'मिला-जुला', unfavourable: 'स्थितियाँ अनुकूल नहीं हैं', unknown: 'कह नहीं सकते' },
+      reason: { healthy: 'स्वस्थ पत्ती: तुलना को कुछ नहीं', no_rules: 'इस रोग के लिए संख्याओं वाली प्रकाशित स्थितियाँ नहीं', missing_data: 'पर्याप्त डेटा नहीं',
+        needs_hourly_weather: 'प्रकाशित मॉडल को घंटेवार मौसम चाहिए', not_enough_weather: 'पर्याप्त मौसम डेटा नहीं' },
+      model: 'प्रकाशित मॉडल {{name}}: संदर्भ दिन पर {{level}}',
+      rule: '{{actual}} (अनुकूल: {{rule}}), स्रोत: {{source}}',
+      factor: { tmean: 'औसत तापमान', tmin: 'औसत न्यूनतम तापमान', tmeanMin: 'सबसे ठंडा दैनिक औसत', rhMean: 'औसत नमी',
+        wetDays: '{{hours}}+ घंटे 90%+ नमी वाले दिन', 'soil.ph': 'मिट्टी का pH', season: 'फ़सल-मौसम',
+        'soilTest.availableN': 'उपलब्ध N (कार्ड)', 'soilTest.availableP': 'उपलब्ध P (कार्ड)', 'soilTest.availableK': 'उपलब्ध K (कार्ड)',
+        'soilTest.ocPct': 'जैविक कार्बन (कार्ड)', 'soilTest.zn': 'ज़िंक (कार्ड)', 'soilTest.fe': 'आयरन (कार्ड)', 'soilTest.s': 'सल्फर (कार्ड)' },
+      window: ', पिछले {{n}} दिन',
+      texture: { 'sand': 'रेतीली', 'loamy sand': 'दोमट रेतीली', 'sandy loam': 'रेतीली दोमट', 'loam': 'दोमट', 'silt loam': 'गादयुक्त दोमट', 'silt': 'गाद', 'sandy clay loam': 'रेतीली चिकनी दोमट', 'clay loam': 'चिकनी दोमट', 'silty clay loam': 'गादयुक्त चिकनी दोमट', 'sandy clay': 'रेतीली चिकनी', 'silty clay': 'गादयुक्त चिकनी', 'clay': 'चिकनी' },
+      op: { lt: '{{v}} से कम', le: 'अधिकतम {{v}}', gt: '{{v}} से अधिक', ge: 'कम से कम {{v}}' },
+      reference: 'संदर्भ तारीख', refSource: { exif: 'फ़ोटो खींचने की तारीख', created_at: 'जाँच की तारीख' },
+      weather: 'मौसम (संदर्भ तारीख तक 14 दिन)', weatherValue: 'औसतन {{tmin}}–{{tmax}} °C, नमी {{rh}}%, बारिश {{rain}} मिमी; {{wet}} दिन 12+ घंटे 90%+ नमी ({{src}})',
+      rain: 'पिछले 30 दिनों की बारिश, 2001–2020 से तुलना', rainValue: 'सामान्य का {{pct}}% ({{rain}} मिमी बनाम {{normal}} मिमी; {{src}}, {{from}} – {{to}})', rainUnknown: 'इन तारीखों के लिए उपलब्ध नहीं',
+      soil: 'मिट्टी, 0–30 सेमी (SoilGrids मॉडल, 250 मीटर; मिट्टी की जाँच नहीं)', soilValue: '{{texture}}; pH {{ph}}; जैविक कार्बन {{soc}} ग्रा/किग्रा; कुल N {{n}} ग्रा/किग्रा', noSoil: 'इस जगह के लिए मिट्टी के नक्शे का डेटा नहीं',
+      card: 'मृदा स्वास्थ्य कार्ड (किसान द्वारा दर्ज)', cardOld: 'कार्ड 2 साल से पुराना है',
+      season: 'फ़सल-मौसम', seasons: { kharif: 'खरीफ़', rabi: 'रबी', zaid: 'ज़ायद (गर्मी)' },
+      draft: 'रोग की स्थितियाँ AI की मदद से उद्धृत स्रोतों से जुटाई गई हैं और अभी किसी विशेषज्ञ ने नहीं जाँची हैं।',
+      explain: 'यह भाग निदान को समझाता है; इसने उसे कभी नहीं बदला। मौसम मौसम-मॉडल (लगभग 5 किमी) से है, खेत में मापा नहीं गया।',
+      computed: 'संदर्भ {{date}} को बना (स्नैपशॉट संस्करण {{v}})।',
+    },
     sourcesTitle: 'हर मान कहाँ से आया',
     integrity: 'छेड़छाड़ का प्रमाण', hash: 'रिपोर्ट की सामग्री का SHA-256',
     verify: 'इस रिपोर्ट की जाँच के लिए {{url}} खोलें: वहाँ यही हैश और मुख्य मान दिखते हैं। इस PDF फ़ाइल का SHA-256 वहाँ के "pdfSha256" से मेल खाना चाहिए।',
@@ -162,7 +211,8 @@ const row = (label, value, source) => ({ label, value, source }); // source: 'AP
 // location: { lat, lon, accuracyM } from the private record, or null. fieldHealth: the cached geo answer
 // or null. risk: utils/diseaseRisk assess() + weatherSource, { unavailable: true }, or null (no model).
 // images: SHA-256 of the embedded photo / heatmap / map bytes (null when missing).
-export function buildReport({ reportId, generatedAt, lang, prediction: p, location, fieldHealth, risk, images, verifyUrl, watermark = null }) {
+// context: { snapshot, fit, soilTest, soilTestNote } from the STORED snapshot (no outside calls at report time), or null.
+export function buildReport({ reportId, generatedAt, lang, prediction: p, location, fieldHealth, risk, context = null, images, verifyUrl, watermark = null }) {
   const t = labels(lang);
   const sections = [];
 
@@ -178,7 +228,8 @@ export function buildReport({ reportId, generatedAt, lang, prediction: p, locati
     row(t.confidence, confidence(p.confidence), `${API} › confidence`),
     row(t.status, ok ? t.statusOk : t.statusUncertain, `${API} › status`),
   ];
-  const others = (p.top3 ?? []).filter((c) => c.disease !== p.disease);
+  // other possibilities only where the result itself is uncertain (every checkup has a top-3 since the context layer)
+  const others = p.status === 'uncertain' ? (p.top3 ?? []).filter((c) => c.disease !== p.disease) : [];
   if (others.length) {
     diag.push(row(t.alternatives, others.map((c) => `${diseaseName(p.crop, c.disease, lang)} ${pct(c.probability)}`).join(', '),
       `${API} › top3[].disease, top3[].probability`));
@@ -273,6 +324,8 @@ export function buildReport({ reportId, generatedAt, lang, prediction: p, locati
     }
   }
 
+  if (location) sections.push(contextSection(context, p, lang, t));
+
   sections.push({ id: 'treatment', title: t.treatment,
     text: p.treatment ?? t.yieldNone, source: `${API} › treatment`,
     notes: p.treatmentNeedsReview ? [t.notReviewed] : [] });
@@ -309,3 +362,46 @@ export const sourceRows = (content) => [
     ...(s.daysSource ? [{ label: s.title, source: s.daysSource }] : []),
     ...(s.source ? [{ label: s.title, source: s.source }] : [])]),
 ];
+
+// The "Environment context" section (docs/CONTEXT_LAYER.md): only what is stored on the checkup.
+function contextSection(context, p, lang, t) {
+  const c = t.ctx;
+  const C = 'GET /api/predict/:id/context';
+  if (!context?.snapshot) return { id: 'context', title: c.title, rows: [], notes: [c.notComputed] };
+  const { snapshot: s, fit, soilTest, soilTestNote } = context;
+  const n1 = (x) => (x == null ? '–' : String(Math.round(x * 10) / 10));
+  const rows = [];
+  const d = fit.diagnosed;
+  if (d) {
+    const why = d.model ? fill(c.model, { name: d.model.name, level: t.level[d.model.level ?? 'null'] ?? d.model.level })
+      : d.reason ? (c.reason[d.reason] ?? d.reason) : null;
+    rows.push(row(fill(c.fit, { disease: diseaseName(p.crop, d.class, lang) }), [c.level[d.level], why].filter(Boolean).join('; '), `${C} › fit.diagnosed.level`));
+    for (const i of [...d.matched, ...d.unmatched].slice(0, 3)) {
+      const label = fill(c.factor[i.factor] ?? i.factor, { hours: i.hours }) + (i.windowDays ? fill(c.window, { n: i.windowDays }) : '');
+      const fmt = (v) => (i.factor === 'season' ? [].concat(v).map((x) => c.seasons[x] ?? x).join(', ') : `${n1(v)} ${i.unit}`);
+      const rule = i.op === 'between' ? `${n1(i.threshold[0])}–${n1(i.threshold[1])} ${i.unit}`
+        : i.op === 'in' ? fmt(i.threshold) : fill(c.op[i.op], { v: `${n1(i.threshold)} ${i.unit}` });
+      rows.push(row(label, fill(c.rule, { actual: fmt(i.actual), rule, source: i.source?.title ?? '–' }), `${C} › fit.diagnosed (${i.ruleId})`));
+    }
+  }
+  rows.push(row(c.reference, `${formatDay(s.reference.date, lang)} (${c.refSource[s.reference.source]})`, `${C} › context.reference`));
+  const w = s.weather.summary;
+  rows.push(row(c.weather, fill(c.weatherValue, { tmin: n1(w.tminMean), tmax: n1(w.tmaxMean), rh: n1(w.rhMean), rain: n1(w.rainMm),
+    wet: w.wetDays12 ?? '–', src: s.weather.source === 'open-meteo' ? 'Open-Meteo' : 'ERA5-Land' }), `${C} › context.weather.summary`));
+  const r = s.rainAnomaly;
+  rows.push(row(c.rain, r.status === 'ok' ? fill(c.rainValue, { pct: r.percentOfNormal, rain: n1(r.rainMm), normal: n1(r.normalMm),
+    src: r.source === 'chirps' ? 'CHIRPS' : 'ERA5-Land', from: formatDay(r.windowStart, lang), to: formatDay(r.windowEnd, lang) }) : c.rainUnknown, `${C} › context.rainAnomaly`));
+  const soil = s.soil?.topsoil0to30;
+  rows.push(row(c.soil, soil ? fill(c.soilValue, { texture: c.texture?.[s.soil.texture] ?? s.soil.texture ?? '–', ph: n1(soil.phH2O), soc: n1(soil.socGkg), n: n1(soil.nitrogenGkg) }) : c.noSoil,
+    `${C} › context.soil`));
+  if (soilTest) {
+    const unit = { ph: 'pH {{v}}', ec: 'EC {{v}} dS/m', ocPct: 'OC {{v}}%', availableN: 'N {{v}} kg/ha', availableP: 'P {{v}} kg/ha',
+      availableK: 'K {{v}} kg/ha', s: 'S {{v}} ppm', zn: 'Zn {{v}} ppm', fe: 'Fe {{v}} ppm', cu: 'Cu {{v}} ppm', mn: 'Mn {{v}} ppm', b: 'B {{v}} ppm' };
+    const vals = Object.entries(soilTest).filter(([k]) => unit[k]).map(([k, v]) => fill(unit[k], { v })).join(', ');
+    rows.push(row(c.card, [vals, soilTest.sampleDate && formatDay(soilTest.sampleDate, lang), soilTestNote && c.cardOld].filter(Boolean).join('; '), `${C} › soilTest`));
+  }
+  rows.push(row(c.season, s.season.names.map((x) => c.seasons[x] ?? x).join(' / '), `${C} › context.season.names`));
+  return { id: 'context', title: c.title, rows,
+    notes: [...(fit.diagnosed?.draft ? [c.draft] : []), c.explain, fill(c.computed, { date: formatIST(s.computedAt, lang), v: s.version }),
+      ...s.provenance.attributions] };
+}

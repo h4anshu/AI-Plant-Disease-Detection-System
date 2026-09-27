@@ -127,7 +127,9 @@ Each rule is either **met**, **not met**, or **missing** (the data isn't there).
 - **Default (weighted):**
   - score = (weight of favourable rules that are met + weight of unfavourable rules that are not met)
     ÷ weight of the rules that could be checked;
-  - favourable ≥ 0.67, unfavourable ≤ 0.33, neutral in between;
+  - favourable at two thirds or more, unfavourable at one third or less, neutral in between (so with a
+    weight-2 wetness rule and a weight-1 temperature rule, wetness alone decides between favourable and
+    unfavourable);
   - **unknown** if the missing rules carry half the total weight or more.
 - **`combine: "any"`** (only groundnut Nutrition_Deficiency): favourable if **any** rule is met,
   because one deficient nutrient is enough. Unfavourable only if at least half of the rules could be
