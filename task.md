@@ -20,6 +20,7 @@ Added 26 Sep 2026. Tick an item off when it's done.
 - [x] **Deploy the server for the PDF report (Task 14), then push `main`:** Done 26 Sep 2026: server `00016` (no watermark env), `main` pushed at `c98b5d0`, Vercel bundle has the button (en + hi); verified live end to end (Task 14, "Live"). Original step: `gcloud run deploy server --source server --region asia-south1` (no new env vars needed; `REPORT_WATERMARK` must stay unset in production), then `git push origin main` for Vercel. Check: a checkup → "Download report (PDF)", then open the verify link printed on its last page.
 - [ ] **Hindi report strings** (`report.*` in `client/src/locales/hi.json` and the `hi` labels in `server/utils/reportContent.js`, AI-drafted): include them in the agronomist review.
 - [ ] **Hindi disease-risk strings** (`risk.*` in `client/src/locales/hi.json`, AI-drafted): include them in the agronomist review.
+- [ ] **Agronomist review of the disease rules** (Task 15): 62 rows in `docs/RULES_REVIEW.csv` (40 rules + 22 classes without rules). Fill `reviewer` / `verdict` (ok, change, reject) / `corrected_value`, then `cd server && npm run rules-review -- --apply <file>`. Steps in `docs/DISEASE_RULES.md`. Until then the app marks every rule "not yet checked by an expert".
 - [x] **Earth Engine setup for field health**, done 26 Sep 2026: registered (noncommercial, BBDU, Community tier), API on, sign-in via gcloud ADC works (test: 7 Sentinel-2 images), `geo-service` service account with both roles. daily EECU cap set to 18,000 EECU-s. **Still open:** an ALU answer (likely no, no GWCID), and **3 real field coordinates** (owners' consent). The field-health code starts after the coordinates.
 
 ---
@@ -663,3 +664,39 @@ GitHub flagged "MongoDB Atlas Database URI with credentials" in `server/tests/ma
 - Nothing to rotate.
 - Git history is not rewritten: both old strings are harmless, and rewriting a public repo's history is disruptive.
 
+
+## Task 15 — Context layer v1: environment-aware diagnosis (27 Sep 2026, Phase A)
+
+Brief: prompt 12 (context snapshot per located checkup: weather, rain anomaly, SoilGrids soil, cached field health, season; a sourced rule knowledge base for all 53 classes; a pure fit engine; explain-only, offline rerank evaluation; card, PDF section, privacy). Done on `main`.
+
+**Phase A (read + live checks, no code)**, plan in `docs/CONTEXT_LAYER_PLAN.md`, waiting for approval:
+- Catalogue sheet "Context Data Sources" present (CX-01…CX-13).
+- SoilGrids assets readable from the project; ISRIC conversion factors taken from the ISRIC FAQ.
+- Latest dates: ERA5-Land 2026-09-19 (8 days lag, not ~3 months); CHIRPS 2026-08-31 (~4 weeks lag).
+- Open-Meteo: `past_days` max 92 (docs); `start_date` accepted back to 93 days, so it covers every accepted photo date (≤ 60 days).
+- EECU (Cloud Monitoring, per workload tag, 3 probe runs): soil 0.04, CHIRPS 30-day + 20-year baseline 0.38, ERA5 17 days 0.34, latest-date via full sort 1.6 (to be replaced by a windowed max) EECU-s per call.
+- Open questions for the user: R1 (SoilGrids total N 11–18 g/kg and SOC 13–38 g/kg at the 3 test fields do not match Indian available-N / Walkley-Black OC thresholds) and R2 (CHIRPS lag: ERA5-Land anomaly fallback?).
+- **Approved by the user (27 Sep 2026).** Decisions: R1 (SoilGrids pH + texture in rules; total N / SOC shown only), a new optional Soil Health Card entry (farmer-typed values, private, card overrides SoilGrids, nutrient rules only from the card), R2(b) (CHIRPS, else an ERA5-Land anomaly, else unknown), no context on training data (confirmed), context-aware advice deferred to after v1. Recorded at the top of `docs/CONTEXT_LAYER_PLAN.md`.
+
+### Phase B — knowledge-base research (started 27 Sep 2026)
+- **Result:** `server/knowledge/disease_rules.json` with all 53 classes:
+  - 21 classes have 40 sourced rules;
+  - 2 reuse the published models (potato late blight → INDO-BLIGHTCAST, rice blast → Yoshino);
+  - 10 are healthy;
+  - 20 have `rules: []` with the reason written down (vector-borne viruses/insects, generic dataset classes, qualitative-only sources, nothing found).
+- Every rule cites a page or paper that was opened. The quote/numbers and section are stored with it.
+- Sources:
+  - TNAU Agritech (CX-12), IRRI Rice Knowledge Bank, ICAR Journal of Wheat Research, ICAR Journal of Sugarcane Research, ICRISAT (pigeonpea handbook, groundnut rust/leaf-spot papers);
+  - GoI Methods Manual Soil Testing in India (2011) for the Soil Health Card limits;
+  - peer-reviewed papers via PMC/Europe PMC/Crossref;
+  - season calendar from the Indian Economic Service (GoI); Soil Health Card retest gap (2 years) from PIB.
+- **Research findings worth knowing:**
+  - TNAU's wheat and sugarcane pages have no numeric conditions, so ICAR journals and peer-reviewed papers were used there.
+  - Many sources state RH / leaf wetness only; wetness is approximated by hours at RH ≥ 90% (as in Task 13).
+  - Soil nutrient rules read only Soil Health Card values (decision R1).
+  - The IMD rainy-day definition could not be opened on an IMD page, and no rule needs it, so rainy-day counts were dropped from the plan.
+- `docs/DISEASE_RULES.md`: schema, factors, reading conventions, scoring, how to review.
+- Review loop:
+  - `docs/RULES_REVIEW.csv` (62 rows);
+  - `npm run rules-review` writes it; `-- --apply <csv>` applies an agronomist's ok / change / reject verdicts and stamps the reviewer.
+- Tests: `server/tests/knowledge.test.js` (104 tests: all 53 classes, factors/units/windows/sources, models reused, no rule reads modelled N/OC, CSV fresh, apply round-trip and bad input). Server suite 371 passed.

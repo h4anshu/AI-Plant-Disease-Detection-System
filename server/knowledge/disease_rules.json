@@ -1,0 +1,651 @@
+{
+  "version": 1,
+  "updated": "2026-09-27",
+  "about": "Environment rules per disease class (docs/DISEASE_RULES.md). Every rule cites an opened source; every rule is a draft until an agronomist reviews docs/RULES_REVIEW.csv. Explanation only: never changes a diagnosis.",
+  "factors": {
+    "tmean": { "label": "mean daily temperature", "unit": "°C", "meaning": "mean of the daily mean air temperature over the window" },
+    "tmin": { "label": "mean daily minimum temperature", "unit": "°C", "meaning": "mean of the daily minimum air temperature over the window" },
+    "tmeanMin": { "label": "coldest daily mean temperature", "unit": "°C", "meaning": "lowest daily mean air temperature in the window" },
+    "rhMean": { "label": "mean relative humidity", "unit": "%", "meaning": "mean of the daily mean relative humidity over the window" },
+    "wetDays": { "label": "wet days", "unit": "days", "meaning": "days in the window with at least `hours` hours at RH >= 90% (leaf-wetness proxy, Sentelhas et al. 2008, docs/DISEASE_RISK.md); hourly weather only" },
+    "soil.ph": { "label": "soil pH", "unit": "pH", "meaning": "soil pH: the farmer's Soil Health Card if entered, else SoilGrids pH (H2O), 0-30 cm, modelled" },
+    "soilTest.availableN": { "label": "Soil Health Card available N", "unit": "kg/ha", "meaning": "available N (alkaline permanganate), Soil Health Card only" },
+    "soilTest.availableP": { "label": "Soil Health Card available P", "unit": "kg/ha", "meaning": "available P (Olsen), Soil Health Card only" },
+    "soilTest.availableK": { "label": "Soil Health Card available K", "unit": "kg/ha", "meaning": "available K (ammonium acetate), Soil Health Card only" },
+    "soilTest.ocPct": { "label": "Soil Health Card organic carbon", "unit": "%", "meaning": "organic carbon (Walkley-Black), Soil Health Card only" },
+    "soilTest.zn": { "label": "Soil Health Card zinc", "unit": "ppm", "meaning": "DTPA zinc, Soil Health Card only" },
+    "soilTest.fe": { "label": "Soil Health Card iron", "unit": "ppm", "meaning": "DTPA iron, Soil Health Card only" },
+    "soilTest.s": { "label": "Soil Health Card sulphur", "unit": "ppm", "meaning": "available sulphur, Soil Health Card only" },
+    "season": { "label": "season", "unit": "season", "meaning": "calendar season of the reference date (see seasons)" }
+  },
+  "seasons": {
+    "months": { "1": ["rabi"], "2": ["rabi"], "3": ["rabi", "zaid"], "4": ["zaid"], "5": ["zaid"], "6": ["zaid"],
+                "7": ["kharif"], "8": ["kharif"], "9": ["kharif"], "10": ["kharif", "rabi"], "11": ["rabi"], "12": ["rabi"] },
+    "note": "Months shared by two seasons in the source (October, March) belong to both. This is the calendar season, not the crop's own sowing date, and not district-specific.",
+    "source": { "id": "ies-seasons", "title": "Cropping seasons of India - Kharif & Rabi", "publisher": "Indian Economic Service (Arthapedia), Government of India",
+      "url": "https://ies.gov.in/arthapedia/concept/cropping-seasons-india-kharif-rabi", "section_or_page": "first paragraph",
+      "quote_or_numbers": "The kharif cropping season is from July –October during the south-west monsoon and the Rabi cropping season is from October-March (winter). The crops grown between March and June are summer crops.",
+      "accessed": "2026-09-27" }
+  },
+  "soilHealthCard": {
+    "retestAfterYears": 2,
+    "source": { "id": "pib-shc-2022", "title": "Soil Health Card Scheme (PIB release PRID 1808329)", "publisher": "Press Information Bureau, Ministry of Agriculture & Farmers Welfare",
+      "url": "https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1808329", "section_or_page": "body",
+      "quote_or_numbers": "soil testing can be repeated after a time gap of two years after first testing", "accessed": "2026-09-27" }
+  },
+  "classes": [
+    {
+      "crop": "wheat", "class": "BlackPoint", "cause_type": "fungal",
+      "cause": "grain discoloration by Alternaria, Bipolaris (Cochliobolus) sativus, Cladosporium and other fungi",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "cpn-black-point", "title": "Black Point of Wheat", "publisher": "Crop Protection Network (US land-grant universities extension)",
+          "url": "https://cropprotectionnetwork.org/encyclopedia/black-point-of-wheat", "section_or_page": "main text",
+          "quote_or_numbers": "Warm, wet weather during filling and ripening (FGS 10.5) typically favors infection, but black point can also be prevalent if weather is hot and dry.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "The sources give only qualitative and contradictory weather (warm-wet, but also hot-dry) and no thresholds; the symptom forms on grain at filling/ripening, which a 14-day weather window cannot place."
+    },
+    {
+      "crop": "wheat", "class": "FusariumFootRot", "cause_type": "fungal",
+      "cause": "Fusarium spp. (F. culmorum, F. pseudograminearum and others) root, crown and foot rot",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "cpn-fusarium-crown", "title": "Fusarium Root, Crown, and Foot Rot of Wheat", "publisher": "Crop Protection Network (US land-grant universities extension)",
+          "url": "https://cropprotectionnetwork.org/encyclopedia/fusarium-root-crown-and-foot-rot-of-wheat", "section_or_page": "main text",
+          "quote_or_numbers": "Seedling blight is favored when seed is sown into dry, warm (68-86°F) soil. Dry weather typically favors Fusarium root, crown, and foot rot, but infection can occur under a wide range of environmental conditions.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "The only numbers (20-30 °C soil) are for soil at sowing, which the snapshot does not have; the rest is qualitative ('dry weather typically favors')."
+    },
+    {
+      "crop": "wheat", "class": "HealthyLeaf", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "wheat", "class": "LeafBlight", "cause_type": "fungal",
+      "cause": "spot blotch, Bipolaris sorokiniana (the main cause of leaf blight of wheat in India)",
+      "rules": [
+        { "id": "wheat.LeafBlight.1", "factor": "tmean", "op": "between", "value": [18, 32], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "jwr2013-spot-blotch" },
+        { "id": "wheat.LeafBlight.2", "factor": "wetDays", "hours": 12, "op": "ge", "value": 1, "unit": "days", "window_days": 7,
+          "role": "favourable", "weight": 2, "source_id": "jwr2013-spot-blotch",
+          "reading": "The source's 'more than 12 to 18 hours of leaf wetness' is read as at least one day with 12 h at RH >= 90% in the last 7 days." }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "jwr2013-spot-blotch", "title": "Chowdhury AK, Singh G, Tyagi BS, Ojha A, Dhar T, Bhattacharya PM (2013). Spot blotch disease of wheat – a new thrust area for sustaining productivity. Journal of Wheat Research 5(2). doi:10.25174/3pfz0r92",
+          "publisher": "ICAR-Indian Institute of Wheat and Barley Research (journal); Uttar Banga Krishi Vishwavidyalaya",
+          "url": "https://epubs.icar.org.in/index.php/JWR/article/download/36730/16366/84384", "section_or_page": "p. 1 abstract; p. 3 Epidemiology",
+          "quote_or_numbers": "Ideal conditions … relative humidity of near 95 per cent … and long periods (more than 12 to 18 hours) of leafs wetness (p. 1). Moderate to warm temperature range (18˚C to 32˚C) favours the growth of B. sorokiniana (p. 3).", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "wheat", "class": "WheatBlast", "cause_type": "fungal",
+      "cause": "Magnaporthe oryzae pathotype Triticum (reported in Bangladesh 2016; not established in India)",
+      "rules": [
+        { "id": "wheat.WheatBlast.1", "factor": "tmean", "op": "between", "value": [10, 32], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "montes2022-wheat-blast",
+          "reading": "Tmin and Tmax for infection (hourly in the model) applied to the daily mean." },
+        { "id": "wheat.WheatBlast.2", "factor": "wetDays", "hours": 12, "op": "ge", "value": 1, "unit": "days", "window_days": 7,
+          "role": "favourable", "weight": 2, "source_id": "montes2022-wheat-blast" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "montes2022-wheat-blast", "title": "Montes C, Hussain SG, Krupnik TJ (2022). Variable climate suitability for wheat blast (Magnaporthe oryzae pathotype Triticum) in Asia. International Journal of Biometeorology 66:2237-2249. doi:10.1007/s00484-022-02352-9",
+          "publisher": "Springer (peer-reviewed; CIMMYT authors)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9640415/", "section_or_page": "Methods, infection model (parameters from Cruz et al. 2016)",
+          "quote_or_numbers": "T min = 10 °C, T max = 32 °C, and T opt = 27.5 °C … WD min and WD max (hours), taken as 12 and 24, respectively … the minimum and maximum leaf wetness duration requirement for infection", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "rice", "class": "Bacterialblight", "cause_type": "bacterial", "cause": "Xanthomonas oryzae pv. oryzae",
+      "rules": [
+        { "id": "rice.Bacterialblight.1", "factor": "tmean", "op": "between", "value": [25, 34], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "irri-rkb-bb" },
+        { "id": "rice.Bacterialblight.2", "factor": "rhMean", "op": "gt", "value": 70, "unit": "%", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "irri-rkb-bb" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "irri-rkb-bb", "title": "Bacterial blight (fact sheet)", "publisher": "IRRI Rice Knowledge Bank",
+          "url": "http://www.knowledgebank.irri.org/training/fact-sheets/pest-management/diseases/item/bacterial-blight", "section_or_page": "Why and where it occurs",
+          "quote_or_numbers": "In general, the disease favors temperatures at 25−34°C, with relative humidity above 70%. … Bacterial blight can be severe in susceptible rice varieties under high nitrogen fertilization.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "rice", "class": "Blast", "cause_type": "fungal", "cause": "Magnaporthe oryzae",
+      "rules": [], "model_ref": "diseaseRisk:yoshino",
+      "sources": [
+        { "id": "disease-risk-rice", "title": "Yoshino (1979) infection hours as published in Katsantonis et al. (2017), with Padmanabhan (1965) as supporting evidence", "publisher": "docs/DISEASE_RISK.md (this repository)",
+          "url": "docs/DISEASE_RISK.md#rice-blast-magnaporthe-oryzae", "section_or_page": "Rice blast",
+          "quote_or_numbers": "5-day mean 20–25 °C, rain < 4 mm/h, wet run >= base wet hours + 4 h; daily infection hours < 3 low, 3–5 medium, >= 6 high", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "rice", "class": "Brownspot", "cause_type": "fungal", "cause": "Bipolaris oryzae (Cochliobolus miyabeanus); common on nutrient-deficient soils",
+      "rules": [
+        { "id": "rice.Brownspot.1", "factor": "rhMean", "op": "between", "value": [86, 100], "unit": "%", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "irri-rkb-brown-spot" },
+        { "id": "rice.Brownspot.2", "factor": "tmean", "op": "between", "value": [16, 36], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "irri-rkb-brown-spot" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "irri-rkb-brown-spot", "title": "Brown spot (fact sheet)", "publisher": "IRRI Rice Knowledge Bank",
+          "url": "http://www.knowledgebank.irri.org/training/fact-sheets/pest-management/diseases/item/brown-spot", "section_or_page": "Why and where it occurs",
+          "quote_or_numbers": "The disease can develop in areas with high relative humidity (86−100%) and temperature between 16 and 36°C. It is common in unflooded and nutrient-deficient soils", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": ""
+    },
+    {
+      "crop": "rice", "class": "Healthy", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "rice", "class": "Tungro", "cause_type": "viral", "cause": "rice tungro bacilliform and spherical viruses, spread by green leafhoppers",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "irri-rkb-tungro", "title": "Tungro (fact sheet)", "publisher": "IRRI Rice Knowledge Bank",
+          "url": "http://www.knowledgebank.irri.org/training/fact-sheets/pest-management/diseases/item/tungro", "section_or_page": "What it does; Why and where it occurs",
+          "quote_or_numbers": "Rice tungro disease is caused by the combination of two viruses, which are transmitted by leafhoppers.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Vector-borne virus: the source gives no weather or soil threshold for the disease itself."
+    },
+    {
+      "crop": "sugarcane", "class": "Banded_Chlorosis", "cause_type": "abiotic", "cause": "cold injury (physiological disorder) after a sudden temperature drop",
+      "rules": [
+        { "id": "sugarcane.Banded_Chlorosis.1", "factor": "tmeanMin", "op": "le", "value": 7, "unit": "°C", "window_days": 14,
+          "role": "favourable", "weight": 1, "source_id": "upcsr2017-banded-chlorosis",
+          "reading": "The reported 2.7–7 °C daily means are read as at least one day with a mean of 7 °C or less; 14 days because the bands show weeks after the cold (Texas handbook)." }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "upcsr2017-banded-chlorosis", "title": "Singh SP, Vishwakarma SK, Singh SP, Singh A, Sharma BL (2017). Novel report of banded chlorosis in commercial sugarcane cultivars from sub-tropical India. Int J Curr Microbiol App Sci 6(4). doi:10.20546/ijcmas.2017.604.044",
+          "publisher": "Sugarcane Research Institute, UP Council of Sugarcane Research, Shahjahanpur", "url": "http://www.ijcmas.com/abstractview.php?ID=1933&vol=6-4-2017&SNo=44", "section_or_page": "Abstract",
+          "quote_or_numbers": "The symptoms were highly appeared at the average temperature of 5.25 0 C with the range from 2.7 to 7 0 C in last week of January, 2016.", "accessed": "2026-09-27" },
+        { "id": "tamu-sugarcane", "title": "Sugarcane", "publisher": "Texas Plant Disease Handbook, Texas A&M AgriLife Extension",
+          "url": "https://plantdiseasehandbook.tamu.edu/industry-specialty/sugar-crops/sugarcane/", "section_or_page": "Banded Chlorosis",
+          "quote_or_numbers": "It occurs as a result of cold damage to portions of unrolled leaves within the spindle. The damage is visible weeks later, when the leaves grow out.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "sugarcane", "class": "BrownRust", "cause_type": "fungal", "cause": "Puccinia melanocephala",
+      "rules": [
+        { "id": "sugarcane.BrownRust.1", "factor": "tmin", "op": "between", "value": [16.7, 22.2], "unit": "°C", "window_days": 14,
+          "role": "favourable", "weight": 1, "source_id": "sanjel2019-rust",
+          "reading": "'Night temperature' is read as the daily minimum." }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "sanjel2019-rust", "title": "Sanjel S, Chaulagain B, Small IM, Comstock JC, Hincapie M, Raid RN, Rott P (2019). Comparison of progress of brown rust and orange rust and conditions conducive for severe epidemic development during the sugarcane crop season in Florida. Plant Disease 103:825-831. doi:10.1094/PDIS-05-18-0862-RE",
+          "publisher": "American Phytopathological Society (peer-reviewed)", "url": "https://doi.org/10.1094/PDIS-05-18-0862-RE", "section_or_page": "Abstract",
+          "quote_or_numbers": "Maximum disease severity was correlated with the number of hours at night with an average temperature of 20 to 22.2°C … Epidemics of brown rust began at lower night temperatures (16.7 to 22.2°C)", "accessed": "2026-09-27" },
+        { "id": "sbi2019-rust-review", "title": "Selvakumar R, Viswanathan R (2019). Sugarcane rust: changing disease dynamics and its management. Journal of Sugarcane Research 9(2):97-118. doi:10.37580/JSR.2019.2.9.97-118",
+          "publisher": "ICAR-Sugarcane Breeding Institute, Coimbatore", "url": "https://epubs.icar.org.in/index.php/JSR/article/view/100945/0", "section_or_page": "Abstract",
+          "quote_or_numbers": "In India, the rust severity is restricted to peninsular regions … and sub tropical states are relatively free from rust diseases due to unfavourable climate for rust pathogens.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "sugarcane", "class": "Brown_Spot", "cause_type": "fungal", "cause": "Cercospora longipes",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "sbi2018-scenario", "title": "Viswanathan R (2018). Changing scenario of sugarcane diseases in India since introduction of hybrid cane varieties: path travelled for a century. Journal of Sugarcane Research 8(1)",
+          "publisher": "ICAR-Sugarcane Breeding Institute, Coimbatore", "url": "https://epubs.icar.org.in/index.php/JSR/article/view/88893", "section_or_page": "Abstract",
+          "quote_or_numbers": "foliar diseases such as rust, brown spot, eye spot, brown stripe, pokkah boeng etc were reported during different periods … the foliar diseases were seasonal in occurrence and mostly variety specific.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "No field weather threshold found (only 'seasonal' and 'high humidity areas'; the one number found is an in-vitro growth optimum of 25 °C)."
+    },
+    {
+      "crop": "sugarcane", "class": "Dried_Leaves", "cause_type": "abiotic", "cause": "dried leaves: a symptom with several possible causes (drought, senescence, disease)",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "The dataset class is a symptom, not one cause, so no single rule applies."
+    },
+    {
+      "crop": "sugarcane", "class": "Grassy_shoot", "cause_type": "viral", "cause": "sugarcane grassy shoot phytoplasma, spread by infected setts and insect vectors",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "tnau-sugarcane-gsd", "title": "Grassy shoot disease", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/sugarcane_diseases/sugarcane_d8.html", "section_or_page": "Management",
+          "quote_or_numbers": "Treat the setts with aerated steam at 50°C for 1 hour to control primary infection … spraying twice a month with aphidicides", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Phytoplasma spread by setts and vectors: no weather or soil threshold in the sources."
+    },
+    {
+      "crop": "sugarcane", "class": "Healthy_Leaves", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "sugarcane", "class": "Pokkah_Boeng", "cause_type": "fungal", "cause": "Fusarium species complex (F. sacchari, F. proliferatum, F. verticillioides and others)",
+      "rules": [
+        { "id": "sugarcane.Pokkah_Boeng.1", "factor": "tmean", "op": "between", "value": [20, 32], "unit": "°C", "window_days": 14,
+          "role": "favourable", "weight": 1, "source_id": "poorniammal2024-pb" },
+        { "id": "sugarcane.Pokkah_Boeng.2", "factor": "rhMean", "op": "ge", "value": 70, "unit": "%", "window_days": 14,
+          "role": "favourable", "weight": 1, "source_id": "poorniammal2024-pb",
+          "reading": "'70–80%' (most severe) and '79.0–85.5%' (incidence) are read as a lower bound of 70%." }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "poorniammal2024-pb", "title": "Poorniammal R, Jernisha J, Prabhu S, Dufossé L (2024). Sugarcane Pokkah Boeng disease: insights and future directions for effective management. Life 14:1533. doi:10.3390/life14121533",
+          "publisher": "MDPI (peer-reviewed review; TNAU authors)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11677414/", "section_or_page": "2.3 Environmental factors",
+          "quote_or_numbers": "The disease was most severe when temperatures ranged from 20 °C to 32 °C, accompanied by high humidity levels of 70–80% and cloudy weather during the rainy season, particularly from July to September.", "accessed": "2026-09-27" },
+        { "id": "tnau-sugarcane-pb", "title": "Pokkah boeng", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/sugarcane_diseases/sugarcane_pokkah_boe.html", "section_or_page": "Favourable conditions",
+          "quote_or_numbers": "Pokkah boeng was favoured by warm, moist condition and additionally, summer showers with cloudy weather also favour disease development", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "sugarcane", "class": "Sett_Rot", "cause_type": "fungal", "cause": "Ceratocystis paradoxa (pineapple disease of setts)",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "tnau-sugarcane-sett-rot", "title": "Sett rot", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/sugarcane_diseases/sugarcane_d7.html", "section_or_page": "Management strategies",
+          "quote_or_numbers": "Proper drainage and planting of setts in 1-2 cm depth … Avoid deep planting during monsoon season", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Only qualitative (drainage, planting depth in the monsoon); no threshold."
+    },
+    {
+      "crop": "sugarcane", "class": "Viral_Disease", "cause_type": "viral", "cause": "sugarcane viral diseases (the dataset class does not name the virus)",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Generic class without a named virus; viral diseases spread by setts and vectors, not by weather thresholds."
+    },
+    {
+      "crop": "sugarcane", "class": "Yellow_Leaf", "cause_type": "viral", "cause": "sugarcane yellow leaf virus (ScYLV), spread by aphids and setts",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "tnau-sugarcane-yld", "title": "Yellow leaf disease", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/sugarcane_diseases/sugarcane_d1.html", "section_or_page": "Symptoms",
+          "quote_or_numbers": "This disease affects the 5 to 6 months crop.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Vector-borne virus: the source gives crop age, no weather or soil threshold."
+    },
+    {
+      "crop": "sugarcane", "class": "smut", "cause_type": "fungal", "cause": "Sporisorium scitamineum (whip smut)",
+      "rules": [
+        { "id": "sugarcane.smut.1", "factor": "tmean", "op": "between", "value": [25, 30], "unit": "°C", "window_days": 14,
+          "role": "favourable", "weight": 1, "source_id": "rajput2021-smut" },
+        { "id": "sugarcane.smut.2", "factor": "rhMean", "op": "between", "value": [65, 70], "unit": "%", "window_days": 14,
+          "role": "favourable", "weight": 1, "source_id": "rajput2021-smut" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "rajput2021-smut", "title": "Rajput MA, Rajput NA, Syed RN, Lodhi AM, Que Y (2021). Sugarcane smut: current knowledge and the way forward for management. Journal of Fungi 7:1095. doi:10.3390/jof7121095",
+          "publisher": "MDPI (peer-reviewed review)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8703903/", "section_or_page": "2. Disease Biology",
+          "quote_or_numbers": "Temperature 25–30 °C and relative humidity 65–70% favor the disease development", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "potato", "class": "Early_blight", "cause_type": "fungal", "cause": "Alternaria solani",
+      "rules": [
+        { "id": "potato.Early_blight.1", "factor": "tmean", "op": "between", "value": [25, 30], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "tnau-potato-eb" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "tnau-potato-eb", "title": "Early blight: Alternaria solani", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/crop_prot_crop%20diseases_veg_potato_2.html", "section_or_page": "Epidemiology",
+          "quote_or_numbers": "Dry warm weather with intermittent rain. Poor vigor. Temperature: 25-30°C. Poorly manured crop.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "potato", "class": "Late_blight", "cause_type": "fungal", "cause": "Phytophthora infestans",
+      "rules": [], "model_ref": "diseaseRisk:indoBlightcast",
+      "sources": [
+        { "id": "disease-risk-potato", "title": "INDO-BLIGHTCAST (Govindakrishnan et al. 2016, ICAR-CPRI), with Wallin/BLITECAST as supporting evidence", "publisher": "docs/DISEASE_RISK.md (this repository)",
+          "url": "docs/DISEASE_RISK.md#potato-late-blight-phytophthora-infestans", "section_or_page": "Potato late blight",
+          "quote_or_numbers": "7-day sums above 52.5 P-days and 525 (night RH %) for 7 consecutive days = high; favourable today = medium", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "potato", "class": "healthy", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "maize", "class": "Blight", "cause_type": "fungal", "cause": "turcicum (northern corn) leaf blight, Exserohilum turcicum",
+      "rules": [
+        { "id": "maize.Blight.1", "factor": "tmean", "op": "between", "value": [15, 30], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "navarro2021-et" },
+        { "id": "maize.Blight.2", "factor": "wetDays", "hours": 5, "op": "ge", "value": 1, "unit": "days", "window_days": 7,
+          "role": "favourable", "weight": 2, "source_id": "navarro2021-et" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "navarro2021-et", "title": "Navarro BL, Campos RA, Gasparoto MCG, von Tiedemann A (2021). In vitro and in planta studies on temperature adaptation of Exserohilum turcicum isolates from maize in Europe and South America. Pathogens 10:154. doi:10.3390/pathogens10020154",
+          "publisher": "MDPI (peer-reviewed)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7913211/", "section_or_page": "1. Introduction",
+          "quote_or_numbers": "Infections occur from 15 to 30 °C, and the optimal temperature is 20 °C. A minimum dew period of 5 h is required for lesion formation.", "accessed": "2026-09-27" },
+        { "id": "tnau-maize-tlb", "title": "Leaf Blight: Exserohilum turcicum & Helminthosporium maydis", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/maize_disease_new/maize_2.html", "section_or_page": "Favourable Conditions",
+          "quote_or_numbers": "Wet humid cool weather typically found later in the growing season.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "maize", "class": "Common_Rust", "cause_type": "fungal", "cause": "Puccinia sorghi",
+      "rules": [
+        { "id": "maize.Common_Rust.1", "factor": "tmean", "op": "between", "value": [15, 25], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "tnau-maize-rust" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "tnau-maize-rust", "title": "Common Rust: Puccinia sorghi", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/maize_disease_new/maize_4.html", "section_or_page": "Favourable condition",
+          "quote_or_numbers": "Cool, warm and moist weather (15 - 25 o C)", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "maize", "class": "Gray_Leaf_Spot", "cause_type": "fungal", "cause": "Cercospora zeina / C. zeae-maydis",
+      "rules": [
+        { "id": "maize.Gray_Leaf_Spot.1", "factor": "tmean", "op": "between", "value": [22, 30], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "nsibo2024-maize" },
+        { "id": "maize.Gray_Leaf_Spot.2", "factor": "rhMean", "op": "gt", "value": 90, "unit": "%", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "nsibo2024-maize" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "nsibo2024-maize", "title": "Nsibo DL, Barnes I, Berger DK (2024). Recent advances in the population biology and management of maize foliar fungal pathogens Exserohilum turcicum, Cercospora zeina and Bipolaris maydis in Africa. Frontiers in Plant Science 15:1404483. doi:10.3389/fpls.2024.1404483",
+          "publisher": "Frontiers (peer-reviewed review)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11324496/", "section_or_page": "Table 1 (optimal growth conditions, C. zeina column)",
+          "quote_or_numbers": "Temperature 22-30°C, relative humidity is > 90%", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "maize", "class": "Healthy", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "pigeonpea", "class": "Healthy", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "pigeonpea", "class": "Leaf_Spot", "cause_type": "fungal", "cause": "leaf spot (the dataset class does not say which: Cercospora, Phyllosticta or bacterial)",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "icrisat1993-pigeonpea", "title": "Reddy MV, Raju TN, Sharma SB, Nene YL, McDonald D (1993). Handbook of pigeonpea diseases. Information Bulletin no. 42",
+          "publisher": "ICRISAT, Patancheru", "url": "https://oar.icrisat.org/1245/1/HandbookOfPigeonpeaDiseases.pdf", "section_or_page": "Cercospora Leaf Spot (pdf p. 26); Phyllosticta Leaf Spot (pdf p. 30)",
+          "quote_or_numbers": "Cercospora: Cool temperatures (25°C) and humid weather favor the disease. Phyllosticta: Mean temperatures ranging from 20 to 30°C with a mean humidity range of 73-80% favor severe outbreaks.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "The handbook gives different conditions for three different leaf spots and the dataset class does not say which one it is. Needs the reviewer to name the pathogen."
+    },
+    {
+      "crop": "pigeonpea", "class": "Leaf_webber", "cause_type": "insect", "cause": "leaf webber (Grapholita critica)",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "lr2018-leaf-webber", "title": "Approach to study of pigeonpea leaf webber [Grapholita critica (Meyr.)] damage dynamics and its relation to weather. Legume Research (2018). doi:10.18805/lr-3937",
+          "publisher": "Legume Research (peer-reviewed)", "url": "https://doi.org/10.18805/lr-3937", "section_or_page": "Abstract",
+          "quote_or_numbers": "damage … recorded on weekly basis between 32 and 42 standard meteorological weeks … description of relations of damage with crop age and weather variables", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Insect pest: studies report correlations with weekly weather, not thresholds."
+    },
+    {
+      "crop": "pigeonpea", "class": "Sterilic_mosaic", "cause_type": "viral", "cause": "pigeonpea sterility mosaic virus, spread by the eriophyid mite Aceria cajani",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "icrisat1993-pigeonpea-smd", "title": "Reddy MV et al. (1993). Handbook of pigeonpea diseases. Information Bulletin no. 42",
+          "publisher": "ICRISAT, Patancheru", "url": "https://oar.icrisat.org/1245/1/HandbookOfPigeonpeaDiseases.pdf", "section_or_page": "Sterility Mosaic (pdf p. 36)",
+          "quote_or_numbers": "Symptoms are suppressed during the hot summer months but with monsoon rains they reappear on the new growth.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Mite-borne virus; the source describes symptom expression by season, not a threshold."
+    },
+    {
+      "crop": "groundnut", "class": "Alternaria_Leaf_Spot", "cause_type": "fungal", "cause": "Alternaria spp. (A. arachidis, A. alternata)",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "No source with a weather threshold was found (searched ICRISAT OAR, Crossref, Europe PMC on 2026-09-27: only screening, fungicide and in-vitro studies)."
+    },
+    {
+      "crop": "groundnut", "class": "Healthy", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "groundnut", "class": "Leaf_Spot", "cause_type": "fungal", "cause": "early and late leaf spot (Passalora arachidicola, Nothopassalora personata)",
+      "rules": [
+        { "id": "groundnut.Leaf_Spot.1", "factor": "tmean", "op": "lt", "value": 30, "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "pande2004-lls" },
+        { "id": "groundnut.Leaf_Spot.2", "factor": "wetDays", "hours": 12, "op": "ge", "value": 1, "unit": "days", "window_days": 7,
+          "role": "favourable", "weight": 2, "source_id": "pande2004-lls" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "pande2004-lls", "title": "Pande S, Rajesh TR, Kishore GK (2004). Effect of temperature and leaf wetness period on the components of resistance to late leaf spot disease in groundnut. Plant Pathology Journal 20(1):67-74. doi:10.5423/PPJ.2004.20.1.067",
+          "publisher": "ICRISAT / ANGRAU authors (peer-reviewed)", "url": "https://www.koreascience.or.kr/article/JAKO200411922294447.page", "section_or_page": "Abstract",
+          "quote_or_numbers": "At temperatures ≥30°C, LLS development was insignificant. The overall severity of LLS increased with an increase in the leaf wetness period from 4 h to 12 h a day. Further increase of wetness period to 16 h resulted in a rapid increase in the severity.", "accessed": "2026-09-27" },
+        { "id": "butler1994-lls", "title": "Butler DR et al. (1994). Effects of leaf wetness and temperature on late leaf-spot infection of groundnut. Plant Pathology. doi:10.1111/j.1365-3059.1994.tb00560.x",
+          "publisher": "ICRISAT authors (peer-reviewed)", "url": "https://doi.org/10.1111/j.1365-3059.1994.tb00560.x", "section_or_page": "Abstract",
+          "quote_or_numbers": "optima close to 20°C and minimum and maximum temperatures of about 8°C and 34 C … Lesions developed only if the leaf wetness period exceeded about 20 h", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "groundnut", "class": "Nutrition_Deficiency", "cause_type": "nutrient", "cause": "nutrient deficiency (the dataset class does not name the nutrient)",
+      "combine": "any",
+      "rules": [
+        { "id": "groundnut.Nutrition_Deficiency.N", "factor": "soilTest.availableN", "op": "lt", "value": 280, "unit": "kg/ha", "window_days": null, "role": "favourable", "weight": 1, "source_id": "goi2011-soil-manual" },
+        { "id": "groundnut.Nutrition_Deficiency.P", "factor": "soilTest.availableP", "op": "lt", "value": 10, "unit": "kg/ha", "window_days": null, "role": "favourable", "weight": 1, "source_id": "goi2011-soil-manual",
+          "reading": "The manual's Olsen limit is for alkaline soils." },
+        { "id": "groundnut.Nutrition_Deficiency.K", "factor": "soilTest.availableK", "op": "lt", "value": 108, "unit": "kg/ha", "window_days": null, "role": "favourable", "weight": 1, "source_id": "goi2011-soil-manual" },
+        { "id": "groundnut.Nutrition_Deficiency.OC", "factor": "soilTest.ocPct", "op": "lt", "value": 0.5, "unit": "%", "window_days": null, "role": "favourable", "weight": 1, "source_id": "goi2011-soil-manual" },
+        { "id": "groundnut.Nutrition_Deficiency.Zn", "factor": "soilTest.zn", "op": "lt", "value": 0.6, "unit": "ppm", "window_days": null, "role": "favourable", "weight": 1, "source_id": "goi2011-soil-manual" },
+        { "id": "groundnut.Nutrition_Deficiency.Fe", "factor": "soilTest.fe", "op": "lt", "value": 4.5, "unit": "ppm", "window_days": null, "role": "favourable", "weight": 1, "source_id": "goi2011-soil-manual",
+          "reading": "The manual gives a critical range of 2.5–4.5 ppm; the upper end is used." },
+        { "id": "groundnut.Nutrition_Deficiency.S", "factor": "soilTest.s", "op": "lt", "value": 10, "unit": "ppm", "window_days": null, "role": "favourable", "weight": 1, "source_id": "goi2011-soil-manual" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "goi2011-soil-manual", "title": "Methods Manual: Soil Testing in India (January 2011)",
+          "publisher": "Department of Agriculture & Cooperation, Ministry of Agriculture, Government of India", "url": "https://biharsoilhealth.in/documents/manualgoi.pdf",
+          "section_or_page": "Table 1 Soil Fertility Ratings (pdf p. 34); Table 6 critical levels in soil (pdf p. 40)",
+          "quote_or_numbers": "Low: organic carbon < 0.5%; available N < 280 kg/ha; available P (Olsen, alkaline soil) < 10 kg/ha; available K < 108 kg/ha. Critical level in soil: sulphur 10 ppm; zinc (DTPA) 0.6 (0.4–1.2) ppm; iron (DTPA) 2.5–4.5 ppm.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "groundnut", "class": "Rosette", "cause_type": "viral", "cause": "groundnut rosette virus complex, spread by the aphid Aphis craccivora",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Aphid-borne virus complex: no weather or soil threshold for the disease itself was found."
+    },
+    {
+      "crop": "groundnut", "class": "Rust", "cause_type": "fungal", "cause": "Puccinia arachidis",
+      "rules": [
+        { "id": "groundnut.Rust.1", "factor": "tmean", "op": "between", "value": [8, 30], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "butler1991-rust" },
+        { "id": "groundnut.Rust.2", "factor": "wetDays", "hours": 6, "op": "ge", "value": 1, "unit": "days", "window_days": 7,
+          "role": "favourable", "weight": 2, "source_id": "butler1991-rust",
+          "reading": "The minimum wetness falls from 6 h at 15 °C as temperature rises; 6 h is used as the conservative value." }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "butler1991-rust", "title": "Butler DR, Jadhav DR (1991). Requirements of leaf wetness and temperature for infection of groundnut by rust. Plant Pathology 40(3):395-400",
+          "publisher": "ICRISAT (OAR record)", "url": "https://oar.icrisat.org/1467/", "section_or_page": "Abstract",
+          "quote_or_numbers": "The value of m decreased linearly from 6 h, as temp. increased from 15 to 25°C … Dmax increased with temp. from zero at 8° to a max. at 22°, and decreased to zero again at c. 30°.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "high", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "blackgram", "class": "Anthracnose", "cause_type": "fungal", "cause": "Colletotrichum lindemuthianum",
+      "rules": [
+        { "id": "blackgram.Anthracnose.1", "factor": "tmean", "op": "between", "value": [15, 20], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "tnau-blackgram-anthracnose" },
+        { "id": "blackgram.Anthracnose.2", "factor": "rhMean", "op": "gt", "value": 90, "unit": "%", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "tnau-blackgram-anthracnose" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "tnau-blackgram-anthracnose", "title": "Anthracnose: Colletotrichum lindemuthianum", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/black_gram_disease/blackgram_d1.html", "section_or_page": "Favourable conditions",
+          "quote_or_numbers": "Temperature : 15-20°C; Relative humidity : Above 90 per cent; Cloudy rainy weather", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "blackgram", "class": "Healthy", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "blackgram", "class": "Leaf_Crinkle", "cause_type": "viral", "cause": "urdbean leaf crinkle virus (seed-borne; sap and insect vectors)",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "tnau-blackgram-ulcv", "title": "Leaf Crinkle: Leaf Crinkle Virus", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/black_gram_disease/blackgram_d9.html", "section_or_page": "Favourable conditions",
+          "quote_or_numbers": "Infects cowpea, mothbean and weed host. High temperature", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Only 'high temperature', without a number."
+    },
+    {
+      "crop": "blackgram", "class": "Powdery_Mildew", "cause_type": "fungal", "cause": "Erysiphe polygoni",
+      "rules": [
+        { "id": "blackgram.Powdery_Mildew.1", "factor": "tmean", "op": "between", "value": [22, 26], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "tnau-blackgram-pm" },
+        { "id": "blackgram.Powdery_Mildew.2", "factor": "rhMean", "op": "between", "value": [80, 88], "unit": "%", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "tnau-blackgram-pm" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "tnau-blackgram-pm", "title": "Powdery Mildew: Erysiphe polygoni", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/black_gram_disease/blackgram_d4.html", "section_or_page": "Favourable conditions",
+          "quote_or_numbers": "Temperature: 22 to 26°C; Warm humid weather; Relative humidity: 80 – 88 %", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "blackgram", "class": "Yellow_Mosaic", "cause_type": "viral", "cause": "mungbean yellow mosaic virus, spread by the whitefly Bemisia tabaci",
+      "rules": [
+        { "id": "blackgram.Yellow_Mosaic.1", "factor": "season", "op": "in", "value": ["zaid"], "unit": "season", "window_days": null,
+          "role": "favourable", "weight": 1, "source_id": "tnau-blackgram-ymv",
+          "reading": "'Summer sown crops' is read as a reference date in the summer (zaid) season; the app does not know the sowing date." }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "tnau-blackgram-ymv", "title": "Yellow Mosaic: Mungbean Yellow Mosaic Virus", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/black_gram_disease/blackgram_d8.html", "section_or_page": "Favourable conditions",
+          "quote_or_numbers": "Summer sown crops; Weed hosts viz., Croton sparsiflorus, Acalypha indica, Eclipta alba and Cosmos pinnatus and legume hosts", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "apple", "class": "Alternaria_Leaf_Blotch", "cause_type": "fungal", "cause": "Alternaria mali / A. alternata apple pathotype",
+      "rules": [
+        { "id": "apple.Alternaria_Leaf_Blotch.1", "factor": "tmean", "op": "between", "value": [25, 31], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "cabrefiga2022-alb" },
+        { "id": "apple.Alternaria_Leaf_Blotch.2", "factor": "wetDays", "hours": 5.1, "op": "ge", "value": 1, "unit": "days", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "cabrefiga2022-alb" }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "cabrefiga2022-alb", "title": "Cabrefiga J, Salomon MV, Vilardell P (2022). Improvement of Alternaria leaf blotch and fruit spot of apple control through the management of primary inoculum. Microorganisms 11:101. doi:10.3390/microorganisms11010101",
+          "publisher": "MDPI (peer-reviewed)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9866788/", "section_or_page": "1. Introduction",
+          "quote_or_numbers": "The disease progresses rapidly in optimum temperatures ranging from 25 to 31 °C and 5.1 h of wetting and symptoms can start appearing two days after infection", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "apple", "class": "Healthy", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "apple", "class": "Mosaic", "cause_type": "viral", "cause": "apple mosaic virus / apple necrotic mosaic virus (graft-transmitted)",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "viruses2023-apmv", "title": "Tissue and time optimization for real-time detection of apple mosaic virus and apple necrotic mosaic virus associated with mosaic disease of apple. Viruses 15(3):795 (2023). doi:10.3390/v15030795",
+          "publisher": "MDPI (peer-reviewed)", "url": "https://doi.org/10.3390/v15030795", "section_or_page": "Abstract",
+          "quote_or_numbers": "Both viruses are unevenly distributed throughout the plant and their titer decreases variably with high temperatures", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Graft-transmitted virus: temperature affects virus titer and symptoms, not the chance of getting the disease; no threshold."
+    },
+    {
+      "crop": "banana", "class": "Bract_Mosaic_Virus", "cause_type": "viral", "cause": "banana bract mosaic virus, spread by infected suckers and aphids",
+      "rules": [], "model_ref": null,
+      "sources": [
+        { "id": "tnau-banana-bbrmv", "title": "Banana Bract Virus", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/banana_diseases/crop_prot_crop%20diseases_fruits_banana_2.html", "section_or_page": "main text",
+          "quote_or_numbers": "The virus is transmitted through aphid vectors. The virus is primarily spread through infected suckers.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Spread by suckers and aphids: no weather or soil threshold in the source."
+    },
+    {
+      "crop": "banana", "class": "Healthy", "cause_type": "healthy", "cause": "healthy leaf",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "high", "review_status": "draft",
+      "no_rule_reason": "Healthy class: no disease rules."
+    },
+    {
+      "crop": "banana", "class": "Insect_Pest", "cause_type": "insect", "cause": "insect damage (the dataset class does not name the pest)",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "Generic class without a named pest."
+    },
+    {
+      "crop": "banana", "class": "Moko_Wilt", "cause_type": "bacterial", "cause": "Ralstonia solanacearum (race 2)",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "No source with a weather or soil threshold was found (spread is by tools, insects, water and planting material)."
+    },
+    {
+      "crop": "banana", "class": "Panama_Wilt", "cause_type": "fungal", "cause": "Fusarium oxysporum f. sp. cubense (soil-borne)",
+      "rules": [
+        { "id": "banana.Panama_Wilt.1", "factor": "soil.ph", "op": "lt", "value": 5.5, "unit": "pH", "window_days": null,
+          "role": "favourable", "weight": 1, "source_id": "jing2025-foc",
+          "reading": "The paper finds disease rises as pH falls and calls pH < 5.5 'low'; it gives a correlation, not a disease threshold." }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "jing2025-foc", "title": "Jing T, Li K, Wang L, et al. (2025). Acidification and nutrient imbalances drive Fusarium wilt severity in banana (Musa spp.) grown on tropical latosols. Journal of Fungi 11:611. doi:10.3390/jof11090611",
+          "publisher": "MDPI (peer-reviewed)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12470300/", "section_or_page": "4.1 and 4.2",
+          "quote_or_numbers": "Our findings indicate a negative correlation between the soil pH and the Panama disease severity … the soils on Hainan Island (85%) had a low pH (< 5.5)", "accessed": "2026-09-27" },
+        { "id": "tnau-banana-panama", "title": "Panama Wilt: Fusarium oxysporum f.sp cubense", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/banana_diseases/crop_prot_crop%20diseases_fruits_banana_7.html", "section_or_page": "main text",
+          "quote_or_numbers": "The disease is soil borne and the fungus enters the roots through the fine laterals.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "low", "review_status": "draft", "no_rule_reason": ""
+    },
+    {
+      "crop": "banana", "class": "Pestalotiopsis_Leaf_Spot", "cause_type": "fungal", "cause": "Pestalotiopsis spp.",
+      "rules": [], "model_ref": null, "sources": [], "literature_confidence": "low", "review_status": "draft",
+      "no_rule_reason": "No source with a weather threshold for Pestalotiopsis on banana was found (Crossref and Europe PMC searched 2026-09-27)."
+    },
+    {
+      "crop": "banana", "class": "Sigatoka_Leaf_Spot", "cause_type": "fungal", "cause": "Sigatoka leaf spots (Pseudocercospora musae yellow Sigatoka and P. fijiensis black Sigatoka; merged in the dataset)",
+      "rules": [
+        { "id": "banana.Sigatoka_Leaf_Spot.1", "factor": "tmean", "op": "between", "value": [16.6, 30.3], "unit": "°C", "window_days": 7,
+          "role": "favourable", "weight": 1, "source_id": "bebber2019-sigatoka",
+          "reading": "Cardinal temperatures of the black Sigatoka infection model applied to the daily mean." }
+      ],
+      "model_ref": null,
+      "sources": [
+        { "id": "bebber2019-sigatoka", "title": "Bebber DP (2019). Climate change effects on Black Sigatoka disease of banana. Philosophical Transactions of the Royal Society B 374:20180269. doi:10.1098/rstb.2018.0269",
+          "publisher": "Royal Society (peer-reviewed)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6553611/", "section_or_page": "Results, figure 1",
+          "quote_or_numbers": "The cardinal temperatures are T min = 16.6, T opt = 27.2 and T max = 30.3°C … at T opt, a cohort of spores would reach 50% of maximum infection after around 26 h of moist conditions", "accessed": "2026-09-27" },
+        { "id": "tnau-banana-sigatoka", "title": "Yellow sigatoka: Mycospharella musicola", "publisher": "TNAU Agritech Portal (CX-12)",
+          "url": "https://agritech.tnau.ac.in/crop_protection/banana_diseases/crop_prot_crop%20diseases_fruits_banana_8.html", "section_or_page": "Management",
+          "quote_or_numbers": "Provide proper drainage and avoid water logging in the fields which favours infection.", "accessed": "2026-09-27" }
+      ],
+      "literature_confidence": "med", "review_status": "draft", "no_rule_reason": ""
+    }
+  ]
+}
