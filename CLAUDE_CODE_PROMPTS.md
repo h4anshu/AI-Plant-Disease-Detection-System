@@ -7,18 +7,19 @@ Run the prompts in order, one Claude Code session per prompt. Each prompt is sel
 
 | # | Prompt | Depends on | Status |
 |---|---|---|---|
-| 0 | Repo baseline + metrics consistency | none | Ready |
-| 1 | Confidence / out-of-distribution gate + photo quality check | 0 | Ready |
-| 2 | Automated tests + GitHub Actions CI | 0, 1 | Ready |
-| 3 | Model versioning + ONNX serving | 2 | Ready |
-| 4 | Security hardening (no login changes) | 2 | Ready |
-| 5 | Deployment: Vercel + Cloud Run + Atlas | 3, 4 | Ready |
-| 6 | Monitoring + feedback loop | 5 | Ready |
-| 7 | Hindi UI (i18n) | 2 | Ready |
-| 8 | Geo-tagging + outbreak map | 5 | Ready |
-| 9 | Field health check (Earth Engine, Sentinel-2) | 8 | Ready |
-| 10 | Weather-based disease risk (Open-Meteo) | 8 | Ready |
-| 11 | Claim-ready field report (PDF) | 9, 10 | Ready |
+| 0 | Repo baseline + metrics consistency | none | Done (task.md Task 3) |
+| 1 | Confidence / out-of-distribution gate + photo quality check | 0 | Done (Task 4) |
+| 2 | Automated tests + GitHub Actions CI | 0, 1 | Done (Task 5) |
+| 3 | Model versioning + ONNX serving | 2 | Done (Task 6) |
+| 4 | Security hardening (no login changes) | 2 | Done (Task 7) |
+| 5 | Deployment: Vercel + Cloud Run + Atlas | 3, 4 | Done (Task 8) |
+| 6 | Monitoring + feedback loop | 5 | Done (Task 9) |
+| 7 | Hindi UI (i18n) | 2 | Done (Task 10) |
+| 8 | Geo-tagging + outbreak map | 5 | Done (Task 11) |
+| 9 | Field health check (Earth Engine, Sentinel-2) | 8 | Done (Task 12) |
+| 10 | Weather-based disease risk (Open-Meteo) | 8 | Done (Task 13) |
+| 11 | Claim-ready field report (PDF) | 9, 10 | Done (Task 14) |
+| 12 | Context Layer v1: environment-aware diagnosis (soil, weather history, disease knowledge base) | 8-11 | **Ready** (added 26 Sep 2026) |
 | P1 | Field-photo test set + `evaluate_field.py` | none | **Pending** (decided 26 Sep 2026) |
 | P2 | Re-enable authentication | none | **Pending** (decided 26 Sep 2026) |
 
@@ -442,6 +443,208 @@ Tasks:
 Constraints: branch feat/field-report; A4, prints well in black and white.
 Done when: the sample report looks professional and every number in it traces to an
 API field.
+```
+
+---
+
+## Prompt 12: Context Layer v1 (environment-aware diagnosis)
+
+```
+# Prompt 12: Context Layer v1 (environment-aware diagnosis)
+
+## 1. Goal (read this twice)
+Today a checkup answers "which disease is visible on this leaf" (image model) and, for some
+crops, shows field health from Sentinel-2 and a weather risk strip (potato late blight, rice
+blast). Diseases also depend on WEATHER, SOIL and SEASON. Build a context layer that, for every
+checkup that has a location, collects a sourced environment snapshot and explains whether that
+environment FITS the diagnosed disease (and the alternatives), with numbers and citations.
+
+Example of the end result a farmer / insurer sees:
+  "Leaf shows Brown Spot. Environment fit: FAVOURABLE. Soil here is low in nitrogen
+   (SoilGrids, modelled: 0.6 g/kg, rule threshold < 1.0) and the last 14 days had 9 humid days
+   (RH >= 90%) at 25-30 C. Source: <rule citation>. Rule status: draft, not yet checked by an
+   expert."
+
+This is an EXPLANATION layer first. It must never silently change the diagnosis.
+
+## 2. Read before doing anything
+- README.md, task.md (especially Tasks 11-14: location, field health, disease risk, PDF report),
+  docs/FIELD_HEALTH.md, docs/DISEASE_RISK.md, docs/GEE_SETUP.md, docs/OOD_GATE.md, docs/REPORT.md.
+- geo-service/app.py, geo-service/field_health.py, server/services/openMeteo.js,
+  server/utils/diseaseRisk.js, server/controllers/{predict,fieldHealth,risk,report}Controller.js,
+  server/models/{Prediction,FieldHealthCache}.js, server/utils/reportContent.js,
+  ml-service/predict.py, ml-service/data/label_maps.json (10 crops, 53 classes).
+- Source catalogue: Indian_Crop_Disease_Datasets_Catalogue.xlsx (repo root; read with openpyxl).
+  * Sheet "Context Data Sources": use ONLY rows where column "Phase" = "Phase 1"
+    (CX-01 Open-Meteo, CX-02 ERA5-Land, CX-03 CHIRPS, CX-06 SoilGrids, CX-08 Sentinel-2,
+    CX-09 WorldCover, CX-11 Earth Engine, CX-12 TNAU) plus CX-13 INDO-BLIGHTCAST, marked "In use"
+    because it is already implemented (Task 13). Each row gives dataset ID, access method,
+    resolution, licence and attribution. Refer to sources by these CX IDs in code comments/docs.
+  * Sheet "Setup Steps": steps 1-2 (Earth Engine) are already done (task.md Task 12).
+  * "Fallback" / "Phase 2" rows (NASA POWER, IMD, Soil Health Card, ALU, etc.) are NOT used.
+    If you conclude one is needed, stop and ask me.
+  * If the sheet "Context Data Sources" is missing, the file on this branch is stale: stop and
+    tell me (do not recreate it).
+
+## 3. Non-negotiable rules
+1. NO context on training data. Existing training images have no GPS/date; never attach soil or
+   weather to them and never retrain heads. Backbone, heads, label maps, OOD gate unchanged.
+2. Diagnosis is not changed. FUSION_MODE env: "explain" (default, production) shows fit only.
+   "rerank" exists only as code + offline evaluation (section 5E) and stays off.
+3. Every rule is sourced, same standard as docs/DISEASE_RISK.md: open the page/paper, record URL,
+   publisher, section/page and a short quote or exact numbers. No rule from memory, blogs, or
+   AI summaries. A disease with no sourceable rule gets rules: [] and a reason. Allowed sources:
+   ICAR institutes / AICRP, state agricultural universities (TNAU Agritech = CX-12), IRRI, CIMMYT,
+   peer-reviewed papers, official extension bulletins.
+4. All AI-researched rules start as review_status "draft" and are shown with a "not yet checked
+   by an expert" note (same pattern as the Hindi advice). Export them for agronomist review.
+5. Reuse, don't duplicate: potato late blight and rice blast already have published models in
+   server/utils/diseaseRisk.js (INDO-BLIGHTCAST, Wallin/Blitecast, Yoshino, Padmanabhan). Their
+   knowledge-base entries must point to those models, not re-implement them.
+6. Missing data => "unknown", never a guess. Every number shown traces to a stored field.
+7. Privacy (existing pattern): exact coordinates only in the private prediction record and in
+   POST bodies to geo-service; Open-Meteo gets the existing 0.05 deg grid point; no coordinates in
+   responses, URLs, logs or cache keys (hash them); "Delete my data" also purges context data.
+8. Quota and licences: Earth Engine noncommercial Community tier with a daily cap of 18,000
+   EECU-s (task.md). Measure EECU per new call (Cloud Monitoring, as in Task 12) and cache
+   aggressively. Attributions shown in UI and PDF: Open-Meteo (CC BY 4.0), "Generated using
+   Copernicus Climate Change Service Information <year>" (ERA5-Land), ISRIC SoilGrids (CC BY 4.0),
+   ESA WorldCover (CC BY 4.0), CHIRPS (public domain).
+9. Don't touch auth/login (pending item P2). Follow repo conventions: en + hi strings, tests for
+   everything, docs, a task.md entry, deploy steps added to task.md "Pending" (I deploy).
+
+## 4. Data to collect per checkup (the "context snapshot")
+Trigger: a checkup with status ok or uncertain AND a stored location. Compute lazily on first
+GET /api/predict/:id/context (owner-only, same guard as field-health), then store it on the
+prediction as an immutable snapshot with a CONTEXT_VERSION; recompute only if the version is
+bumped. The client calls it automatically once after showing a result that has a location.
+
+Reference date: the photo's capture date if available (add optional EXIF DateTimeOriginal
+capture in client/src/services/location.js via the existing exifr import, sent as capturedAt;
+server accepts it only if not in the future and not older than 60 days), else createdAt.
+Store which one was used.
+
+A. Weather (window = 14 days before the reference date + 3-day outlook)
+   - Primary: existing server/services/openMeteo.js (reuse its grid snapping and cache).
+     Check Open-Meteo docs for the maximum past_days and whether a date older than that can be
+     served on the free tier; document the finding.
+   - When the reference date is outside what Open-Meteo can give: ERA5-Land daily
+     (CX-02, ECMWF/ERA5_LAND/DAILY_AGGR) via geo-service. It lags ~3 months, so check actual
+     latest date at runtime; clip negative precipitation to 0; RH from temperature + dew point
+     with a cited formula (e.g. Magnus), stated in docs.
+   - Rainfall anomaly: CHIRPS daily (CX-03, UCSB-CHG/CHIRPS/DAILY): rain in the 30 days before
+     the reference date vs the mean of the same calendar window over a fixed baseline
+     (e.g. 2001-2020) -> percent of normal. Check CHIRPS latest available date at runtime.
+   - Summaries stored: daily Tmin/Tmean/Tmax, RH mean and hours >= 90% (hourly sources only),
+     rain mm and rainy days, humid-day count, source per day, gaps flagged.
+B. Soil (static, from SoilGrids CX-06 via Earth Engine community assets
+   projects/soilgrids-isric/<property>_mean; bands per depth)
+   - Properties: phh2o, nitrogen, soc, clay, sand, silt, cec, bdod; depths 0-5, 5-15, 15-30 cm.
+   - Convert stored integer values to conventional units using ISRIC's official conversion
+     factors (look them up in ISRIC docs and cite; do not guess the factors).
+   - Derive texture class (USDA triangle) from clay/sand/silt with a cited method.
+   - Label everywhere as "modelled at 250 m (SoilGrids), not a soil test of this field".
+   - Cache forever, keyed by a hash of the 250 m cell (static data).
+C. Field health: reuse the cached field-health answer if it exists (never spend quota here);
+   store its verdict, last clear date, latest NDVI and z. If not cached, store "not requested".
+D. Season: kharif / rabi / zaid for the reference date and crop from a cited Indian crop
+   calendar (ICAR or Ministry of Agriculture source). Store the source.
+E. Provenance: CONTEXT_VERSION, computedAt, sources used (CX IDs + dataset IDs + dates),
+   attributions, coverage flags, EECU spent.
+
+## 5. What to build
+A. geo-service (extend, don't fork): one new token-protected POST endpoint (e.g. /context)
+   returning soil (B) and, when asked, ERA5-Land + CHIRPS series (A) in as few Earth Engine
+   requests as possible. Same auth token, logging, error mapping (timeout 502, quota 503) and
+   test style (recorded real EE fixtures + synthetic rows) as /field-health.
+B. Knowledge base: server/knowledge/disease_rules.json with an entry for EVERY class in
+   label_maps.json (53). Suggested schema (improve if needed, keep it documented):
+     { crop, class, cause_type: fungal|bacterial|viral|insect|nutrient|abiotic|healthy,
+       cause: "<pathogen / pest / condition>",
+       rules: [ { factor, op, value, unit, window_days, role: favourable|unfavourable,
+                  weight, source_id } ],
+       model_ref: "diseaseRisk:indoBlightcast" (only where an existing model applies),
+       sources: [ { id, title, publisher, url, section_or_page, quote_or_numbers, accessed } ],
+       literature_confidence: high|med|low, review_status: draft|reviewed,
+       no_rule_reason: "" }
+   Factors limited to what the snapshot actually has (temperature, RH / humid days, rain /
+   rainy days / anomaly, soil N / OC / pH / texture, season). Abiotic classes get rules where
+   literature supports them (e.g. sugarcane Banded_Chlorosis = cold injury, Nutrition_Deficiency
+   = soil nutrients). Healthy classes: no rules. Priority for research order: wheat, rice,
+   sugarcane, potato (Uttar Pradesh demo), then maize, pigeonpea, groundnut, blackgram, apple,
+   banana. Commit the researched knowledge base + docs alone first (like commit 5630668).
+   Also generate docs/RULES_REVIEW.csv (one row per rule: crop, class, rule text, source link,
+   quote, blank columns reviewer / verdict / corrected_value / notes) and a script that applies
+   reviewed rows back into the JSON (like `npm run translation-review`).
+C. Rule engine: server/utils/environmentFit.js, pure functions, no I/O.
+   fit(classEntry, snapshot) -> { level: favourable|neutral|unfavourable|unknown,
+     score 0..1, matched[], unmatched[], missing[] } where each item shows actual value vs
+   threshold and source id. Classes with model_ref take their level from diseaseRisk.js.
+   Define and document the scoring (weights, how many missing factors make it "unknown").
+D. API: GET /api/predict/:id/context (owner-only, rate-limited like fieldLimiter) returns the
+   stored snapshot (no coordinates) + fit for the diagnosed class and, when top-3 exists, for
+   each alternative. Make ml-service always return top3 (today only when uncertain); backward
+   compatible; store it.
+E. Fusion, offline only: implement rerank as p_i * f(score_i)^alpha, renormalised over top-3,
+   with f bounded (e.g. 0.5..1.5) and alpha configurable (default 0.3). It may only reorder the
+   existing top-3 of an "uncertain" checkup and never flips an "ok" diagnosis. Write
+   server/scripts/eval_fusion.js: on labelled checkups (feedback-confirmed "correct"/corrected
+   labels, later the P1 field set) report top-1 accuracy with vs without fusion, per crop. If
+   fewer than 200 labelled checkups with a snapshot exist, print "insufficient data" and exit 0.
+   Production stays FUSION_MODE=explain.
+F. Client: components/ContextCard.jsx on the result page when a location exists: fit badge for
+   the diagnosed disease with 2-3 reasons (numbers vs thresholds), a compact weather summary,
+   soil summary with the "modelled" label, season, alternatives' fit when top-3 is shown,
+   citations, the draft-rule note, attributions. en + hi strings, works at 360 px, loads once
+   automatically (no repeat calls).
+G. PDF report: add an "Environment context" section built ONLY from the stored snapshot (no
+   external calls at report time); keep the hash / verify flow intact; bump the report version.
+H. Privacy page + DELETE: mention the snapshot; purge it with the user's data.
+I. Sanity check of the rules (report only, never training features): for datasets in the
+   catalogue sheet "Dataset Catalogue" whose collection district and months are documented
+   (e.g. groundnut West Bengal, Purba Medinipur, Jan-Apr 2022 and 2023), compute district-month
+   climate from ERA5-Land / CHIRPS and show whether each class's rules come out favourable in
+   those months. Skip datasets without documented dates. Results table in docs/CONTEXT_LAYER.md.
+
+## 6. Work in phases, with one stop
+Phase A (no code): read everything in section 2, check live: SoilGrids asset access from the
+  geo-service account, ERA5-Land and CHIRPS latest dates, Open-Meteo past-days limit, EECU cost of
+  a soil lookup. Write docs/CONTEXT_LAYER_PLAN.md: design, snapshot schema, knowledge-base
+  schema, list of the 53 classes with the planned source for each, EECU and Open-Meteo call
+  budget per checkup, risks. STOP and wait for my approval.
+Phase B: knowledge-base research + docs/RULES_REVIEW.csv (commit alone).
+Phase C: geo-service endpoint, server snapshot + API, rule engine, fusion (offline), tests.
+Phase D: client card, PDF section, privacy, en + hi.
+Phase E: sanity-check report, docs/CONTEXT_LAYER.md, task.md entry, deploy steps in task.md
+  Pending.
+
+## 7. Tests (minimum)
+- environmentFit: every operator and threshold edge, missing data -> unknown, model_ref path.
+- Snapshot assembly: Open-Meteo path, ERA5 fallback path, CHIRPS anomaly, soil unit conversion
+  and texture class, capturedAt validation, versioning / immutability, no coordinates anywhere
+  in responses and logs.
+- API: owner-only 200 / 404 other device / 409 no location; geo-service timeout and quota errors
+  -> friendly 502 / 503 with nothing stored; cache hit costs no EE call; DELETE purges.
+- Knowledge base: JSON schema test (all 53 classes present, every rule has a source that exists,
+  units valid, draft/reviewed only).
+- Fusion: never changes an "ok" diagnosis; only reorders top-3; eval script handles < 200.
+- Client: card states (favourable / neutral / unfavourable / unknown / loading / error),
+  draft note, Hindi at 360 px. PDF: snapshot test of the new section.
+- CI stays green with no network and no credentials (mock EE and Open-Meteo).
+
+## 8. Done when
+- Phase A plan approved by me, then all phases complete.
+- A real checkup with location on the local stack shows the context card with real
+  Open-Meteo + SoilGrids values, and the PDF contains the same numbers.
+- All 53 classes are in the knowledge base (rules or a no_rule_reason), each rule sourced.
+- Measured EECU per checkup and Open-Meteo calls per checkup are written in the docs.
+- docs/CONTEXT_LAYER.md explains every factor, formula, source and limit in plain words
+  (I am a beginner in remote sensing).
+- Summary to me: what was built, numbers measured, what needs expert review, what I must deploy.
+
+## 9. Out of scope
+Retraining or new heads; NASA POWER / IMD / Soil Health Card / ALU; login changes; changing the
+disease map; turning FUSION_MODE=rerank on in production; any commercial deployment.
 ```
 
 ---

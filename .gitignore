@@ -57,3 +57,10 @@ Thumbs.db
 *-key.json
 *.private-key.json
 .private-key.json
+
+# Local working files: prompts, dataset catalogue, presentations (kept out of the repo)
+CLAUDE_CODE_PROMPTS.md
+*.xlsx
+~$*.xlsx
+*.pptx
+presentation.html
