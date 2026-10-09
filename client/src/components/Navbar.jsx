@@ -3,16 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { LANGUAGES } from '../i18n';
+import { ArrowUpRight, LeafMark } from './heroIcons';
 
 // Always visible (also on phones, next to the menu button); the choice is remembered (i18n.js)
 const LanguageSwitch = () => {
   const { t, i18n } = useTranslation();
   return (
-    <div role="group" aria-label={t('nav.language')} className="flex border border-ink/25 font-mono text-xs md:order-last">
+    <div role="group" aria-label={t('nav.language')} className="flex border border-ink/25 font-mono text-xs lg:order-last">
       {Object.entries(LANGUAGES).map(([code, lang]) => (
         <button key={code} type="button" lang={code} aria-label={lang.name} aria-pressed={i18n.language === code}
           onClick={() => i18n.changeLanguage(code)}
-          className={`px-2.5 py-1 ${i18n.language === code ? 'bg-ink text-parchment' : 'text-ink/70 hover:text-ink'}`}>
+          className={`px-3 py-2.5 lg:px-2.5 lg:py-1 ${i18n.language === code ? 'bg-ink text-parchment' : 'text-ink-2 hover:text-ink'}`}>
           {lang.short}
         </button>
       ))}
@@ -36,21 +37,22 @@ const Navbar = () => {
 
   return (
     <nav className="border-b border-ink/15 bg-parchment/95 backdrop-blur-sm sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto flex items-center justify-between px-6 py-4">
+      <div className="max-w-[2000px] mx-auto flex items-center justify-between px-[clamp(1.25rem,4.2vw,5.5rem)] py-4">
         {/* Logo */}
-        <Link to="/" onClick={closeMenu} className="flex items-center gap-2">
-          <span className="font-display text-2xl italic text-ink">PlantGuard</span>
-          <span className="hidden sm:inline font-mono text-[10px] text-sage tracking-widest uppercase">Field Ed.</span>
+        <Link to="/" onClick={closeMenu} className="flex items-center gap-3">
+          <LeafMark className="h-8 w-9 text-leaf-text" />
+          <span className="font-display text-[1.7rem] leading-none text-ink">PlantGuard</span>
+          <span className="hidden sm:inline border-l border-ink/25 pl-3 font-mono text-[11px] text-ink-2 tracking-[0.25em] uppercase">Field Clinic</span>
         </Link>
 
-        <div className="flex items-center gap-4 md:gap-6">
+        <div className="flex items-center gap-4 lg:gap-6">
         <LanguageSwitch />
         {/* Mobile Hamburger Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           type="button"
           aria-label={t('nav.toggle')}
-          className="md:hidden text-ink focus:outline-none p-1"
+          className="lg:hidden text-ink focus:outline-none p-2.5 -m-1.5"
         >
           <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
             {isOpen ? (
@@ -69,23 +71,26 @@ const Navbar = () => {
         </button>
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-6 font-body text-sm">
-          <Link to="/" className="text-ink/70 hover:text-ink transition-colors">
+        <div className="hidden lg:flex items-center gap-6 font-body text-sm">
+          <Link to="/" className="text-ink-2 hover:text-ink transition-colors">
             {t('nav.home')}
           </Link>
 
           {/* ponytail: login temporarily disabled, always show the signed-in links. Restore the isAuthenticated ternary once login is back on. */}
-          <Link to="/predict" className="text-ink/70 hover:text-ink transition-colors">
+          <Link to="/predict" className="text-ink-2 hover:text-ink transition-colors">
             {t('nav.diagnose')}
           </Link>
-          <Link to="/history" className="text-ink/70 hover:text-ink transition-colors">
+          <Link to="/history" className="text-ink-2 hover:text-ink transition-colors">
             {t('nav.log')}
           </Link>
-          <Link to="/map" className="text-ink/70 hover:text-ink transition-colors">
+          <Link to="/map" className="text-ink-2 hover:text-ink transition-colors">
             {t('nav.map')}
           </Link>
-          <Link to="/privacy" className="text-ink/70 hover:text-ink transition-colors">
+          <Link to="/privacy" className="text-ink-2 hover:text-ink transition-colors">
             {t('nav.privacy')}
+          </Link>
+          <Link to="/predict" className="inline-flex items-center gap-2 rounded-lg bg-pine px-5 py-2.5 text-parchment transition-colors hover:bg-pine-hover">
+            {t('nav.start')}<ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
         </div>
@@ -93,23 +98,26 @@ const Navbar = () => {
 
       {/* Mobile Menu Dropdown */}
       {isOpen && (
-        <div className="md:hidden border-t border-ink/10 bg-parchment px-6 py-4 flex flex-col gap-4 font-body text-sm">
-          <Link to="/" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+        <div className="lg:hidden border-t border-ink/10 bg-parchment px-6 py-4 flex flex-col gap-4 font-body text-sm">
+          <Link to="/" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
             {t('nav.home')}
           </Link>
 
           {/* ponytail: login temporarily disabled, always show the signed-in links */}
-          <Link to="/predict" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+          <Link to="/predict" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
             {t('nav.diagnose')}
           </Link>
-          <Link to="/history" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+          <Link to="/history" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
             {t('nav.log')}
           </Link>
-          <Link to="/map" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+          <Link to="/map" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
             {t('nav.map')}
           </Link>
-          <Link to="/privacy" onClick={closeMenu} className="text-ink/70 hover:text-ink transition-colors py-1">
+          <Link to="/privacy" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
             {t('nav.privacy')}
+          </Link>
+          <Link to="/predict" onClick={closeMenu} className="mt-1 inline-flex items-center justify-center gap-2 rounded-lg bg-pine px-5 py-3 text-parchment">
+            {t('nav.start')}<ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
       )}

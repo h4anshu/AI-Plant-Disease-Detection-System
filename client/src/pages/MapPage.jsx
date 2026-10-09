@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -27,9 +27,11 @@ const label = 'font-mono text-[10px] text-sage uppercase tracking-widest block m
 const MapPage = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const [crop, setCrop] = useState('');
+  // The landing page links here with ?crop=&days= (the server validates again; unknown values fall back to "all" / 30)
+  const [params] = useSearchParams();
+  const [crop, setCrop] = useState(() => (CROPS.includes(params.get('crop')) ? params.get('crop') : ''));
   const [disease, setDisease] = useState('');
-  const [days, setDays] = useState(30);
+  const [days, setDays] = useState(() => (DAYS.includes(Number(params.get('days'))) ? Number(params.get('days')) : 30));
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [centre, setCentre] = useState(null); // { lat, lon, zoom } after the map settles

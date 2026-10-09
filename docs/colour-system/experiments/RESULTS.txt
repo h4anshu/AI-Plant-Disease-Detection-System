@@ -1,0 +1,454 @@
+Colour lab results, snapshot 2026-10-09 (node colour_lab.mjs; python scripts below). Re-run to refresh. System v2 (hero palette adopted).
+
+######## colour_lab.mjs ########
+
+====================================================================================================
+E0  Baseline: does the palette on the site today pass its own rules?
+====================================================================================================
+body text-ink/70 on parchment (Home intro)     #5F7162 on #F4EFE1  4.54:1  Lc 66  ok
+text-sage on parchment (labels, 10px mono)     #7A8B6F on #F4EFE1  3.18:1  Lc 55  FAIL < 4.5
+text-clay on parchment (eyebrow)               #B5652E on #F4EFE1  3.76:1  Lc 60  FAIL < 4.5
+RiskStrip high: text-clay on bg-clay/20        #B5652E on #E7D3BD  2.97:1  Lc 46  FAIL < 4.5
+RiskStrip low: text-field on bg-field/15       #4A6741 on #DBDBC9  4.53:1  Lc 60  ok
+RiskStrip medium: ink on bg-wheat/25           #1F3B2C on #E9DCB3  8.93:1  Lc 77  ok
+Button: parchment on field                     #F4EFE1 on #4A6741  5.53:1  Lc 76  ok
+text-wheat on parchment (ResultCard)           #C9A227 on #F4EFE1  2.11:1  Lc 38  FAIL < 4.5
+
+====================================================================================================
+E1  Inventory: every colour from the brief in OKLCH, against the colours measured in real leaf photos
+====================================================================================================
+measured: healthy leaf hue ~128, lesion hue ~70, no leaf cluster above chroma 0.14
+
+group                       name                          hex      L     C     h    family        d(leaf)  d(lesion)  chroma     src
+1 Greens                    USER gradient start           #215C46  0.43  0.072  165  teal             37       95      natural    USER
+1 Greens                    USER shade                    #4A4C15  0.40  0.075  111  yellow           17       41      natural    USER
+1 Greens                    USER shade ("5IB42F")         #51B42F  0.68  0.191  139  green            11       69      TOO VIVID  USER
+1 Greens                    USER shade                    #50987B  0.62  0.086  166  teal             38       96      natural    USER
+1 Greens                    Forest Green (web)            #228B22  0.56  0.169  143  green            15       73      TOO VIVID  W
+1 Greens                    Forest Green (designer)       #2E6F40  0.49  0.100  150  green            22       80      natural    F
+1 Greens                    Pine                          #01796F  0.52  0.091  185  teal             57      115      natural    W
+1 Greens                    Evergreen                     #05472A  0.35  0.080  158  green            30       88      natural    F
+1 Greens                    Fern                          #4F7942  0.53  0.095  139  green            11       69      natural    W
+1 Greens                    Pistachio                     #93C572  0.77  0.124  134  olive-lime        6       64      natural    W
+2 Ink Blue + Eucalyptus     Ink Blue                      #0B5369  0.41  0.074  225  cyan             97      155      natural    S
+2 Ink Blue + Eucalyptus     Eucalyptus (dark, RAL)        #1E675A  0.47  0.074  179  teal             51      109      natural    RAL
+2 Ink Blue + Eucalyptus     Eucalyptus                    #5F8575  0.58  0.049  167  teal             39       97      natural    H
+2 Ink Blue + Eucalyptus     Eucalyptus (light)            #8EA096  0.69  0.025  161  neutral          33       91      natural    B
+3 Chocolate, Butter, Olive, Latte Chocolate                     #7B3F00  0.43  0.105   57  orange/brown     71       13      natural    W
+3 Chocolate, Butter, Olive, Latte Butter Yellow                 #FFFD74  0.97  0.158  108  yellow           20       38      TOO VIVID  O
+3 Chocolate, Butter, Olive, Latte Butter (soft)                 #FEE48D  0.92  0.111   93  yellow           35       23      natural    PL
+3 Chocolate, Butter, Olive, Latte Olive                         #808000  0.58  0.127  110  yellow           18       40      natural    W
+3 Chocolate, Butter, Olive, Latte Latte                         #C19C80  0.72  0.059   59  orange/brown     69       11      natural    66
+3 Chocolate, Butter, Olive, Latte Latte (milky)                 #ECDCCB  0.90  0.029   69  neutral          59        1      natural    BM
+4 Blues                     Powder                        #B0E0E6  0.88  0.050  206  cyan             78      136      natural    W
+4 Blues                     Sky                           #87CEEB  0.81  0.082  226  cyan             98      156      natural    W
+4 Blues                     Azure                         #007FFF  0.61  0.212  256  blue            128      174      TOO VIVID  W
+4 Blues                     Cornflower                    #6495ED  0.67  0.141  261  blue            133      169      TOO VIVID  CSS
+4 Blues                     Cobalt                        #0047AB  0.43  0.172  260  blue            132      170      TOO VIVID  CSS
+4 Blues                     Sapphire                      #0F52BA  0.47  0.176  260  blue            132      170      TOO VIVID  W
+4 Blues                     Royal                         #4169E1  0.56  0.188  266  blue            138      164      TOO VIVID  W
+4 Blues                     Navy                          #000080  0.27  0.188  264  blue            136      166      TOO VIVID  W
+4 Blues                     Midnight                      #191970  0.29  0.144  273  blue            145      157      TOO VIVID  CSS
+5 Stone, Inferno, Palm      Stone brown (assumed)         #8B7765  0.58  0.036   64  neutral          64        6      natural    ?
+5 Stone, Inferno, Palm      Red Inferno                   #700004  0.34  0.140   28  red             100       42      TOO VIVID  USER
+5 Stone, Inferno, Palm      Palm leaf                     #7C9254  0.63  0.090  125  olive-lime        3       55      natural    USER
+
+====================================================================================================
+E2  Role coverage: can each group express healthy / early / moderate / severe / water by itself?
+====================================================================================================
+1 Greens                           covers 2/6: healthy (green), dark surface (L<0.40)
+2 Ink Blue + Eucalyptus            covers 1/6: water/rain (blue)
+3 Chocolate, Butter, Olive, Latte  covers 3/6: healthy (green), early (yellow), moderate (orange-brown)
+4 Blues                            covers 2/6: water/rain (blue), dark surface (L<0.40)
+5 Stone, Inferno, Palm             covers 3/6: healthy (green), severe (dark red), dark surface (L<0.40)
+
+bands nobody supplies: none
+
+====================================================================================================
+E3  Contrast roles: each colour as text on paper and latte, as a mark (>=3), as a dark surface carrying paper-coloured text
+====================================================================================================
+name                          hex      on paper  Lc   on latte | paper-on-it  Lc | role
+USER gradient start           #215C46   6.81   77    5.84  |   6.81   81 | text, large or UI (AA)
+USER shade                    #4A4C15   7.83   81    6.71  |   7.83   85 | BODY TEXT / dark surface
+USER shade ("5IB42F")         #51B42F   2.31   42    1.98  |   2.31   46 | fill/tint only
+USER shade                    #50987B   2.99   52    2.56  |   2.99   57 | fill/tint only
+Forest Green (web)            #228B22   3.82   60    3.27  |   3.82   65 | mark only (>=3)
+Forest Green (designer)       #2E6F40   5.28   71    4.52  |   5.28   75 | text, large or UI (AA)
+Pine                          #01796F   4.61   66    3.95  |   4.61   71 | text, large or UI (AA)
+Evergreen                     #05472A   9.42   85    8.07  |   9.42   88 | BODY TEXT / dark surface
+Fern                          #4F7942   4.41   65    3.78  |   4.41   70 | mark only (>=3)
+Pistachio                     #93C572   1.75   29    1.50  |   1.75   33 | fill/tint only
+Ink Blue                      #0B5369   7.44   80    6.38  |   7.44   83 | BODY TEXT / dark surface
+Eucalyptus (dark, RAL)        #1E675A   5.82   73    4.98  |   5.82   77 | text, large or UI (AA)
+Eucalyptus                    #5F8575   3.59   59    3.07  |   3.59   63 | mark only (>=3)
+Eucalyptus (light)            #8EA096   2.40   44    2.06  |   2.40   48 | fill/tint only
+Chocolate                     #7B3F00   7.16   79    6.14  |   7.16   82 | BODY TEXT / dark surface
+Butter Yellow                 #FFFD74   1.07    0    1.25  |   1.07    0 | fill/tint only
+Butter (soft)                 #FEE48D   1.09    0    1.07  |   1.09    0 | fill/tint only
+Olive                         #808000   3.65   59    3.13  |   3.65   64 | mark only (>=3)
+Latte                         #C19C80   2.19   40    1.88  |   2.19   44 | fill/tint only
+Latte (milky)                 #ECDCCB   1.17    7    1.00  |   1.17    9 | fill/tint only
+Powder                        #B0E0E6   1.25   11    1.07  |   1.25   13 | fill/tint only
+Sky                           #87CEEB   1.52   22    1.30  |   1.52   25 | fill/tint only
+Azure                         #007FFF   3.34   55    2.86  |   3.34   60 | mark only (>=3)
+Cornflower                    #6495ED   2.59   47    2.22  |   2.59   51 | fill/tint only
+Cobalt                        #0047AB   7.34   79    6.29  |   7.34   82 | BODY TEXT / dark surface
+Sapphire                      #0F52BA   6.23   75    5.34  |   6.23   79 | text, large or UI (AA)
+Royal                         #4169E1   4.22   64    3.62  |   4.22   68 | mark only (>=3)
+Navy                          #000080  13.94   91   11.94  |  13.94   93 | BODY TEXT / dark surface
+Midnight                      #191970  12.92   92   11.08  |  12.92   94 | BODY TEXT / dark surface
+Stone brown (assumed)         #8B7765   3.71   60    3.18  |   3.71   65 | mark only (>=3)
+Red Inferno                   #700004  10.81   87    9.27  |  10.81   89 | BODY TEXT / dark surface
+Palm leaf                     #7C9254   3.00   52    2.57  |   3.00   57 | fill/tint only
+
+====================================================================================================
+E4  Distinctiveness: dE from each candidate brand colour to the primary colours of competing sites
+====================================================================================================
+competitor primaries (css audit): Plantix #0158DA | Fasal #3898EC | DeHaat #0F8040 | BigHaat #298E4D | Tailwind-green (BigHaat) #22C55E | Cropin #B8FF5A | Syngenta amber #FFAA00 | Syngenta blue #0550E6
+
+candidate  nearest competitor            dE    gap-rule(>=15)
+#15803D*   DeHaat                         0.4   TOO CLOSE
+#22C55E*   Tailwind-green (BigHaat)       0.0   TOO CLOSE
+#215C46    DeHaat                        11.9   TOO CLOSE
+#50987B    BigHaat                        7.6   TOO CLOSE
+#51B42F    Tailwind-green (BigHaat)       5.2   TOO CLOSE
+#4F7942    DeHaat                         4.8   TOO CLOSE
+#7C9254    BigHaat                        8.6   TOO CLOSE
+#05472A    DeHaat                        18.4   ok
+#2E6F40    DeHaat                         5.4   TOO CLOSE
+#0B5369    DeHaat                        17.7   ok
+#1E675A    DeHaat                         9.9   TOO CLOSE
+#5F8575    BigHaat                        8.9   TOO CLOSE
+#7B3F00    DeHaat                        20.0   ok
+#0F52BA    Plantix                        5.2   TOO CLOSE
+#6495ED    Fasal                          3.6   TOO CLOSE
+#700004    DeHaat                        30.5   ok
+#4A6741    DeHaat                         8.5   TOO CLOSE
+
+====================================================================================================
+E5  Severity under colour-vision deficiency (protan, deutan, tritan), grayscale printing, and mark contrast
+====================================================================================================
+A conventional traffic light
+   colours #2E7D32 #F9A825 #EF6C00 #C62828
+   min dE, any vision: healthy~severe (deutan) 4.3   [gamma-convention check: 4.4]  FAIL (>=10)
+   adjacent grey steps (dL): 0.27 0.11 0.14  prints ok
+   mark contrast vs paper: 4.5 1.7 2.7 4.9  some <3
+B user colours, naive (palm, butter, chocolate, inferno)
+   colours #7C9254 #FEE48D #7B3F00 #700004
+   min dE, any vision: moderate~severe (tritan) 8.0   [gamma-convention check: 6.6]  FAIL (>=10)
+   adjacent grey steps (dL): 0.29 0.49 0.09  prints ok
+   mark contrast vs paper: 3.0 1.1 7.2 10.8  some <3
+C site today (field, wheat, clay + dark clay)
+   colours #4A6741 #C9A227 #B5652E #8E3B1F
+   min dE, any vision: healthy~severe (deutan) 4.3   [gamma-convention check: 5.0]  FAIL (>=10)
+   adjacent grey steps (dL): 0.25 0.14 0.13  prints ok
+   mark contrast vs paper: 5.5 2.1 3.8 6.5  some <3
+D system v1 (E6d solution: palm-ish, mustard, sienna, inferno)
+   colours #628763 #B79307 #8E5100 #700004
+   min dE, any vision: healthy~early (protan) 10.7   [gamma-convention check: 10.6]  PASS (>=10)
+   adjacent grey steps (dL): 0.09 0.18 0.15  prints ok
+   mark contrast vs paper: 3.5 2.5 5.5 10.8  some <3
+E system v2 (hero palette: Leaf, ochre, rust-deep, inferno)
+   colours #6C854D #AE9900 #98370C #700004
+   min dE, any vision: healthy~early (protan) 10.0   [gamma-convention check: 10.1]  PASS (>=10)
+   adjacent grey steps (dL): 0.10 0.21 0.13  prints ok
+   mark contrast vs paper: 3.6 2.5 6.3 10.8  some <3
+
+final system tint fills (decorative only): min dE 0.1 under tritan; they merge for colour-blind users, so no meaning rides on a tint
+
+simulated appearance of scheme A and B:
+  A normal  #2E7D32 #F9A825 #EF6C00 #C62828
+  A protan  #7F722A #C4AD00 #928000 #5B5226
+  A deutan  #756B38 #D7C02A #B29E00 #817420
+  A tritan  #1E7A6D #FF9390 #FF4C5C #DA002B
+  B normal  #7C9254 #FEE48D #7B3F00 #700004
+  B protan  #988B4F #F5E186 #514600 #2B2502
+  B deutan  #958A57 #FCE990 #5F5400 #453C00
+  B tritan  #808D83 #FFD8CF #883135 #7C0004
+
+====================================================================================================
+E6  Optimiser: best healthy/early/moderate marks next to the brief's Red Inferno, constrained to >=3:1 on paper
+====================================================================================================
+D optimised (150k random candidates, seed 11)
+   colours #597D5F #AD7F1D #915300 #700004
+   min dE, any vision: healthy~early (protan) 8.9   [gamma-convention check: 8.4]  FAIL (>=10)
+   adjacent grey steps (dL): 0.07 0.12 0.16  MERGE in B/W
+   mark contrast vs paper: 4.0 3.1 5.3 10.8  all >=3
+   same search with a lighter severe (#8E3B1F, site today)
+   colours #638362 #A28600 #A05E00 #8E3B1F
+   min dE, any vision: early~moderate (deutan) 8.1   [gamma-convention check: 7.8]  FAIL (>=10)
+   adjacent grey steps (dL): 0.05 0.08 0.08  MERGE in B/W
+   mark contrast vs paper: 3.7 3.1 4.5 6.5  all >=3
+
+====================================================================================================
+E6D  Cap chroma at the leaf maximum (0.14): what does it cost?
+====================================================================================================
+cMax 1  mark>=2.5: min dE 10.7 (protan)  #678360 #B19100 #A03500 #700004  C 0.061 0.137 0.151 0.140
+cMax 0.14  mark>=2.5: min dE 10.7 (protan)  #628763 #B79307 #8E5100 #700004  C 0.068 0.137 0.113 0.140
+cMax 0.13  mark>=2.5: min dE 10.7 (protan)  #628763 #B59424 #8D5103 #700004  C 0.068 0.128 0.112 0.140
+
+====================================================================================================
+E6B  Trade-off: how much separation does each step of "mark must contrast with paper" cost?
+====================================================================================================
+mark >= 1  :1 on paper -> best min dE 13.7 (moderate~severe, tritan)  #739574 #D5AB1C #8D5200 #700004  L 0.63 0.76 0.50 0.34
+mark >= 1.5:1 on paper -> best min dE 13.7 (moderate~severe, tritan)  #739574 #D5AB1C #8D5200 #700004  L 0.63 0.76 0.50 0.34
+mark >= 2  :1 on paper -> best min dE 12.6 (healthy~moderate, deutan)  #6A8C6B #D9A114 #8C5100 #700004  L 0.60 0.74 0.49 0.34
+mark >= 2.5:1 on paper -> best min dE 10.7 (healthy~early, protan)  #678360 #B19100 #A03500 #700004  L 0.58 0.67 0.48 0.34
+mark >= 3  :1 on paper -> best min dE  8.9 (healthy~early, protan)  #597D5F #AD7F1D #915300 #700004  L 0.55 0.63 0.50 0.34
+
+====================================================================================================
+E7  Map ramp (sequential, 4 bins): lightness order, step size, colour-blind steps
+====================================================================================================
+site today                         #E9C46A #DE9B45 #C4702E #8E3B1F  L 0.83 0.74 0.63 0.46 monotone  min adjacent dE: n10.2 p11.1 d9.1 t10.5
+ColorBrewer YlOrBr-4 (reference)   #FFFFD4 #FED98E #FE9929 #CC4C02  L 0.99 0.90 0.77 0.58 monotone  min adjacent dE: n10.5 p11.2 d9.4 t10.8
+butter > ochre > clay > inferno    #F2D98B #D9A441 #B5652E #700004  L 0.89 0.75 0.59 0.34 monotone  min adjacent dE: n14.3 p15.7 d13.9 t14.4
+
+====================================================================================================
+E8  Gradients: sRGB vs OKLab vs OKLCH interpolation (chroma dip, evenness, worst-case text contrast)
+====================================================================================================
+
+#215C46 -> #50987B   endpoint chroma 0.072 / 0.086
+  srgb   chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.06  hue drift 1 deg  paper-text worst 3.0:1
+  oklab  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.05  hue drift 1 deg  paper-text worst 3.0:1
+  oklch  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.05  hue drift 1 deg  paper-text worst 3.0:1
+
+#215C46 -> #51B42F   endpoint chroma 0.072 / 0.191
+  srgb   chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.05  hue drift 26 deg  paper-text worst 2.3:1
+  oklab  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.04  hue drift 26 deg  paper-text worst 2.3:1
+  oklch  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.03  hue drift 26 deg  paper-text worst 2.3:1
+
+#05472A -> #7C9254   endpoint chroma 0.080 / 0.090
+  srgb   chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.04  hue drift 33 deg  paper-text worst 3.0:1
+  oklab  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.02  hue drift 33 deg  paper-text worst 3.0:1
+  oklch  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.04  hue drift 33 deg  paper-text worst 3.0:1
+
+#16281F -> #2E6F40   endpoint chroma 0.029 / 0.100
+  srgb   chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.06  hue drift 11 deg  paper-text worst 5.3:1
+  oklab  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.05  hue drift 11 deg  paper-text worst 5.3:1
+  oklch  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.06  hue drift 11 deg  paper-text worst 5.3:1
+
+#FEE48D -> #05472A   endpoint chroma 0.111 / 0.080
+  srgb   chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.03  hue drift 64 deg  paper-text worst 1.1:1
+  oklab  chroma-min/endpoint-min 0.96  step evenness (sd/mean) 0.02  hue drift 64 deg  paper-text worst 1.1:1
+  oklch  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.02  hue drift 64 deg  paper-text worst 1.1:1
+
+#ECDCCB -> #215C46   endpoint chroma 0.029 / 0.072
+  srgb   chroma-min/endpoint-min 0.87  step evenness (sd/mean) 0.02  hue drift 96 deg  paper-text worst 1.2:1
+  oklab  chroma-min/endpoint-min 0.89  step evenness (sd/mean) 0.02  hue drift 96 deg  paper-text worst 1.2:1
+  oklch  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.01  hue drift 96 deg  paper-text worst 1.2:1
+
+#B5652E -> #700004   endpoint chroma 0.124 / 0.140
+  srgb   chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.12  hue drift 24 deg  paper-text worst 3.8:1
+  oklab  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.03  hue drift 24 deg  paper-text worst 3.8:1
+  oklch  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.02  hue drift 24 deg  paper-text worst 3.8:1
+
+#87CEEB -> #215C46   endpoint chroma 0.082 / 0.072
+  srgb   chroma-min/endpoint-min 0.92  step evenness (sd/mean) 0.04  hue drift 60 deg  paper-text worst 1.5:1
+  oklab  chroma-min/endpoint-min 0.91  step evenness (sd/mean) 0.02  hue drift 60 deg  paper-text worst 1.5:1
+  oklch  chroma-min/endpoint-min 1.00  step evenness (sd/mean) 0.02  hue drift 60 deg  paper-text worst 1.5:1
+
+====================================================================================================
+E9  Finalists: same system, only the hue of the dark family changes
+====================================================================================================
+
+T1 olive-leaf (hue 125)   bg #1A2309  bg2 #283215  ink #242C16  primary #303E15  hover #222E08
+   ink on paper 12.6:1 Lc 92 | primary on paper 10.0:1 | paper on primary 10.0:1
+   on dark bg: paper 14.2:1 Lc 95 | butter 11.9:1 | leaf 4.0:1 | butter button text (bg) on butter 11.9:1
+   distance: primary to nearest competitor DeHaat dE 20.3 | hue to leaf 3 deg | leaf-photo greens vs band: min dE 23.1
+
+T2 evergreen (hue 160)   bg #072618  bg2 #143525  ink #162F22  primary #11422C  hover #04321E
+   ink on paper 12.5:1 Lc 92 | primary on paper 9.9:1 | paper on primary 9.9:1
+   on dark bg: paper 14.1:1 Lc 95 | butter 11.8:1 | leaf 3.9:1 | butter button text (bg) on butter 11.8:1
+   distance: primary to nearest competitor DeHaat dE 20.1 | hue to leaf 32 deg | leaf-photo greens vs band: min dE 23.2
+
+T3 ink-sea (hue 205)   bg #002529  bg2 #02353A  ink #0B2E32  primary #004046  hover #003034
+   ink on paper 12.6:1 Lc 92 | primary on paper 10.0:1 | paper on primary 10.0:1
+   on dark bg: paper 14.1:1 Lc 95 | butter 11.8:1 | leaf 3.9:1 | butter button text (bg) on butter 11.8:1
+   distance: primary to nearest competitor DeHaat dE 21.9 | hue to leaf 77 deg | leaf-photo greens vs band: min dE 24.2
+
+====================================================================================================
+E6C  Optimiser: chart-line colours for NDVI / NDRE / REDSI (green, blue, orange bands), >= 3:1 on paper
+====================================================================================================
+best min dE 12.7 (deutan)  NDVI #6F9364  NDRE #0A3C62  REDSI #8A5517   L 0.62 0.35 0.50
+for comparison, the site today (field, clay, purple #7A5C99): 6.3
+
+====================================================================================================
+E10  The system per finalist: tokens and the contract (every intended pair must pass)
+====================================================================================================
+
+T1 olive-leaf: contract PASSES (33 pairs + status/map/series separation)
+
+T2 evergreen: contract PASSES (33 pairs + status/map/series separation)
+
+T3 ink-sea: contract PASSES (33 pairs + status/map/series separation)
+
+====================================================================================================
+E11  Glare sensitivity: how much of the contrast survives when ambient light washes the screen?
+====================================================================================================
+pair                                     F=0  F=0.05   F=0.1   F=0.2   F=0.3
+ink on paper                            12.6     7.9     5.9     4.1     3.3
+ink-2 on paper                           8.6     6.2     4.9     3.7     3.0
+rust-deep on paper                       6.4     5.0     4.2     3.3     2.8
+leaf-text on paper                       6.4     5.0     4.2     3.3     2.7
+site today: ink/70 on parchment          4.5     3.8     3.4     2.8     2.4
+site today: sage on parchment            3.2     2.9     2.6     2.3     2.1
+site today: clay on parchment            3.8     3.3     3.0     2.5     2.2
+
+read: at F=0.1 the 4.5:1 body text the site ships today falls to 3.4:1 (below AA); a 7:1 pair still keeps 4.5:1. That is why body copy is held to 7:1.
+
+====================================================================================================
+E12  Hero image palette: Pine, Leaf, Sage, Parchment, Rust
+====================================================================================================
+colour      hex      L     C     h   chroma   nearest token in system v1    competitor gap   on parchment   parchment on it
+pine       #193D2B  0.33  0.053  160  ok         primary        dE   1.7      DeHaat    21.6    10.58:1       10.58:1
+leaf       #6C854D  0.58  0.085  128  ok         healthy        dE   2.8      BigHaat    6.6     3.62:1        3.62:1
+sage       #DCE4D1  0.91  0.027  126  ok         latte          dE   2.4      Cropin    17.9     1.15:1        1.15:1
+parchment  #F5F0E2  0.96  0.019   91  ok         paper          dE   0.3      Cropin    19.3     1.00:1        1.00:1
+rust       #D85D2D  0.63  0.166   40  ABOVE cap  early          dE  14.2      Syngenta  20.0     3.34:1        3.34:1
+
+How the image uses them (pair, size, requirement):
+  pine headline on parchment (60px)                      10.58:1  Lc  89  need 3  ok
+  parchment on pine: CTA / care-plan text (13px mono)    10.58:1  Lc  91  need 4.5  ok
+  RUST eyebrow on parchment (12px mono caps)              3.34:1  Lc  56  need 4.5  FAIL
+  near-white on RUST badge (12px mono caps)               3.79:1  Lc  70  need 4.5  FAIL
+  parchment on RUST badge                                 3.34:1  Lc  61  need 4.5  FAIL
+  pine on RUST (dark text on badge)                       3.17:1  Lc  31  need 4.5  FAIL
+  LEAF italic headline on parchment (60px)                3.62:1  Lc  59  need 3  ok
+  LEAF as body/label text on parchment                    3.62:1  Lc  59  need 4.5  FAIL
+  pine on sage (icons, labels)                            9.21:1  Lc  80  need 7  ok
+  LEAF on sage (icons)                                    3.15:1  Lc  51  need 3  ok
+  RUST on pine (accent on the dark card, large)           3.17:1  Lc  30  need 3  ok
+  LEAF on pine                                            2.92:1  Lc  26  need 3  FAIL
+  butter on pine (my accent)                              8.78:1  Lc  78  need 7  ok
+
+Seam: the image's own background #F2EAD6 vs stated Parchment #F5F0E2: dE 1.9; vs system paper #F4EFE1: dE 1.7 (1 JND is about 2)
+
+rust family at hue 40, chroma 0.166: lightness needed on parchment
+  L 0.62  #D65B2B  C 0.167  on parchment 3.42:1  parchment on it 3.42:1
+  L 0.56  #C14811  C 0.166  on parchment 4.39:1  parchment on it 4.39:1
+  L 0.52  #B23C00  C 0.163  on parchment 5.21:1  parchment on it 5.21:1
+  L 0.5  #A93900  C 0.157  on parchment 5.64:1  parchment on it 5.64:1
+  L 0.48  #A03500  C 0.151  on parchment 6.14:1  parchment on it 6.14:1
+  L 0.46  #973200  C 0.144  on parchment 6.65:1  parchment on it 6.65:1
+  L 0.44  #8E2E00  C 0.138  on parchment 7.26:1  parchment on it 7.26:1
+  L 0.42  #852B00  C 0.132  on parchment 7.87:1  parchment on it 7.87:1
+  L 0.4  #7C2700  C 0.126  on parchment 8.59:1  parchment on it 8.59:1
+
+Severity ladder, Leaf / best early / Rust / Inferno: 4.7 (healthy~moderate, protan) early #D0BD87  (rule: >= 10)
+  even without an early colour, Leaf / Rust / Inferno: 4.7 (leaf~rust, protan)
+  system v1 ladder (healthy / early / sienna / inferno): 10.7
+
+====================================================================================================
+E12B  Can a rust-hued colour be the "moderate" status? Search with moderate pinned to the rust hue band (36-46 deg)
+====================================================================================================
+rust band, chroma <= 0.17, mark >= 2.5
+   best min dE 11.1 (healthy~moderate, deutan)  #5B8560 #AC9710 #993A00 #700004  L 0.58 0.67 0.48 0.34
+rust band, chroma <= 0.17, mark >= 3
+   best min dE 9.7 (healthy~moderate, deutan)  #57795A #A28900 #913A00 #700004  L 0.54 0.63 0.46 0.34
+rust band, chroma <= 0.14 (cap), mark >= 2.5
+   best min dE 11.1 (healthy~moderate, deutan)  #5B8560 #AC9710 #983B04 #700004  L 0.58 0.67 0.48 0.34
+
+for comparison: system v1 (sienna, hue 63) = 10.7
+
+######## leaf_palette.py (PlantDoc, 12 images per class, seed 7) ########
+
+[healthy] 120 images, 336515 px
+  23.7%  #85B14C  L0.71 C0.140 h129
+  23.6%  #648B3D  L0.59 C0.116 h131
+  20.3%  #4C632C  L0.47 C0.084 h128
+  14.5%  #C0CF87  L0.82 C0.096 h118
+  11.5%  #2D3818  L0.32 C0.053 h124
+   6.4%  #C4735E  L0.64 C0.107 h 36
+
+[diseased] 206 images, 698443 px
+  23.5%  #749255  L0.62 C0.093 h130
+  22.1%  #5B7740  L0.53 C0.087 h131
+  18.7%  #92AE73  L0.71 C0.086 h129
+  16.8%  #44592E  L0.44 C0.071 h131
+  10.1%  #BECD92  L0.82 C0.080 h120
+   8.8%  #25361B  L0.31 C0.052 h134
+
+[lesion pixels: hue 15-98, 49253 px = 7.1% of diseased-photo pixels]
+  25.1%  #A27C4F  L0.61 C0.078 h 70
+  23.1%  #7D5B36  L0.50 C0.069 h 68
+  23.0%  #C59F6D  L0.73 C0.081 h 74
+  14.9%  #E5C391  L0.83 C0.076 h 76
+  14.0%  #593A1D  L0.38 C0.062 h 62
+
+######## audit_sites.py (CSS declarations, not rendered area) ########
+
+== bighaat_com: 3221KB css, 154 chromatic colours
+   hue families: green 32%, orange 20%, red 13%, blue 8%, purple 6%
+   #298E4D  x31   L0.57 C0.13 h151 green
+   #4EAA6F  x18   L0.67 C0.12 h153 green
+   #FA9527  x12   L0.76 C0.16 h 61 orange
+   #22C55E  x12   L0.72 C0.19 h150 green
+   #E94226  x11   L0.62 C0.21 h 32 red
+   #FFE8CB  x8    L0.94 C0.05 h 74 orange
+
+== cropin_com: 697KB css, 296 chromatic colours
+   hue families: cyan 36%, lime 28%, green 15%, teal 15%, orange 1%
+   #B8FF5A  x142  L0.92 C0.21 h130 lime
+   #9CF347  x39   L0.88 C0.22 h133 lime
+   #67D69D  x21   L0.80 C0.13 h159 green
+   #97CCBD  x18   L0.80 C0.06 h175 teal
+   #6ED9E9  x18   L0.83 C0.10 h208 cyan
+   #65DFC3  x16   L0.83 C0.12 h176 teal
+
+== dehaat_in: 240KB css, 79 chromatic colours
+   hue families: green 38%, red 22%, yellow 11%, lime 8%, blue 7%
+   #0F8040  x39   L0.53 C0.14 h151 green
+   #0E7A41  x8    L0.51 C0.13 h153 green
+   #FAD305  x7    L0.87 C0.18 h 95 yellow
+   #E3F5CE  x6    L0.95 C0.05 h128 lime
+   #D91625  x6    L0.56 C0.22 h 26 red
+   #CC293F  x6    L0.55 C0.20 h 20 red
+
+== fasal_co: 692KB css, 46 chromatic colours
+   hue families: blue 34%, red 23%, green 15%, purple 14%, yellow 5%
+   #3898EC  x27   L0.66 C0.15 h249 blue
+   #B16CEA  x6    L0.66 C0.19 h307 purple
+   #FFA84B  x4    L0.80 C0.15 h 64 orange
+   #FF8A56  x4    L0.75 C0.16 h 44 red
+   #FF5E69  x4    L0.70 C0.20 h 20 red
+   #14603D  x4    L0.43 C0.09 h158 green
+
+== plantix_net: 214KB css, 3 chromatic colours
+   hue families: blue 91%, teal 8%
+   #0158DA  x20   L0.50 C0.21 h261 blue
+   #00796B  x2    L0.52 C0.09 h181 teal
+   #0055D4  x2    L0.49 C0.21 h261 blue
+
+== syngenta_com: 353KB css, 54 chromatic colours
+   hue families: orange 39%, blue 28%, red 16%, green 7%, yellow 7%
+   #FFAA00  x63   L0.80 C0.17 h 73 orange
+   #0550E6  x26   L0.50 C0.24 h263 blue
+   #B27600  x25   L0.61 C0.13 h 74 orange
+   #0094F0  x10   L0.65 C0.17 h247 blue
+   #F9C9BF  x9    L0.88 C0.06 h 32 red
+   #F4DAA6  x9    L0.90 C0.07 h 84 yellow
+
+######## hero_image_probe.py (../hero-reference.jpg) ########
+image (1536, 1024)
+background (border median) #F3EBD8  vs stated Parchment: dE 1.6  (1 JND is about 2)
+CTA button fill                      #1E3E2C  L0.33 C0.050 h158  nearest stated Pine      dE 0.7
+care-plan card                       #1E3E2B  L0.33 C0.051 h156  nearest stated Pine      dE 0.7
+eyebrow text (most chromatic 8%)     #D36637  L0.63 C0.151 h 42  nearest stated Rust      dE 1.8
+MODERATE badge fill                  #D96129  L0.63 C0.165 h 43  nearest stated Rust      dE 1.0
+headline pine (darkest 10%)          #143323  L0.29 C0.048 h159  nearest stated Pine      dE 3.6
+headline italic (darkest 10%)        #4C6534  L0.47 C0.079 h131  nearest stated Leaf      dE 10.9
+lesions on the leaf (C > 0.12)       #C4A435  L0.73 C0.130 h 92  nearest stated Leaf      dE 16.5
+
+k-means clusters (share, nearest stated colour):
+  78.0%  #F3EBD8  L0.94 C0.027  nearest Parchment dE 1.6
+   5.6%  #203B28  L0.33 C0.048  nearest Pine      dE 0.9
+   5.5%  #E8E1C5  L0.91 C0.037  nearest Sage      dE 1.9
+   2.2%  #838949  L0.61 C0.087  nearest Leaf      dE 3.5
+   2.2%  #646E3A  L0.52 C0.076  nearest Leaf      dE 6.7
+   2.0%  #A7A45E  L0.71 C0.092  nearest Leaf      dE 12.7
+   1.5%  #C7C3A6  L0.81 C0.040  nearest Sage      dE 9.7
+   1.4%  #4E532D  L0.43 C0.058  nearest Pine      dE 10.9
+   1.1%  #D1C95F  L0.82 C0.128  nearest Sage      dE 13.5
+   0.4%  #CD7535  L0.65 C0.134  nearest Rust      dE 5.1
+
+seam: crop edge #F2EAD7 vs Parchment dE 1.9; spread inside the edge (p5..p95) dE 2.2

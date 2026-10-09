@@ -106,6 +106,10 @@ It is not an official loss assessment.
 - **Details and the rendering choice:** [docs/REPORT.md](docs/REPORT.md).
 - **Samples:** [docs/sample_report.pdf](docs/sample_report.pdf), [docs/sample_report_hi.pdf](docs/sample_report_hi.pdf).
 
+## Landing page and colour system
+
+The home page (7 sections, English + Hindi, one viewport per section on desktop, stacked on phones and tablets) is described in [docs/LANDING_PAGE.md](docs/LANDING_PAGE.md); the colour system, with the experiments behind it, is [docs/COLOUR_SYSTEM.md](docs/COLOUR_SYSTEM.md).
+
 ## Crops and disease coverage
 
 | Crop | Disease classes | Accuracy [95% CI] | Macro F1 | Weakest-class recall | Images evaluated | Evaluation |

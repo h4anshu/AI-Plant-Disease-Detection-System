@@ -64,3 +64,6 @@ CLAUDE_CODE_PROMPTS.md
 ~$*.xlsx
 *.pptx
 presentation.html
+
+# raw generated art (originals; the app uses the WebP copies in client/src/assets)
+/assests/
