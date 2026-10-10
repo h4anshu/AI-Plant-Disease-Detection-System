@@ -1004,3 +1004,11 @@ Reported (screenshot at 1905×930): the sentence in the bottom right of the Repo
 - **Checked:** Vitest 67 pass, build OK, lint only fast-refresh notes. Server tests for the touched routes passed earlier (Task 26).
 - **Not done:** real devices, Firefox, Safari; the workspace sweep used mocked data, so Field context and Satellite were not seen with real answers; the older components inside the Checkup tabs keep their older inner look.
 
+
+## Task 28 — Live site down: billing was disabled on the Google project (10 Oct 2026)
+
+Reported: New check on the live site (Vercel) answered "Diagnosis failed" for a wheat photo. Not a code bug.
+- **Cause:** billing was disabled on `plant-disease-503711`: `gcloud billing projects describe` showed `billingEnabled: false`, and every Cloud Run log said "The request failed because billing is disabled for this project" (server 503, ml-service and geo-service 500). The frontend gets no JSON body then, so it shows the generic `predict.failed`.
+- **Fix:** the user re-linked the billing account `019E94-58F9F7-0480AC` ("My Billing Account"). geo-service recovered by itself. server and ml-service stayed at 429 "Rate exceeded" / "no available instance" for ~35 minutes (the first start attempt had failed while billing was off), so I created new revisions from the same image with a label only: `gcloud run services update ml-service|server --region asia-south1 --update-labels restarted=1010` (ml-service-00009-xq8, server-00019-bp8). They answered 429 for about 5 more minutes after that, then both returned 200.
+- **Verified:** `/health` 200 on all three, CORS preflight for the Vercel origin 204 with the right `access-control-allow-origin`, a real `POST /api/predict` (wheat photo from `ml-service/data/e2e`) returned 201 in 4 s; the test record (device id `11111111-…`) was deleted afterwards with `DELETE /api/predict`.
+- **Not done / open:** the label `restarted=1010` stays on both services (harmless). The frontend still shows a generic error when the server is unreachable; a clearer "service not available, try again later" message was offered, not built. Budget alert ($1, `docs/DEPLOY.md` A2) was not checked; the cause of billing being unlinked (trial or credits ending) is not known: check Billing → Overview.
