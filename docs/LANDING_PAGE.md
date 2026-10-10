@@ -30,6 +30,8 @@ Navbar: `components/Navbar.jsx` (switches to the hamburger menu below 1184 px, s
 
 Around the leaf, Report and the Finale are normal flow layouts: `min-height: calc(100svh - 4.6rem)`, content centred, paddings kept small enough that the content fits (checked at 1280×720 and 1366×768).
 
+The Report section ends above the dark closing band's wave: its bottom padding is `--edge-h + 1.5 rem` (`+ 2 rem` on phones), so the caption "Sample report, page 1 of 3" never sits on the dark wave (dark text on the dark green was unreadable at 1920×930 before 10 Oct).
+
 **Below 1184 px (tablets, phones)** every section is a stacked column (order set with `max-lg:order-*`), canvas-only decor is `max-lg:hidden`, the hero picture is capped at 34 rem and centred. There is no horizontal scroll at any width checked.
 
 ## 3. Backgrounds and the "separate sheets" edges
@@ -56,7 +58,7 @@ Namespaces in `client/src/locales/{en,hi}.json`: `home`, `nav.start`, `how`, `ho
 
 ## 7. Tests and checks
 
-`cd client && npx vitest run` (63 tests: `Hero`, `Honest`, `MapSection`, `Landing` cover the landing sections) · `npx oxlint` (only the old login-related warnings remain) · `npx vite build`.
+`cd client && npx vitest run` (67 tests; the landing sections are covered by `Hero`, `Honest`, `MapSection`, `Landing`) · `npx oxlint` (only the old login-related warnings remain) · `npx vite build`.
 
 Final QA round (Playwright, English unless noted):
 
@@ -69,6 +71,8 @@ Final QA round (Playwright, English unless noted):
 | 1920×930, 2560×1300 | every canvas section exactly one viewport, no overflow |
 | Hindi at 1366×768 | no overflow, all sections one viewport (How 707) |
 
+Sweep of 10 Oct 2026 (Playwright, 11 sizes from 360×740 to 2560×1300, plus 1905×930): no horizontal overflow, no broken images, no text under 11 px. Found and fixed: the Report caption on the dark wave (above); the hero's "SCAN ACTIVE" badge wrapping onto two lines at 1280 to 1440 px (`whitespace-nowrap`, width from `min-width`); 10 px labels in older components (raised to 11 px app-wide). Report is now 769 px tall at 1280×720, 798 at 1366×768 (the wave clearance), and exactly one viewport from 1440×900 up. Hindi: no overflow at 360, 768, 1280 and 1920.
+
 ## 8. Known limits
 
 - On 1280×720 and lower, How is up to ~60 px taller than the screen (text floors); nothing is clipped.
@@ -76,3 +80,13 @@ Final QA round (Playwright, English unless noted):
 - Not tested on real phones/tablets or other browsers (only Chromium at those sizes); Hindi checked at 1366×768 only.
 - Contrast of body text on the new section tones was not re-measured (the text colours did not change).
 - Hindi text unreviewed; the example numbers are illustrative.
+
+## 9. Motion (Task 24)
+
+Scroll and ambient motion is one small system: `client/src/components/motion.jsx` (`useReveal()` called once in `Home.jsx`, `CountUp`) plus the "Motion" block at the end of `client/src/index.css`.
+
+- Markup opts in with `data-rv="up|left|right|zoom|fade|wipe|t"` and `style={d(seconds)}` for a delay. An IntersectionObserver adds `.in` when 15% of the element is visible; the CSS then transitions it (opacity and the individual `translate` / `scale` properties, so it stacks with the layouts' own transforms). `t` only triggers: its children `.rv-grow` (bars and lines grow), `.rv-pop` (dots, chips) and `.rv-fade` animate.
+- `CountUp` counts a number from 0 once it is seen; the final text is always what is in the DOM at rest (tests, reduced motion).
+- Ambient motion: `.fl` (float), `.sway`, `.glow`, `.nudge`, `.cta-lift` (buttons), a slow turn of the hero ring, scroll-linked drift (`.px`, only where `animation-timeline` exists).
+- Rules: everything is inside `prefers-reduced-motion: no-preference`; content is hidden only after the script adds `rv-js` to `<html>`; only transform and opacity animate; reveals run once. `wipe` uses a mask, not `clip-path` (IntersectionObserver treats a fully clipped element as never visible).
+

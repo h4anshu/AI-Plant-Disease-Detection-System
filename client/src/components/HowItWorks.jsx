@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Leaf, Sprig } from './heroIcons';
+import { CountUp, d } from './motion';
 import foliageTl from '../assets/how/foliage-tl.webp';
 import foliageTr from '../assets/how/foliage-tr.webp';
 import islands from '../assets/how/islands.webp';
@@ -25,7 +26,7 @@ const Badge = ({ n }) => (
   <span className="grid shrink-0 place-items-center bg-pine font-display text-parchment shadow-md" style={{ width: U(62), height: U(62), borderRadius: '50% 50% 50% 16%', ...fs(26, 16), minWidth: 38, minHeight: 38 }}>{n}</span>
 );
 const StepText = ({ n, t, style }) => (
-  <div className="how-abs" style={style}>
+  <div data-rv className="how-abs" style={{ ...style, ...d(0.15 * n) }}>
     <Badge n={`0${n}`} />
     <h3 className="mt-3 font-display leading-tight text-ink" style={fs(34, 20)}>{t(`how.s${n}t`)}</h3>
     <p className="mt-2 max-w-[22rem] leading-snug text-ink-2 lg:max-w-none" style={fs(19, 13)}>{t(`how.s${n}d`)}</p>
@@ -64,16 +65,16 @@ const HowItWorks = () => {
 
           {/* header */}
           <header className="relative z-20 text-center max-lg:pt-20 lg:absolute lg:inset-x-0 lg:top-[calc(var(--u)*40)]">
-            <p className="inline-flex items-center gap-3 font-mono uppercase tracking-[0.34em] text-pine" style={fs(20, 12)}>
+            <p data-rv="fade" className="inline-flex items-center gap-3 font-mono uppercase tracking-[0.34em] text-pine" style={fs(20, 12)}>
               <Leaf className="h-[1.1em] w-[1.1em] text-leaf" />{t('how.eyebrow')}<Leaf className="h-[1.1em] w-[1.1em] -scale-x-100 text-leaf" />
             </p>
-            <div className="mx-auto mt-3 flex items-center justify-center gap-2 text-leaf" style={{ width: U(380) }} aria-hidden="true">
-              <i className="h-px flex-1 bg-leaf/50" /><Leaf className="h-5 w-5" /><i className="h-px flex-1 bg-leaf/50" />
+            <div data-rv="t" className="mx-auto mt-3 flex items-center justify-center gap-2 text-leaf" style={{ width: U(380) }} aria-hidden="true">
+              <i className="rv-grow h-px flex-1 bg-leaf/50" style={{ '--o': '100%' }} /><Leaf className="fl h-5 w-5" /><i className="rv-grow h-px flex-1 bg-leaf/50" />
             </div>
             <h2 className="mt-4 text-balance font-display leading-[1.04] text-ink" style={fs(72, 30)}>
-              {t('how.title1')}<br />{t('how.title2')} <em className="text-leaf-text">{t('how.titleEm')}</em>
+              <span data-rv className="block" style={d(.1)}>{t('how.title1')}</span><span data-rv className="block" style={d(.22)}>{t('how.title2')} <em className="text-leaf-text">{t('how.titleEm')}</em></span>
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-ink-2 lg:max-w-none lg:whitespace-nowrap" style={fs(22, 14)}>{t('how.sub')}</p>
+            <p data-rv style={{ ...fs(22, 14), ...d(.35) }} className="mx-auto mt-4 max-w-2xl text-ink-2 lg:max-w-none lg:whitespace-nowrap">{t('how.sub')}</p>
           </header>
 
           {/* layers: islands + vines */}
@@ -88,7 +89,7 @@ const HowItWorks = () => {
             {/* step 1 */}
             <div className="lg:contents">
               <StepText n={1} t={t} style={pos(232, 276, 330)} />
-              <div className="how-vis" style={{ '--bx': 20, '--by': 440, '--bw': 560, '--bh': 440 }}>
+              <div data-rv="zoom" className="how-vis" style={{ '--bx': 20, '--by': 440, '--bw': 560, '--bh': 440, ...d(.2) }}>
                 <img className="how-isl" src={islands} alt="" aria-hidden="true" loading="lazy" />
                 <div className="rounded-[2.2em] border-white/0" style={{ ...box(185, 58, 280, 220), border: `${U(5)} solid transparent` }}>
                   {['tl', 'tr', 'bl', 'br'].map((c) => (
@@ -104,14 +105,14 @@ const HowItWorks = () => {
                 <div style={box(95, 160, 250, 202)}>{cameraImg ? <img src={cameraImg} alt="" className="h-full w-full object-contain" /> : <CameraArt />}</div>
               </div>
               <ul className="how-abs mx-auto mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-ink-2 lg:mt-0 lg:block lg:space-y-1" style={{ ...pos(150, 880, 400), ...fs(16, 13) }}>
-                {bullets.map((b) => <li key={b} className="flex items-center gap-2"><Leaf className="h-[1.1em] w-[1.1em] shrink-0 text-leaf-text" />{t(`how.${b}`)}</li>)}
+                {bullets.map((b, i) => <li key={b} data-rv="left" style={d(.5 + i * .12)} className="flex items-center gap-2"><Leaf className="h-[1.1em] w-[1.1em] shrink-0 text-leaf-text" />{t(`how.${b}`)}</li>)}
               </ul>
             </div>
 
             {/* step 2 */}
             <div className="lg:contents">
               <StepText n={2} t={t} style={pos(748, 372, 390)} />
-              <div className="how-vis" style={{ '--bx': 560, '--by': 520, '--bw': 640, '--bwm': 470, '--bh': 380 }}>
+              <div data-rv="zoom" className="how-vis" style={{ '--bx': 560, '--by': 520, '--bw': 640, '--bwm': 470, '--bh': 380, ...d(.4) }}>
                 <img className="how-isl" src={islands} alt="" aria-hidden="true" loading="lazy" />
                 <span className="how-ring rounded-[50%] border-2 border-[#9fd48a]/70 shadow-[0_0_30px_rgba(150,210,120,.55)]" style={box(60, 175, 470, 130)} />
                 <span className="how-ring rounded-[50%] border border-[#9fd48a]/60" style={{ ...box(30, 153, 530, 160), animationDelay: '-1.6s' }} />
@@ -119,7 +120,7 @@ const HowItWorks = () => {
                   <p className="flex items-center justify-between font-mono text-[max(11px,0.78em)] uppercase tracking-widest text-ink-2"><span className="flex items-center gap-2"><Leaf className="h-[1.3em] w-[1.3em] text-leaf-text" />{t('how.cardLabel')}</span><span>{t('how.example')}</span></p>
                   <div className="mt-[0.7em] flex items-end justify-between gap-3">
                     <h4 className="font-display text-[1.75em] italic leading-tight text-ink max-lg:text-[1.4em]">{t('how.cardDisease')}</h4>
-                    <span className="shrink-0 rounded-2xl bg-sage-wash px-[0.7em] py-[0.3em] text-center font-display text-[1.5em] text-leaf-text">92%<small className="block font-body text-[max(11px,0.45em)] not-italic text-ink-2">{t('how.cardConf')}</small></span>
+                    <span className="shrink-0 rounded-2xl bg-sage-wash px-[0.7em] py-[0.3em] text-center font-display text-[1.5em] text-leaf-text"><CountUp to={92} suffix="%" delay={.9} /><small className="block font-body text-[max(11px,0.45em)] not-italic text-ink-2">{t('how.cardConf')}</small></span>
                   </div>
                   <div className="mt-[0.8em] flex items-center gap-3">
                     <img src={thumb} alt="" className="h-[4.4em] w-[6.4em] rounded-xl object-cover" />
@@ -132,7 +133,7 @@ const HowItWorks = () => {
             {/* step 3 */}
             <div className="lg:contents">
               <StepText n={3} t={t} style={pos(1198, 290, 340)} />
-              <div className="how-vis" style={{ '--bx': 1110, '--by': 440, '--bw': 560, '--bh': 440 }}>
+              <div data-rv="zoom" className="how-vis" style={{ '--bx': 1110, '--by': 440, '--bw': 560, '--bh': 440, ...d(.6) }}>
                 <img className="how-isl" src={islands} alt="" aria-hidden="true" loading="lazy" />
                 <div style={boardImg ? box(30, 52, 390, 270) : { ...box(65, 62, 300, 220), transform: 'rotate(-7deg)' }}>
                   {boardImg ? <img src={boardImg} alt="" className="absolute inset-0 h-full w-full object-contain" /> : (
@@ -141,8 +142,8 @@ const HowItWorks = () => {
                     </div>
                   )}
                   <ul className="absolute flex flex-col justify-between text-ink" style={{ ...(boardImg ? { ...box(80, 74, 258, 132), transform: 'rotate(-6.5deg)' } : box(30, 26, 245, 170)), ...fs(boardImg ? 16 : 17, 11) }}>
-                    {plan.map((p) => (
-                      <li key={p} className="flex items-center gap-[0.6em] leading-tight">
+                    {plan.map((p, i) => (
+                      <li key={p} data-rv="left" style={d(1 + i * .18)} className="flex items-center gap-[0.6em] leading-tight">
                         <span className="grid h-[1.9em] w-[1.9em] shrink-0 place-items-center rounded-full border border-pine/60 bg-parchment/80 text-pine"><Leaf className="h-[1.1em] w-[1.1em]" /></span>{t(`how.${p}`)}
                       </li>
                     ))}
@@ -153,11 +154,11 @@ const HowItWorks = () => {
             </div>
 
             {/* call to action, on the middle island */}
-            <div className="how-abs flex justify-center max-lg:relative" style={pos(655, 822, 370)}>
+            <div data-rv="zoom" className="how-abs flex justify-center max-lg:relative" style={{ ...pos(655, 822, 370), ...d(.2) }}>
               {logImg && <img src={logImg} alt="" aria-hidden="true" className="pointer-events-none absolute max-lg:hidden" style={{ left: '-18%', top: U(30), width: '136%' }} />}
-              <Link to="/predict" className="relative z-10 inline-flex w-full items-center justify-between gap-3 rounded-full border-[3px] border-leaf bg-pine pl-8 pr-2 text-parchment shadow-[0_18px_30px_-12px_rgba(7,38,24,.6)] transition-colors hover:bg-pine-hover focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ink max-lg:max-w-sm max-lg:py-2" style={{ ...fs(27, 17), height: 'max(46px, ' + U(70) + ')' }}>
+              <Link to="/predict" className="relative z-10 inline-flex w-full items-center justify-between gap-3 rounded-full border-[3px] border-leaf bg-pine pl-8 pr-2 text-parchment shadow-[0_18px_30px_-12px_rgba(7,38,24,.6)] cta-lift hover:bg-pine-hover focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ink max-lg:max-w-sm max-lg:py-2" style={{ ...fs(27, 17), height: 'max(46px, ' + U(70) + ')' }}>
                 <span className="whitespace-nowrap font-display">{t('how.cta')}</span>
-                <span className="grid place-items-center rounded-full bg-parchment text-pine" style={{ width: 'max(36px, ' + U(54) + ')', height: 'max(36px, ' + U(54) + ')' }}><svg viewBox="0 0 24 24" className="h-1/2 w-1/2" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></span>
+                <span className="nudge grid place-items-center rounded-full bg-parchment text-pine" style={{ width: 'max(36px, ' + U(54) + ')', height: 'max(36px, ' + U(54) + ')' }}><svg viewBox="0 0 24 24" className="h-1/2 w-1/2" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></span>
               </Link>
             </div>
           </div>

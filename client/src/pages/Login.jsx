@@ -38,7 +38,7 @@ const Login = () => {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Email</label>
+          <label className="font-mono text-[11px] text-ink-2 uppercase tracking-widest block mb-1">Email</label>
           <input
             type="email"
             value={email}
@@ -48,7 +48,7 @@ const Login = () => {
           />
         </div>
         <div>
-          <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Password</label>
+          <label className="font-mono text-[11px] text-ink-2 uppercase tracking-widest block mb-1">Password</label>
           <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -64,7 +64,7 @@ const Login = () => {
         </button>
       </form>
 
-      <p className="font-mono text-xs text-sage mt-6">
+      <p className="font-mono text-xs text-ink-2 mt-6">
         Don't have an account? <Link to="/register" className="text-field underline">Register</Link>
       </p>
     </div>

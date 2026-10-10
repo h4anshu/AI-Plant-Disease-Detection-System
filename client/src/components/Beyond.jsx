@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Calendar, Leaf, Magnifier } from './heroIcons';
+import { CountUp, d } from './motion';
 import leafA from '../assets/how/leaf-a.webp';
 import leafC from '../assets/how/leaf-c.webp';
 
@@ -27,7 +28,8 @@ const Head = ({ Icon, children }) => (
     <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-pine text-parchment"><Icon className="h-4 w-4" /></span>{children}
   </p>
 );
-const Card = ({ children }) => <article className="map-glass flex flex-col rounded-[1.7rem] p-5 sm:p-6">{children}</article>;
+// the wrapper reveals, the card itself lifts on hover (a card with its own reveal transition would drag the hover along)
+const Card = ({ children, i }) => <div data-rv style={d(.2 + i * .15)} className="flex"><article className="map-glass hov flex w-full flex-col rounded-[1.7rem] p-5 sm:p-6">{children}</article></div>;
 const Tag = ({ t }) => <span className="ml-auto rounded-full bg-butter px-2.5 py-0.5 font-body text-xs normal-case tracking-normal text-ink">{t('beyond.tag')}</span>;
 
 const Beyond = () => {
@@ -41,23 +43,23 @@ const Beyond = () => {
       <div className="relative mx-auto w-full max-w-[1380px]">
         <header className="grid items-end gap-6 lg:grid-cols-[1.1fr_.9fr] lg:gap-14">
           <div>
-            <p className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.3em] text-ink-2"><Leaf className="h-5 w-5 -rotate-12 text-leaf-text" />{t('beyond.eyebrow')}</p>
-            <h2 className="mt-3 text-balance font-display text-[clamp(2.2rem,4vw,3.5rem)] leading-[1.04] text-ink">{t('beyond.title1')}<br /><em className="text-leaf-text">{t('beyond.titleEm')}</em></h2>
+            <p data-rv="fade" className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.3em] text-ink-2"><Leaf className="h-5 w-5 -rotate-12 text-leaf-text" />{t('beyond.eyebrow')}</p>
+            <h2 className="mt-3 text-balance font-display text-[clamp(2.2rem,4vw,3.5rem)] leading-[1.04] text-ink"><span data-rv className="block" style={d(.1)}>{t('beyond.title1')}</span><em data-rv className="block text-leaf-text" style={d(.24)}>{t('beyond.titleEm')}</em></h2>
           </div>
-          <p className="max-w-xl text-lg leading-relaxed text-ink-2 lg:pb-2">{t('beyond.intro')}</p>
+          <p data-rv style={d(.35)} className="max-w-xl text-lg leading-relaxed text-ink-2 lg:pb-2">{t('beyond.intro')}</p>
         </header>
 
         <div className="mt-8 grid gap-5 lg:mt-7 lg:grid-cols-3 lg:gap-6">
           {/* weather risk */}
-          <Card>
+          <Card i={0}>
             <div className="flex items-center"><Head Icon={(p) => <Magnifier {...p} />}>{t('beyond.c1')}</Head><Tag t={t} /></div>
             <h3 className="mt-4 font-display text-2xl text-ink">{t('beyond.c1t')}</h3>
             <ol className="my-auto grid grid-cols-6 gap-1.5 py-5 sm:gap-2" aria-label={t('beyond.c1t')}>
               {RISK.map((lv, i) => {
                 const s = STATE[lv];
                 return (
-                  <li key={i} className={`flex flex-col items-center gap-2 rounded-xl border-[1.5px] px-0.5 py-6 text-center lg:py-4 ${i < TODAY ? 'opacity-70' : ''} ${i === TODAY ? 'ring-2 ring-ink/70 ring-offset-1 ring-offset-transparent' : ''}`}
-                    style={{ borderColor: s.c, background: s.tint, color: s.text }}>
+                  <li key={i} data-rv="zoom" className={`flex flex-col items-center gap-2 rounded-xl border-[1.5px] px-0.5 py-6 text-center lg:py-4 ${i < TODAY ? 'opacity-70' : ''} ${i === TODAY ? 'chip-now ring-2 ring-ink/70 ring-offset-1 ring-offset-transparent' : ''}`}
+                    style={{ borderColor: s.c, background: s.tint, color: s.text, '--rv-o': i < TODAY ? 0.7 : 1, ...d(.5 + i * .09) }}>
                     <svg viewBox="0 0 16 16" className="h-6 w-6" style={{ color: s.c }} aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.6" />{GLYPH[s.g]}</svg>
                     <span className="text-xs font-medium leading-none">{i === TODAY ? t('risk.today') : day(i)}</span>
                     <span className="text-[11px] leading-none sm:text-xs">{t(`risk.level.${lv}`)}</span>
@@ -74,26 +76,26 @@ const Beyond = () => {
           </Card>
 
           {/* rain vs normal */}
-          <Card>
+          <Card i={1}>
             <div className="flex items-center"><Head Icon={(p) => <Calendar {...p} />}>{t('beyond.c2')}</Head><Tag t={t} /></div>
             <h3 className="mt-4 font-display text-2xl text-ink">{t('beyond.c2t')}</h3>
             <div className="mt-6 space-y-6">
-              {[[t('beyond.c2normal'), 64, 70, false], [t('beyond.c2now'), 91, 100, true]].map(([name, mm, w, now]) => (
-                <div key={name}>
-                  <div className="flex items-baseline justify-between text-ink"><span className="text-sm">{name}</span><span className="font-display text-2xl tabular-nums">{mm}<small className="ml-1 font-body text-sm text-ink-2">mm</small></span></div>
-                  <div className="mt-2 h-5 rounded-full bg-ink/10"><div className="h-full rounded-full" style={{ width: `${w}%`, background: now ? 'linear-gradient(90deg,#3d7f95,#0B5369)' : 'repeating-linear-gradient(135deg,#D2EDF4 0 6px,#bfe0ea 6px 12px)', boxShadow: now ? 'none' : 'inset 0 0 0 1.5px #0B5369' }} /></div>
+              {[[t('beyond.c2normal'), 64, 70, false], [t('beyond.c2now'), 91, 100, true]].map(([name, mm, w, now], i) => (
+                <div key={name} data-rv="t" style={d(.5 + i * .25)}>
+                  <div className="flex items-baseline justify-between text-ink"><span className="text-sm">{name}</span><span className="font-display text-2xl tabular-nums"><CountUp to={mm} delay={.8 + i * .25} /><small className="ml-1 font-body text-sm text-ink-2">mm</small></span></div>
+                  <div className="mt-2 h-5 rounded-full bg-ink/10"><div className="rv-grow h-full rounded-full" style={{ width: `${w}%`, background: now ? 'linear-gradient(90deg,#3d7f95,#0B5369)' : 'repeating-linear-gradient(135deg,#D2EDF4 0 6px,#bfe0ea 6px 12px)', boxShadow: now ? 'none' : 'inset 0 0 0 1.5px #0B5369' }} /></div>
                 </div>
               ))}
             </div>
-            <p className="mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-[#D2EDF4] px-3.5 py-1.5 text-sm font-medium text-[#0B5369]"><svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5" /></svg>+{Math.round(((91 - 64) / 64) * 100)}%</p>
+            <p data-rv="zoom" style={d(1.5)} className="mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-[#D2EDF4] px-3.5 py-1.5 text-sm font-medium text-[#0B5369]"><svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5" /></svg><CountUp to={Math.round(((91 - 64) / 64) * 100)} prefix="+" suffix="%" delay={1.5} /></p>
             <p className="mt-auto pt-4 text-sm leading-snug text-ink-2">{t('beyond.c2n')}</p>
           </Card>
 
           {/* field from space */}
-          <Card>
+          <Card i={2}>
             <div className="flex items-center"><Head Icon={Leaf}>{t('beyond.c3')}</Head><Tag t={t} /></div>
             <h3 className="mt-4 font-display text-2xl text-ink">{t('beyond.c3t')}</h3>
-            <svg viewBox="0 0 360 150" className="mt-3 w-full" role="img" aria-label={t('beyond.c3')}>
+            <svg data-rv="wipe" style={d(.7)} viewBox="0 0 360 150" className="mt-3 w-full" role="img" aria-label={t('beyond.c3')}>
               <g stroke="#162F22" strokeOpacity=".16">{[0, 1, 2, 3].map((i) => <line key={i} x1="8" x2="352" y1={14 + i * 36} y2={14 + i * 36} />)}</g>
               {SERIES.map(({ k, c, d, y }) => <polyline key={k} fill="none" stroke={c} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" strokeDasharray={d} points={y.map((v, i) => `${8 + i * 31.3},${130 - v * 120}`).join(' ')} />)}
               <text x="8" y="146" fontSize="11" fill="#2F493B">{t('beyond.sowing')}</text>
@@ -106,7 +108,7 @@ const Beyond = () => {
           </Card>
         </div>
 
-        <p className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-sm text-ink-2 lg:mt-5">
+        <p data-rv="fade" style={d(.9)} className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-sm text-ink-2 lg:mt-5">
           <span className="font-mono text-[11px] uppercase tracking-[0.2em]">{t('beyond.sources')}</span><span>{t('beyond.sourcesList')}</span>
         </p>
       </div>

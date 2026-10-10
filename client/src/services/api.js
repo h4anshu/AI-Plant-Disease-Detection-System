@@ -46,6 +46,9 @@ export const predictDisease = (formData) =>
 // newest first, 50 per page; pass the createdAt of the last record shown to get older ones
 export const getPredictionHistory = (before) => api.get('/predict', { params: before ? { before } : {} });
 
+// one checkup of this browser, with its heatmap (the checkup page opens by link)
+export const getPrediction = (id) => api.get(`/predict/${id}`);
+
 // "Was this correct?": { feedback: 'correct' | 'incorrect' | 'unsure', correctedLabel? }
 export const sendFeedback = (id, body) => api.patch(`/predict/${id}/feedback`, body);
 export const getCropClasses = () => api.get('/predict/classes');

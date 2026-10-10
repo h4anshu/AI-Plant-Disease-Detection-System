@@ -24,7 +24,7 @@ const RiskStrip = ({ load, reloadKey }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reloadKey]);
 
-  if (state.status === 'loading') return <p role="status" className="font-mono text-xs text-sage mt-3">{t('risk.loading')}</p>;
+  if (state.status === 'loading') return <p role="status" className="font-mono text-xs text-ink-2 mt-3">{t('risk.loading')}</p>;
   if (state.status === 'error') return <p role="alert" className="font-mono text-xs text-clay mt-3">{state.message}</p>;
 
   const d = state.data;
@@ -33,12 +33,12 @@ const RiskStrip = ({ load, reloadKey }) => {
 
   return (
     <section aria-labelledby="risk-title" className="mt-3">
-      <p id="risk-title" className="font-mono text-[10px] text-sage uppercase tracking-widest mb-1">{t(`risk.title.${d.disease}`)}</p>
+      <p id="risk-title" className="font-mono text-[11px] text-ink-2 uppercase tracking-widest mb-1">{t(`risk.title.${d.disease}`)}</p>
       <ol className="grid grid-cols-6 gap-1">
         {d.days.map((x) => (
           <li key={x.date} aria-label={`${day(x.date)}: ${t(`risk.level.${x.level ?? 'unknown'}`)}`}
             className={`border px-1 py-1.5 text-center ${LEVEL_STYLE[x.level]} ${x.date === d.today ? 'ring-2 ring-ink/60' : ''} ${x.date < d.today ? 'opacity-60' : ''}`}>
-            <span className="block text-[10px] leading-tight">{x.date === d.today ? t('risk.today') : day(x.date)}</span>
+            <span className="block text-[11px] leading-tight">{x.date === d.today ? t('risk.today') : day(x.date)}</span>
             <span className="block font-mono text-[11px] font-medium mt-0.5">{t(`risk.level.${x.level ?? 'unknown'}`)}</span>
           </li>
         ))}
@@ -47,7 +47,7 @@ const RiskStrip = ({ load, reloadKey }) => {
 
       {today && (
         <details className="mt-1 text-xs text-ink/70">
-          <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-widest text-sage">{t('risk.why')}</summary>
+          <summary className="cursor-pointer font-mono text-[11px] uppercase tracking-widest text-ink-2">{t('risk.why')}</summary>
           <ul className="mt-1 flex flex-col gap-1">
             {d.crop === 'potato' ? (
               <>

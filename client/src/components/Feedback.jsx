@@ -40,7 +40,7 @@ const Feedback = ({ predictionId, crop }) => {
 
   if (answer) {
     return (
-      <p role="status" className="font-mono text-xs text-sage mt-5">
+      <p role="status" className="font-mono text-xs text-ink-2 mt-5">
         {answer === 'incorrect' ? t('feedback.thanksCorrection') : t('feedback.thanks')}
       </p>
     );
@@ -48,7 +48,7 @@ const Feedback = ({ predictionId, crop }) => {
 
   return (
     <div className="mt-5 pt-4 border-t border-ink/10">
-      <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">{t('feedback.question')}</p>
+      <p className="font-mono text-[11px] text-ink-2 uppercase tracking-widest mb-2">{t('feedback.question')}</p>
       <div className="flex gap-2">
         <button type="button" className={button} disabled={busy} onClick={() => send('correct')}>{t('feedback.yes')}</button>
         <button type="button" className={button} disabled={busy} onClick={openPicker}>{t('feedback.no')}</button>

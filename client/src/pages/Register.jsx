@@ -43,7 +43,7 @@ const Register = () => {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Name</label>
+          <label className="font-mono text-[11px] text-ink-2 uppercase tracking-widest block mb-1">Name</label>
           <input
             type="text"
             value={name}
@@ -53,7 +53,7 @@ const Register = () => {
           />
         </div>
         <div>
-          <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Email</label>
+          <label className="font-mono text-[11px] text-ink-2 uppercase tracking-widest block mb-1">Email</label>
           <input
             type="email"
             value={email}
@@ -63,7 +63,7 @@ const Register = () => {
           />
         </div>
         <div>
-          <label className="font-mono text-[10px] text-sage uppercase tracking-widest block mb-1">Password</label>
+          <label className="font-mono text-[11px] text-ink-2 uppercase tracking-widest block mb-1">Password</label>
           <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -80,7 +80,7 @@ const Register = () => {
         </button>
       </form>
 
-      <p className="font-mono text-xs text-sage mt-6">
+      <p className="font-mono text-xs text-ink-2 mt-6">
         Already have an account? <Link to="/login" className="text-field underline">Sign in</Link>
       </p>
     </div>

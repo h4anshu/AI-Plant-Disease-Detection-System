@@ -30,7 +30,7 @@ const PasswordInput = ({ value, onChange, required, minLength }) => {
         type="button"
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? 'Hide password' : 'Show password'}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-sage hover:text-field"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-2 hover:text-field"
       >
         {visible ? <EyeOffIcon /> : <EyeIcon />}
       </button>

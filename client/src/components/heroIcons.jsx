@@ -26,15 +26,15 @@ export const Sprig = ({ className }) => (   // faded corner sprig
     ))}
   </svg>
 );
-export const LeafSketch = ({ className, style }) => (   // "leaf anatomy" drawing: outline, midrib, veins
-  <svg viewBox="0 0 100 150" className={className} style={style} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
+export const LeafSketch = ({ className, style, ...p }) => (   // "leaf anatomy" drawing: outline, midrib, veins
+  <svg viewBox="0 0 100 150" className={className} style={style} {...p} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
     <path d="M50 6C86 30 92 84 50 142 8 84 14 30 50 6Z" />
     <path d="M50 12V138" />
     {[34, 52, 70, 88, 106].map((y) => <path key={y} d={`M50 ${y}L${72 - (y - 34) / 12} ${y - 14}M50 ${y}L${28 + (y - 34) / 12} ${y - 14}`} opacity=".7" />)}
   </svg>
 );
-export const LeafCircle = ({ className, style }) => (   // leaf in a ring with a small node, as in the reference scan badge
-  <svg viewBox="0 0 100 100" className={className} style={style} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+export const LeafCircle = ({ className, style, ...p }) => (   // leaf in a ring with a small node, as in the reference scan badge
+  <svg viewBox="0 0 100 100" className={className} style={style} {...p} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="50" cy="50" r="42" /><circle cx="86" cy="22" r="5" fill="currentColor" stroke="none" />
     <path d="M32 70C30 44 46 28 70 28 72 54 56 70 32 70Z" /><path d="M32 70 58 40" />
   </svg>

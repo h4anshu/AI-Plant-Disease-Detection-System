@@ -72,7 +72,7 @@ const FieldHealth = ({ predictionId, crop }) => {
       </div>
     );
   }
-  if (state.status === 'loading') return <p role="status" className="mt-5 font-mono text-xs text-sage">{t('field.loading')}</p>;
+  if (state.status === 'loading') return <p role="status" className="mt-5 font-mono text-xs text-ink-2">{t('field.loading')}</p>;
   if (state.status === 'error') return <p role="alert" className="mt-5 font-mono text-xs text-clay">{state.message}</p>;
 
   const d = state.data;
@@ -82,7 +82,7 @@ const FieldHealth = ({ predictionId, crop }) => {
 
   return (
     <section className="mt-5 pt-4 border-t border-ink/10" aria-labelledby="field-title">
-      <p id="field-title" className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">{t('field.title')}</p>
+      <p id="field-title" className="font-mono text-[11px] text-ink-2 uppercase tracking-widest mb-2">{t('field.title')}</p>
       <p className={`text-sm leading-relaxed ${worrying ? 'text-clay font-medium' : 'text-ink/80'}`}>{flag}</p>
       {d.flag.stale && d.last_clear_date && d.flag.code !== 'not_farmland' && (
         <p className="text-xs text-ink/60 mt-1">{t('field.stale', { date: longDate(d.last_clear_date, i18n.language) })}</p>
@@ -102,7 +102,7 @@ const FieldHealth = ({ predictionId, crop }) => {
 
       {crop === 'wheat' && rows.some((r) => r.redsi != null) && (
         <div className="mt-3">
-          <p className="font-mono text-[10px] text-sage uppercase tracking-widest">{t('field.redsiTitle')}</p>
+          <p className="font-mono text-[11px] text-ink-2 uppercase tracking-widest">{t('field.redsiTitle')}</p>
           <SeriesChart rows={rows} window={d.window} keys={['redsi']} bandKey="redsi" lang={i18n.language} label={t('field.redsiTitle')}
             yMin={Math.min(...rows.map((r) => r.redsi ?? Infinity), 0)} yMax={Math.max(...rows.map((r) => r.redsi ?? -Infinity), 1)} />
           <p className="text-xs text-ink/60">{t('field.redsiNote')}</p>

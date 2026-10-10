@@ -77,6 +77,9 @@ const Navbar = () => {
           </Link>
 
           {/* ponytail: login temporarily disabled, always show the signed-in links. Restore the isAuthenticated ternary once login is back on. */}
+          <Link to="/overview" className="text-ink-2 hover:text-ink transition-colors">
+            {t('nav.myField')}
+          </Link>
           <Link to="/predict" className="text-ink-2 hover:text-ink transition-colors">
             {t('nav.diagnose')}
           </Link>
@@ -104,6 +107,9 @@ const Navbar = () => {
           </Link>
 
           {/* ponytail: login temporarily disabled, always show the signed-in links */}
+          <Link to="/overview" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
+            {t('nav.myField')}
+          </Link>
           <Link to="/predict" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
             {t('nav.diagnose')}
           </Link>

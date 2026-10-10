@@ -22,7 +22,7 @@ const RISK_CROPS = ['potato', 'rice']; // crops with a published weather model (
 const RISK_MIN_ZOOM = 7; // at country zoom, 'the centre of the map' is not a place anyone farms // a 5 km^2 hexagon is a few pixels at state/country zoom: draw a dot on it too
 
 const select = 'w-full border border-ink/25 bg-parchment px-2 py-2 text-sm text-ink';
-const label = 'font-mono text-[10px] text-sage uppercase tracking-widest block mb-1';
+const label = 'font-mono text-[11px] text-ink-2 uppercase tracking-widest block mb-1';
 
 const MapPage = () => {
   const { t, i18n } = useTranslation();
@@ -138,7 +138,7 @@ const MapPage = () => {
 
       {RISK_CROPS.includes(crop) && centre && (
         <div className="mt-4 border border-ink/15 p-3">
-          <p className="font-mono text-[10px] text-sage uppercase tracking-widest">{t('risk.mapCentre')}</p>
+          <p className="font-mono text-[11px] text-ink-2 uppercase tracking-widest">{t('risk.mapCentre')}</p>
           {centre.zoom >= RISK_MIN_ZOOM ? (
             <RiskStrip load={() => getDiseaseRisk({ lat: centre.lat, lon: centre.lon, crop })}
               reloadKey={`${crop}|${centre.lat.toFixed(2)}|${centre.lon.toFixed(2)}`} />
@@ -156,7 +156,7 @@ const MapPage = () => {
             {binLabel(i)}
           </span>
         ))}
-        <Link to="/privacy" className="font-mono text-xs text-sage underline ml-auto">{t('map.privacy')}</Link>
+        <Link to="/privacy" className="font-mono text-xs text-ink-2 underline ml-auto">{t('map.privacy')}</Link>
       </div>
     </div>
   );

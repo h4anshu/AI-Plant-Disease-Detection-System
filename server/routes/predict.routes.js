@@ -1,5 +1,5 @@
 import express from "express";
-import { predict, getHistory, getClasses, giveFeedback, deleteMine } from "../controllers/predictController.js";
+import { predict, getHistory, getOne, getClasses, giveFeedback, deleteMine } from "../controllers/predictController.js";
 import upload from "../middleware/upload.js";
 import authMiddleware from "../middleware/auth.js";
 import guestDevice from "../middleware/guestDevice.js";
@@ -14,6 +14,7 @@ predictRouter.post('/', predictLimiter, authMiddleware, guestDevice, upload.sing
 predictRouter.get('/', authMiddleware, guestDevice, getHistory);
 predictRouter.delete('/', authMiddleware, guestDevice, deleteMine);
 predictRouter.get('/classes', getClasses);
+predictRouter.get('/:id', authMiddleware, guestDevice, getOne);
 predictRouter.patch('/:id/feedback', authMiddleware, guestDevice, giveFeedback);
 predictRouter.get('/:id/field-health', fieldLimiter, authMiddleware, guestDevice, getFieldHealth);
 predictRouter.get('/:id/disease-risk', riskLimiter, authMiddleware, guestDevice, getPredictionRisk);

@@ -33,7 +33,7 @@ const RetakeCard = ({ result, title, message }) => {
         <img src={result.imageUrl} alt={t('result.uploadedAlt')} className="w-full max-h-72 object-cover mb-5 border border-ink/10" />
       )}
 
-      <span className="font-mono text-[10px] text-sage uppercase tracking-widest">{t('result.noReading', { crop: cropName(result.crop, i18n.language) })}</span>
+      <span className="font-mono text-[11px] text-ink-2 uppercase tracking-widest">{t('result.noReading', { crop: cropName(result.crop, i18n.language) })}</span>
       <h3 className="font-display text-3xl text-ink mt-1 mb-3">{title}</h3>
       <p className="text-sm text-ink/80 leading-relaxed mb-5">{message}</p>
 
@@ -46,7 +46,7 @@ const RetakeCard = ({ result, title, message }) => {
       )}
 
       <div className="vein-divider mb-4" />
-      <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">{t('result.goodPhoto')}</p>
+      <p className="font-mono text-[11px] text-ink-2 uppercase tracking-widest mb-2">{t('result.goodPhoto')}</p>
       <ul className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-ink/70">
         {GENERAL_TIPS.map((k) => <li key={k}>· {t(`result.generalTips.${k}`)}</li>)}
       </ul>
@@ -57,7 +57,7 @@ const RetakeCard = ({ result, title, message }) => {
 
       {result.status === 'uncertain' && result.top3?.length > 0 && (
         <details className="mt-5 text-xs text-ink/60">
-          <summary className="cursor-pointer font-mono uppercase tracking-widest text-[10px] text-sage">
+          <summary className="cursor-pointer font-mono uppercase tracking-widest text-[11px] text-ink-2">
             {t('result.leanings')}
           </summary>
           <ul className="mt-2 flex flex-col gap-1">
@@ -109,7 +109,7 @@ const ResultCard = ({ result }) => {
         className="w-full max-h-72 object-cover mb-5 border border-ink/10"
       />
 
-      <span className="font-mono text-[10px] text-sage uppercase tracking-widest">
+      <span className="font-mono text-[11px] text-ink-2 uppercase tracking-widest">
         {t('result.specimen', { crop: cropName(crop, lang) })}
       </span>
       <h3 className="font-display text-3xl text-ink mt-1 mb-4">
@@ -117,7 +117,7 @@ const ResultCard = ({ result }) => {
       </h3>
 
       <div className="mb-5">
-        <div className="flex justify-between font-mono text-xs text-sage mb-1">
+        <div className="flex justify-between font-mono text-xs text-ink-2 mb-1">
           <span>{t('result.confidence')}</span>
           <span>{(confidence * 100).toFixed(1)}%</span>
         </div>
@@ -132,7 +132,7 @@ const ResultCard = ({ result }) => {
       <div className="vein-divider mb-5" />
 
       <div className="mb-5">
-        <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">{t('result.treatment')}</p>
+        <p className="font-mono text-[11px] text-ink-2 uppercase tracking-widest mb-2">{t('result.treatment')}</p>
         <p className="text-sm text-ink/80 leading-relaxed">{treatment}</p>
         {/* the server says when it answered with a translation no expert has checked yet (treatmentMap.hi.js) */}
         {result.treatmentNeedsReview && (
@@ -143,7 +143,7 @@ const ResultCard = ({ result }) => {
       {/* a Cloudinary URL; records saved before the migration hold base64 */}
       {gradcam && (
         <div className="mb-5">
-          <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">{t('result.affected')}</p>
+          <p className="font-mono text-[11px] text-ink-2 uppercase tracking-widest mb-2">{t('result.affected')}</p>
           <img
             src={/^(https?:|data:)/.test(gradcam) ? gradcam : `data:image/png;base64,${gradcam}`}
             alt={t('result.gradcamAlt')}
@@ -154,7 +154,7 @@ const ResultCard = ({ result }) => {
 
       {yieldLossPercent !== null && (
         <div className="border-l-2 border-clay pl-4">
-          <p className="font-mono text-[10px] text-sage uppercase tracking-widest mb-1">{t('result.yieldImpact')}</p>
+          <p className="font-mono text-[11px] text-ink-2 uppercase tracking-widest mb-1">{t('result.yieldImpact')}</p>
           <p className="text-sm text-ink/80">
             <Trans i18nKey="result.yieldLoss" values={{ pct: yieldLossPercent }}
               components={{ b: <span className="text-clay font-medium" /> }} />

@@ -56,7 +56,7 @@ const Privacy = () => {
             {t('privacy.deleteButton')}
           </button>
         )}
-        {message && <p role="status" className="font-mono text-xs text-sage mt-3">{message}</p>}
+        {message && <p role="status" className="font-mono text-xs text-ink-2 mt-3">{message}</p>}
       </section>
     </div>
   );

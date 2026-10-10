@@ -106,6 +106,10 @@ It is not an official loss assessment.
 - **Details and the rendering choice:** [docs/REPORT.md](docs/REPORT.md).
 - **Samples:** [docs/sample_report.pdf](docs/sample_report.pdf), [docs/sample_report_hi.pdf](docs/sample_report_hi.pdf).
 
+## My Field workspace
+
+After the landing page, `/overview`, `/predict` (new check), `/history` (field log), `/checkup/:id` and `/me` form one workspace (left menu on desktop, tab bar on phones): last result and counts, a result page with Care plan, Field context, Satellite and Report tabs, a filterable log, and a profile and privacy page. Built from the "My Field" design; routes, data sources, scaling and limits are in [docs/WORKSPACE.md](docs/WORKSPACE.md).
+
 ## Landing page and colour system
 
 The home page (7 sections, English + Hindi, one viewport per section on desktop, stacked on phones and tablets) is described in [docs/LANDING_PAGE.md](docs/LANDING_PAGE.md); the colour system, with the experiments behind it, is [docs/COLOUR_SYSTEM.md](docs/COLOUR_SYSTEM.md).
@@ -261,6 +265,7 @@ The golden tests need the ONNX files built from the tracked weights; without the
 | POST | `/api/auth/login` | Log in, returns JWT |
 | POST | `/api/predict` | multipart `image` + `crop` → orchestrates the ML call, uploads to Cloudinary, saves the record |
 | GET | `/api/predict` | Authenticated user's prediction history |
+| GET | `/api/predict/:id` | One checkup of this user or browser, with its heatmap (404 for anyone else) |
 | GET | `/api/predict/:id/disease-risk` | Weather risk for a checkup's location (potato, rice) |
 | GET | `/api/disease-risk?lat=&lon=&crop=` | Weather risk for a point (potato, rice) |
 | GET | `/api/predict/:id/report.pdf?lang=en\|hi` | PDF field report of a checkup (owner only) |

@@ -194,6 +194,20 @@ const getHistory = async (req, res) => {
   }
 };
 
+// @route  GET /api/predict/:id -> one checkup of this browser/user (with its heatmap; the page for a checkup opens by link)
+const getOne = async (req, res) => {
+  try {
+    const owner = ownerFilter(req);
+    if (!owner || !mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ message: 'Prediction not found' });
+    const prediction = await PredictionModel.findOne({ _id: req.params.id, ...owner }).select('-context');
+    if (!prediction) return res.status(404).json({ message: 'Prediction not found' });
+    res.json(toResponse(req, res, prediction));
+  } catch (error) {
+    logError(req, 'Get one failed', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // @route  GET /api/predict/classes -> { crop: [class, ...] }, the choices for "what was it really?"
 // (the treatment map has exactly the ML label maps' classes; tests/feedback.test.js checks that)
 const getClasses = (req, res) => {
@@ -263,4 +277,4 @@ const deleteMine = async (req, res) => {
   }
 };
 
-export { predict, getHistory, getClasses, giveFeedback, deleteMine };
+export { predict, getHistory, getOne, getClasses, giveFeedback, deleteMine };

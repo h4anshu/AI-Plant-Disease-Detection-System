@@ -5,6 +5,7 @@ import { ArrowUpRight, Calendar, Leaf } from './heroIcons';
 import terms from '../locales/terms.json';
 import { cropName, diseaseName } from '../locales/terms';
 import { BINS, binLabel } from '../pages/mapStyle';
+import { d } from './motion';
 import diorama from '../assets/map/diorama.webp';
 import lens from '../assets/map/lens.webp';
 import badge from '../assets/map/privacy-badge.webp';
@@ -44,7 +45,7 @@ const HexLayer = ({ style }) => (
       {HEX.map(([c, r, k]) => {
         const x = 1.5 * HEX_R * c, y = HEX_H * (r + (Math.abs(c) % 2 ? 0.5 : 0)), col = HEX_COLOR[k];
         return (
-          <g key={`${c}${r}`} transform={`translate(${x} ${y - (k === 'R' ? 9 : 0)})`}>
+          <g key={`${c}${r}`} transform={`translate(${x} ${y - (k === 'R' ? 9 : 0)})`} className="rv-hex rv-pop" style={{ '--pd': `${0.5 + (Math.abs(c) + Math.abs(r)) * 0.12}s` }}>
             {k === 'R' && <polygon points={hexPts(HEX_R * 0.93)} transform="translate(0 9)" fill={col} fillOpacity=".55" />}
             <polygon points={hexPts(HEX_R * 0.93)} fill={col || '#fff'} fillOpacity={col ? (k === 'R' ? 0.62 : 0.55) : 0.07} stroke="#fff" strokeOpacity={col ? 0.85 : 0.8} strokeWidth="2.2" strokeLinejoin="round" />
             <polygon points={hexPts(HEX_R * 0.93)} fill="url(#hexsheen)" opacity=".55" />
@@ -69,8 +70,8 @@ const Dd = ({ children, icon }) => (   // a drop-down drawn as part of the illus
   </span>
 );
 
-const Feature = ({ Icon, children }) => (
-  <li className="flex items-center gap-4 lg:gap-[calc(var(--u)*20)]">
+const Feature = ({ Icon, children, i }) => (
+  <li data-rv="left" style={d(.45 + i * .13)} className="flex items-center gap-4 lg:gap-[calc(var(--u)*20)]">
     <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-pine text-parchment shadow-md lg:h-[calc(var(--u)*66)] lg:w-[calc(var(--u)*66)]"><Icon className="h-[46%] w-[46%]" /></span>
     <span className="leading-snug text-ink" style={fs(22, 16)}>{children}</span>
   </li>
@@ -102,17 +103,17 @@ const MapSection = () => {
 
           {/* left column: text, features, the two real selects and the button */}
           <div className="map-abs relative z-20" style={pos(96, 70, 640)}>
-            <p className="flex items-center gap-3 font-mono uppercase tracking-[0.3em] text-ink-2" style={fs(17, 12)}><Leaf className="h-[1.3em] w-[1.3em] -rotate-12 text-leaf-text" />{t('mapsec.eyebrow')}</p>
+            <p data-rv="fade" className="flex items-center gap-3 font-mono uppercase tracking-[0.3em] text-ink-2" style={fs(17, 12)}><Leaf className="h-[1.3em] w-[1.3em] -rotate-12 text-leaf-text" />{t('mapsec.eyebrow')}</p>
             <h2 className="mt-[0.3em] text-balance font-display leading-[1.02] text-ink" style={fs(76, 40)}>
-              {t('mapsec.title1')}<br /><em className="text-leaf-text">{t('mapsec.titleEm')}</em>
+              <span data-rv className="block" style={d(.1)}>{t('mapsec.title1')}</span><em data-rv className="block text-leaf-text" style={d(.24)}>{t('mapsec.titleEm')}</em>
             </h2>
-            <p className="mt-[0.5em] max-w-[34rem] leading-relaxed text-ink-2 lg:max-w-[calc(var(--u)*560)]" style={fs(22, 16)}>{t('mapsec.intro')}</p>
+            <p data-rv style={{ ...fs(22, 16), ...d(.35) }} className="mt-[0.5em] max-w-[34rem] leading-relaxed text-ink-2 lg:max-w-[calc(var(--u)*560)]">{t('mapsec.intro')}</p>
             <ul className="mt-6 space-y-3.5 lg:mt-[calc(var(--u)*28)] lg:space-y-[calc(var(--u)*16)]">
-              <Feature Icon={(p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true" {...p}><path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4z" /></svg>}>{t('mapsec.f1')}</Feature>
-              <Feature Icon={(p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}><path d="M12 3 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6z" /><rect x="9.3" y="10.5" width="5.4" height="4.4" rx="1" /><path d="M10.4 10.5V9a1.6 1.6 0 0 1 3.2 0v1.5" /></svg>}>{t('mapsec.f2')}</Feature>
-              <Feature Icon={Calendar}>{t('mapsec.f3')}</Feature>
+              <Feature i={0} Icon={(p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true" {...p}><path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4z" /></svg>}>{t('mapsec.f1')}</Feature>
+              <Feature i={1} Icon={(p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}><path d="M12 3 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6z" /><rect x="9.3" y="10.5" width="5.4" height="4.4" rx="1" /><path d="M10.4 10.5V9a1.6 1.6 0 0 1 3.2 0v1.5" /></svg>}>{t('mapsec.f2')}</Feature>
+              <Feature i={2} Icon={Calendar}>{t('mapsec.f3')}</Feature>
             </ul>
-            <div className="mt-7 flex flex-wrap gap-3 lg:mt-[calc(var(--u)*28)]">
+            <div data-rv style={d(.9)} className="mt-7 flex flex-wrap gap-3 lg:mt-[calc(var(--u)*28)]">
               <label className="min-w-[10rem] flex-1 lg:max-w-[calc(var(--u)*250)]"><span className="sr-only">{t('mapsec.cropSel')}</span>
                 <select value={crop} onChange={(e) => setCrop(e.target.value)} className={sel} style={fs(21, 15)}>
                   {CROPS.map((c) => <option key={c} value={c}>{t('mapsec.cropSel')}: {crn(c)}</option>)}
@@ -122,14 +123,14 @@ const MapSection = () => {
                   {DAYS.map((d) => <option key={d} value={d}>{t(`map.days${d}`)}</option>)}
                 </select></label>
             </div>
-            <Link to={`/map?crop=${crop}&days=${days}`} className="mt-6 inline-flex items-center gap-4 rounded-full bg-pine px-9 py-4 font-display text-parchment shadow-[0_18px_30px_-14px_rgba(7,38,24,.65)] transition-colors hover:bg-pine-hover focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ink lg:mt-[calc(var(--u)*24)]" style={fs(26, 19)}>
+            <Link to={`/map?crop=${crop}&days=${days}`} className="cta-lift mt-6 inline-flex items-center gap-4 rounded-full bg-pine px-9 py-4 font-display text-parchment shadow-[0_18px_30px_-14px_rgba(7,38,24,.65)] hover:bg-pine-hover focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ink lg:mt-[calc(var(--u)*24)]" style={fs(26, 19)}>
               {t('mapsec.cta')}<ArrowUpRight className="h-[0.8em] w-[0.8em]" />
             </Link>
           </div>
 
           {/* the picture: slab, tinted hexagons lying on the land, one thin ring, the lens joined to a tile by a line.
               Nothing in this group animates its position, so the line always stays attached. */}
-          <div className="map-vis z-10" aria-hidden="true">
+          <div data-rv="t" className="map-vis z-10" aria-hidden="true">
             <img src={diorama} alt="" style={at(16, 100, 908)} />
             <svg className="pointer-events-none" viewBox="0 0 940 720" style={at(0, 0, 940, 720)} fill="none" aria-hidden="true">
               <ellipse className="map-ring" cx="492" cy="372" rx="262" ry="132" stroke="#fff" strokeOpacity=".7" strokeWidth="2" />
@@ -150,7 +151,7 @@ const MapSection = () => {
           </div>
 
           {/* example card (a worked example, labelled as such) */}
-          <div className="map-abs relative z-20 max-lg:mx-auto max-lg:w-full max-lg:max-w-sm" style={pos(1062, 84, 366)}>
+          <div data-rv="zoom" className="map-abs relative z-20 max-lg:mx-auto max-lg:w-full max-lg:max-w-sm" style={{ ...pos(1062, 84, 366), ...d(.5) }}>
             <div className="map-glass" style={{ padding: U(24), borderRadius: U(30) }}>
               <div className="flex items-center justify-between">
                 <PanelHead Icon={(p) => <Leaf {...p} />}>{t('mapsec.cardLabel')}</PanelHead>
@@ -166,7 +167,7 @@ const MapSection = () => {
 
           {/* the three panels in one column: same width, same glass, same header, equal gaps */}
           <div className="map-abs relative z-20 flex flex-col max-lg:mx-auto max-lg:w-full max-lg:max-w-sm max-lg:gap-4" style={{ ...pos(1590, 44, 292), gap: U(18) }}>
-            <div className="map-glass hidden lg:block" aria-hidden="true" style={{ padding: U(22), borderRadius: U(28) }}>
+            <div data-rv="right" className="map-glass hidden lg:block" aria-hidden="true" style={{ padding: U(22), borderRadius: U(28), ...d(.6) }}>
               <PanelHead Icon={Calendar}>{t('mapsec.filtersTitle')}</PanelHead>
               <p className="mt-[0.6em] font-body text-ink" style={fs(17, 13)}>{t('mapsec.filterCrop')}</p>
               <div className="mt-1"><Dd icon={<img src={potato} alt="" className="object-contain" style={{ width: U(30), height: U(30) }} />}>{crn(EXAMPLE.crop)}</Dd></div>
@@ -176,17 +177,17 @@ const MapSection = () => {
                 {DAYS.map((d) => <span key={d} className={`rounded-full py-[0.45em] ${d === 30 ? 'bg-pine text-parchment' : 'border border-ink/10 bg-white/70 text-ink'}`}>{d}{lang === 'hi' ? ' दिन' : 'd'}</span>)}
               </div>
             </div>
-            <div className="map-glass" style={{ padding: U(22), borderRadius: U(28) }}>
+            <div data-rv="right" className="map-glass" style={{ padding: U(22), borderRadius: U(28), ...d(.78) }}>
               <PanelHead Icon={(p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden="true" {...p}><path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4z" /></svg>}>{t('mapsec.legendTitle')}</PanelHead>
               <ul className="mt-[0.6em] grid grid-cols-1 gap-y-[calc(var(--u)*5)] max-lg:gap-y-2">
                 {BINS.map((b, i) => (
                   <li key={b.color} className="flex items-center gap-3 text-ink" style={fs(18, 14)}>
-                    <span className="map-hexsw inline-block shrink-0" style={{ width: U(30), height: U(30), minWidth: 22, minHeight: 22, background: b.color }} />{t('mapsec.legendRange', { range: binLabel(i) })}
+                    <span className="map-hexsw rv-pop inline-block shrink-0" style={{ width: U(30), height: U(30), minWidth: 22, minHeight: 22, background: b.color, '--pd': `${1 + i * .12}s` }} />{t('mapsec.legendRange', { range: binLabel(i) })}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="map-glass" style={{ padding: U(18), borderRadius: U(28) }}>
+            <div data-rv="right" className="map-glass" style={{ padding: U(18), borderRadius: U(28), ...d(.96) }}>
               <div className="flex items-center gap-3">
                 <img src={badge} alt="" aria-hidden="true" className="shrink-0 object-contain" style={{ width: U(54), height: U(54), minWidth: 44 }} />
                 <p className="font-display leading-tight text-ink" style={fs(19, 16)}>{t('mapsec.privTitle')}</p>
@@ -196,7 +197,7 @@ const MapSection = () => {
           </div>
 
           {/* cords: example card to the darkest tile (with a travelling dot), and one from each panel to the part of the map it controls or describes */}
-          <svg className="map-flow pointer-events-none absolute inset-0 z-[15] h-full w-full max-lg:hidden" viewBox="0 0 1900 941" fill="none" aria-hidden="true">
+          <svg data-rv="wipe" className="map-flow pointer-events-none absolute inset-0 z-[15] h-full w-full max-lg:hidden" style={d(1.1)} viewBox="0 0 1900 941" fill="none" aria-hidden="true">
             {CORDS.map(({ d, from, to, dot }) => (
               <g key={d}>
                 <path d={d} stroke="#fff" strokeOpacity=".75" strokeWidth="7" strokeLinecap="round" />

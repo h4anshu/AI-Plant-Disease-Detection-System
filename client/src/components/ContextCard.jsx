@@ -18,7 +18,7 @@ const longDate = (d, lang) => new Date(`${d}T00:00:00`).toLocaleDateString(lang 
 
 const Badge = ({ level }) => {
   const { t } = useTranslation();
-  return <span className={`inline-block border font-mono text-[10px] uppercase tracking-wide px-2 py-0.5 ${LEVEL_STYLE[level] ?? LEVEL_STYLE.unknown}`}>{t(`context.level.${level}`)}</span>;
+  return <span className={`inline-block border font-mono text-[11px] uppercase tracking-wide px-2 py-0.5 ${LEVEL_STYLE[level] ?? LEVEL_STYLE.unknown}`}>{t(`context.level.${level}`)}</span>;
 };
 
 // "Mean daily temperature, last 7 days: 28 °C — rule: 25–34 °C ✓"
@@ -78,7 +78,7 @@ function SoilCardForm({ predictionId, onSaved }) {
   };
   return (
     <details className="mt-3 text-xs">
-      <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-widest text-sage">{t('context.card.open')}</summary>
+      <summary className="cursor-pointer font-mono text-[11px] uppercase tracking-widest text-ink-2">{t('context.card.open')}</summary>
       <form onSubmit={submit} className="mt-2">
         <p className="text-ink/70 mb-2">{t('context.card.why')}</p>
         <div className="grid grid-cols-2 gap-2">
@@ -124,7 +124,7 @@ const ContextCard = ({ result, leanings = false }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result._id]);
 
-  if (state.status === 'loading') return <p role="status" className="font-mono text-xs text-sage mt-3">{t('context.loading')}</p>;
+  if (state.status === 'loading') return <p role="status" className="font-mono text-xs text-ink-2 mt-3">{t('context.loading')}</p>;
   if (state.status === 'error') return <p role="alert" className="font-mono text-xs text-clay mt-3">{state.message}</p>;
 
   const { context: c, fit, draft, soilTest, soilTestNote } = state.data;
@@ -140,7 +140,7 @@ const ContextCard = ({ result, leanings = false }) => {
 
   return (
     <section aria-labelledby="context-title" className="mt-5 border-t border-ink/10 pt-4">
-      <p id="context-title" className="font-mono text-[10px] text-sage uppercase tracking-widest mb-2">{t('context.title')}</p>
+      <p id="context-title" className="font-mono text-[11px] text-ink-2 uppercase tracking-widest mb-2">{t('context.title')}</p>
 
       {leanings ? (
         <div className="flex flex-col gap-2">
@@ -176,7 +176,7 @@ const ContextCard = ({ result, leanings = false }) => {
       <SoilCardForm predictionId={result._id} onSaved={(d) => d.fit && setState({ status: 'done', data: { ...state.data, ...d } })} />
 
       <details className="mt-2 text-[11px] text-ink/60">
-        <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-widest text-sage">{t('context.sources')}</summary>
+        <summary className="cursor-pointer font-mono text-[11px] uppercase tracking-widest text-ink-2">{t('context.sources')}</summary>
         <ul className="mt-1 flex flex-col gap-0.5">
           {[...sources.values()].map((s) => <li key={s.url}><a className="underline" href={s.url} target="_blank" rel="noreferrer">{s.title}</a></li>)}
           {c.provenance.attributions.map((a) => <li key={a}>{a}</li>)}
