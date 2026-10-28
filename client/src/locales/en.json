@@ -191,15 +191,21 @@
     "locationTitle": "Your location",
     "location": "Taken only after you agree: from your phone's location or, if that isn't available, from the location saved in the photo. You can stop sharing any time with \"Change\" on the Diagnose page. For the weather risk of potato and rice, a point rounded to about 5 km is sent to the free weather service Open-Meteo, with nothing that identifies you. For a PDF report, our server loads the map around that rounded area from OpenStreetMap.",
     "deleteTitle": "Delete your data",
-    "delete": "This removes every checkup made in this browser, with its photos, from our servers. It cannot be undone. Do it before clearing your browser data: after that we can no longer tell which checkups were yours.",
+    "delete": "This removes every checkup made in this browser, with its photos, and every saved field, from our servers. It cannot be undone. Do it before clearing your browser data: after that we can no longer tell which checkups and fields were yours.",
     "deleteButton": "Delete my data",
     "confirm": "Yes, delete everything",
     "cancel": "Cancel",
     "failed": "Could not delete your data. Please try again.",
     "done_one": "Deleted 1 checkup from this browser.",
     "done_other": "Deleted {{count}} checkups from this browser.",
+    "fieldsTitle": "Saved fields",
+    "fields": "For each field you add for weather alerts: its crop, growth stage, an optional name and the place you chose, tied to a random ID for this browser. The exact place is kept private: it is never shown, never in the public map and never in our logs. Only a point rounded to about 5 km is sent to the free weather service Open-Meteo, with nothing that identifies you. \"Delete my data\" removes your fields too, and each field also has its own Delete button under Profile and privacy.",
     "contextTitle": "Weather and soil for a checkup",
-    "context": "The first time you open a checkup that has a location, our server looks up the weather around the photo date (Open-Meteo, the same point rounded to about 5 km), the rainfall compared with normal and a modelled soil map (through Google Earth Engine, which is sent only the centre of a square of about 250 m around your point, never the exact location). The result is saved with the checkup, without coordinates. Soil Health Card values you type in are saved with that checkup only. \"Delete my data\" removes all of it."
+    "context": "The first time you open a checkup that has a location, our server looks up the weather around the photo date (Open-Meteo, the same point rounded to about 5 km), the rainfall compared with normal and a modelled soil map (through Google Earth Engine, which is sent only the centre of a square of about 250 m around your point, never the exact location). The result is saved with the checkup, without coordinates. Soil Health Card values you type in are saved with that checkup only. \"Delete my data\" removes all of it.",
+    "alertsTitle": "Weather alerts: what leaves our server",
+    "alerts": "The weather and the river forecast are asked for with a point rounded to about 5 km, never your field's exact place. Fires are asked for from NASA with the same rounded area (a box of about 22 km); the distance to a fire is worked out on our server. Official warnings (NDMA, IMD, the river gauges) news headlines and mandi prices are fetched by our server for everyone (for a state and a crop, never for a person), so nothing about you is sent for them. Saved fields stay until you delete them. Weather, river, fire and satellite answers are kept from half an hour to a few days and hold no personal data. The satellite flood check, which runs only when you press its button, is the one place where the exact point of your field goes to Google (Earth Engine): it reads a circle of 500 m around that point from public satellite images, and the answer is kept for 3 days under a code that does not show the place.",
+    "reportsTitle": "Reports from other farmers, and your answers",
+    "reports": "\"Disease reports near you\" uses the same data as the public disease map: a disease counts only when at least 3 different browsers reported it, your own browser is never counted, and the alert shows a disease and a number, never a place. \"Did this help?\" stores the rule, the date, your answer and the field's crop and growth stage, with no place; it is kept for a year, and \"Delete my data\" removes it."
   },
   "field": {
     "show": "See this field from space",
@@ -722,6 +728,449 @@
       "st2": "Reading the leaf",
       "st3": "Drawing the heatmap",
       "st4": "Adding weather and soil notes"
+    }
+  },
+  "alerts": {
+    "mode": {
+      "aria": "Overview view",
+      "field": "My Field",
+      "fieldSub": "Leaf checks and field health",
+      "weather": "Weather & Alerts",
+      "weatherSub": "Rain, frost and heat for your fields",
+      "noChecks": "No checks yet",
+      "clear": "All clear",
+      "recheck_one": "{{count}} to recheck",
+      "recheck_other": "{{count}} to recheck",
+      "unavailable": "Weather unavailable",
+      "addField": "Add a field",
+      "none": "No alert",
+      "warn_one": "{{count}} warning",
+      "warn_other": "{{count}} warnings",
+      "watch_one": "{{count}} watch",
+      "watch_other": "{{count}} watch",
+      "info_one": "{{count}} tip",
+      "info_other": "{{count}} tips",
+      "urgent_one": "{{count}} urgent",
+      "urgent_other": "{{count}} urgent",
+      "officialLate": "Official feed late"
+    },
+    "title": {
+      "noFields": "Add a field to get weather alerts.",
+      "alerts_one": "{{count}} weather alert for your fields.",
+      "alerts_other": "{{count}} weather alerts for your fields.",
+      "clear": "No weather alert ahead.",
+      "unavailable": "The weather could not be checked.",
+      "clearLate": "No alert from our forecast."
+    },
+    "level": {
+      "info": "Tip",
+      "watch": "Watch",
+      "warn": "Warning",
+      "calm": "No alert",
+      "stale": "Unavailable",
+      "urgent": "Urgent"
+    },
+    "stage": {
+      "sowing": "Sowing",
+      "vegetative": "Growing leaves",
+      "flowering": "Flowering",
+      "grain_fill": "Grain or tuber filling",
+      "harvest_ready": "Ready to harvest"
+    },
+    "hazard": {
+      "frost": "Frost",
+      "heat": "Heat",
+      "heatwave": "Heat wave",
+      "rain_harvest": "Rain at harvest",
+      "rain_heavy": "Heavy rain",
+      "rain_spray": "Rain after spraying",
+      "flood_river": "River flow",
+      "dry_spell": "Dry spell",
+      "disease_near": "Disease nearby",
+      "fire_near": "Fire nearby"
+    },
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "midnight": "midnight",
+    "windowSame": "{{day}}, {{from}} to {{to}}",
+    "windowAcross": "{{day1}}, {{from}} to {{day2}}, {{to}}",
+    "chart": {
+      "tmin": "Night low",
+      "tmax": "Daytime high",
+      "rain": "Rain per day",
+      "discharge": "River flow per day",
+      "dry": "Dry days in a row",
+      "days": "days"
+    },
+    "rules": {
+      "FROST-WHEAT-1": {
+        "head": "Frost risk. Give a light irrigation in the evening before the cold night.",
+        "why": "The forecast night low is {{value}} °C, and this level starts at {{threshold}} °C. Wheat that is flowering or filling grain is easily hurt by frost, and the ground can be colder than the forecast air."
+      },
+      "FROST-POTATO-1": {
+        "head": "Frost risk. Irrigate lightly before the cold night, but not if heavy rain is forecast.",
+        "why": "The forecast night low is {{value}} °C, and this level starts at {{threshold}} °C. Frost burns potato leaves, and a light irrigation before the cold night is the usual protection."
+      },
+      "HEAT-WHEAT-1": {
+        "head": "Hot weather for wheat. Give light, frequent irrigation in the evening and hold off fertiliser.",
+        "why": "The forecast daytime high is {{value}} °C, and this level starts at {{threshold}} °C. Heat at flowering and grain filling makes the crop age early and can lower the yield."
+      },
+      "HEAT-RICE-1": {
+        "head": "Hot days while the rice flowers. Keep a thin layer of water in the field.",
+        "why": "The forecast daytime high is {{value}} °C, and this level starts at {{threshold}} °C. Above about 33 °C the pollen of flowering rice can fail, and then the grains do not fill."
+      },
+      "HEAT-ANY-1": {
+        "head": "Very hot day ahead. Irrigate in the evening, protect people working outside and check the official IMD warning.",
+        "why": "The forecast daytime high is {{value}} °C, and this level starts at {{threshold}} °C, the heat wave level IMD uses for the plains. This is our own forecast check, not an official warning."
+      },
+      "RAIN-HARVEST-1": {
+        "head": "Rain is coming before harvest is done. Cut the ripe crop first and keep it covered and dry.",
+        "why": "The forecast rain is {{value}} mm in one day, and this level starts at {{threshold}} mm. Rain on a ripe or cut crop causes grain loss and spoilage."
+      },
+      "RAIN-HEAVY-1": {
+        "head": "Heavy rain expected. Open the field drains and put off spraying, fertiliser and irrigation.",
+        "why": "The forecast rain is {{value}} mm in one day, and this level starts at {{threshold}} mm. IMD calls 64.5 mm or more in a day heavy rain."
+      },
+      "RAIN-SPRAY-1": {
+        "head": "Rain is coming. Hold off spraying, the rain will wash it off.",
+        "why": "The forecast rain is {{value}} mm in the next day or so, and this tip starts at {{threshold}} mm. A spray that is washed off is wasted and the leaf stays unprotected."
+      },
+      "FLOOD-RIVER-1": {
+        "head": "River flow in your area is forecast to be unusually high {{day}}. Watch the water level, keep drains open and move tools and stored produce away from low ground.",
+        "why": "The forecast flow of the biggest river near your field reaches {{value}} m³/s, above {{threshold}} m³/s, a level it reaches on only a few days of the year. This is a forecast for the region with low confidence, not for your field: it does not mean your field will flood."
+      },
+      "DRY-SPELL-1": {
+        "head": "Dry spell: {{value}} dry days in a row ({{day}}). Irrigate if you can: sowing, flowering and grain filling need moisture in the soil.",
+        "why": "A dry day is a day with less than 2.5 mm of rain. {{value}} in a row is past {{threshold}}, the level this alert starts at (IMD counts dry spells at 7 and 14 days). The forecast for one place can be wrong, so look at your soil too."
+      },
+      "DRY-SPELL-2": {
+        "head": "Dry spell: {{value}} dry days in a row ({{day}}). Check the soil moisture, and irrigate if the crop is wilting.",
+        "why": "A dry day is a day with less than 2.5 mm of rain. {{value}} in a row is past {{threshold}}, the level this alert starts at for a young crop (IMD counts dry spells at 7 and 14 days). The forecast for one place can be wrong, so look at your soil too."
+      },
+      "DISEASE-NEAR-1": {
+        "head": "Other farmers near you found {{disease}} on {{crop}} in the last {{window}} days. Look at your own plants soon.",
+        "why": "At least {{value}} different phones checked a {{crop}} leaf within about 5 km of this field and the AI read {{disease}}. These are photo checks by other users of this app, not lab results, and where each one was taken stays private. Compare with your own leaves."
+      },
+      "FIRE-NEAR-1": {
+        "head": "A fire was seen by satellite within {{km}} km of your field in the last {{window}} hours. Check around your field now, and if smoke or flames come close, call 101.",
+        "why": "NASA satellites saw {{count}} hot spots within 5 km of your field, the nearest within {{km}} km. A satellite passes only a few times a day and sees a fire only while it burns, so a small or short fire can be missed, and a hot spot is not always a crop fire. Our server works out the distance; NASA is only asked about the area around the field, not its exact place."
+      }
+    },
+    "error": {
+      "title": "Weather alerts did not load",
+      "load": "Check your connection and try again."
+    },
+    "retry": "Try again",
+    "empty": {
+      "title": "Add your first field",
+      "text": "Tell us the crop, how far it has grown and where the field is. We check the weather for the next 3 days and warn you about rain, frost and heat that matter for that crop.",
+      "cta": "Add a field"
+    },
+    "fields": {
+      "aria": "Your fields",
+      "all": "All fields",
+      "add": "Add a field",
+      "max": "You can save up to {{count}} fields."
+    },
+    "checked": "Checked {{time}}",
+    "unavailable": {
+      "title": "The weather for {{name}} could not be loaded",
+      "text": "We do not know if an alert is coming. Do not read this as all clear. Try again in a few minutes."
+    },
+    "needs": "Needs your attention",
+    "allDone": "All marked as done",
+    "sourceModel": "Model forecast",
+    "sourceReports": "Reports near you",
+    "when": "When",
+    "ends": "Until",
+    "why": "Why this alert?",
+    "done": "Mark as done",
+    "doneOn": "Marked as done",
+    "doneShort": "Done",
+    "whyTitle": "Why you see this",
+    "sure": "Forecast confidence: {{level}}",
+    "capNote": "Three days ahead a forecast is least certain, so it shows as a Watch at most.",
+    "confidence": {
+      "medium": "medium",
+      "low": "low"
+    },
+    "source": "Weather: Open-Meteo forecast, checked {{time}}",
+    "rule": "Rule {{id}}, draft: an expert has not reviewed it yet",
+    "next": "Then",
+    "calm": {
+      "title": "No weather alert for the next 3 days",
+      "text": "Checked {{time}}. We looked for frost, heat and heavy rain for your crop stage. A forecast can change, so look again tomorrow.",
+      "titleLate": "No alert from our forecast"
+    },
+    "cond": {
+      "title": "Field conditions",
+      "rain7": "Rain, next 7 days",
+      "coldest": "Coldest night, next 3 days",
+      "stage": "Crop stage",
+      "stageNote": "Change it when your crop moves to the next stage. The alerts follow it.",
+      "stageFailed": "Could not change the stage. Please try again."
+    },
+    "disclaimer": "Alerts marked Official are passed on from IMD or NDMA SACHET as published. The others come from a weather forecast model and simple crop rules that experts are still reviewing, and are not official warnings. Forecasts change, so ask your local agriculture office (KVK) before big decisions.",
+    "hz": {
+      "eyebrow": "Next 3 days",
+      "title": "{{name}}: rain and temperature",
+      "now": "Now",
+      "night": "Night",
+      "morn": "Morning",
+      "noon": "Noon",
+      "eve": "Evening",
+      "rain": "Rain",
+      "temp": "Temperature",
+      "alerts": "Alerts",
+      "none": "No alert in these 3 days",
+      "dry": "No rain expected",
+      "foot": "Night shows the lowest temperature, noon the highest, morning and evening the average. Hatched parts have already passed.",
+      "scroll": "The 72-hour strip, scrolls sideways"
+    },
+    "new": {
+      "eyebrow": "New field · step {{step}} of 3",
+      "title1": "Add a",
+      "title2": "field",
+      "stepsAria": "Steps",
+      "step": {
+        "crop": "Crop",
+        "stage": "Stage",
+        "place": "Place"
+      },
+      "cropTitle": "Which crop is in this field?",
+      "cropText": "Pick the main crop. You can add up to 3 fields.",
+      "stageTitle": "How far has the {{crop}} grown?",
+      "stageText": "Pick the closest one. Alerts depend on it, and you can change it later.",
+      "stageHelp": {
+        "sowing": "Seed is in the ground, little or no leaf yet",
+        "vegetative": "Leaves and shoots are growing",
+        "flowering": "Flowers or ears are coming out",
+        "grain_fill": "Grains or tubers are filling",
+        "harvest_ready": "Ripe, ready to cut or dig"
+      },
+      "notSure": "Not sure?",
+      "notSureText": "Pick the closest stage. You can change it any time from the Weather page.",
+      "placeTitle": "Where is the field?",
+      "placeText": "Stand in the field and use your phone location, or tap the map.",
+      "gps": "Use my location",
+      "locating": "Finding you…",
+      "orTap": "or tap the map",
+      "gpsFailed": "Could not get your location. Tap the field on the map instead.",
+      "mapAria": "Map. Tap to place the field.",
+      "centre": "Use the map centre",
+      "placed": "Place chosen. Tap the map again to move it.",
+      "noPin": "No place chosen yet.",
+      "nameLabel": "Name (optional)",
+      "privateHead": "Your place stays private.",
+      "privateText": "It is saved only for this device and never shown to anyone. We ask for the weather of the 5 km square around it, not your exact spot.",
+      "back": "Back",
+      "next": "Next",
+      "cancel": "Cancel",
+      "save": "Save field",
+      "saving": "Saving…",
+      "full": "You already have 3 fields, the most we can check. Delete one to add another.",
+      "fullTitle": "Your fields are full",
+      "manage": "Manage my fields",
+      "invalid": "Some details are not valid. Please go back and check them.",
+      "failed": "Could not save the field. Please try again."
+    },
+    "mine": {
+      "title": "My fields",
+      "note": "Saved with your checkups on this device. The exact place is kept private and only used to ask for the weather of a 5 km square.",
+      "none": "No fields saved yet.",
+      "failed": "Could not load your fields.",
+      "deleteFailed": "Could not delete the field. Please try again.",
+      "confirm": "Yes, delete",
+      "delete": "Delete",
+      "deleteAria": "Delete the field {{name}}"
+    },
+    "official": {
+      "panel": "Official warning",
+      "issuedBy": "Issued by",
+      "validUntil": "Valid until",
+      "says": "The issuer adds",
+      "open": "Open the original",
+      "chip": "Official · {{source}}",
+      "source": {
+        "sachet": "NDMA SACHET",
+        "imd": "IMD",
+        "cwc": "CWC gauge"
+      },
+      "family": {
+        "rain": "Rain",
+        "storm": "Thunderstorm",
+        "wind": "Wind",
+        "heat": "Heat",
+        "cold": "Cold",
+        "fog": "Fog",
+        "flood": "Flood",
+        "other": "Warning"
+      },
+      "color": {
+        "watch": "Yellow",
+        "warn": "Orange",
+        "urgent": "Red"
+      },
+      "code": {
+        "2": "heavy rain",
+        "3": "heavy snow",
+        "4": "thunderstorm and lightning",
+        "5": "hailstorm",
+        "6": "dust storm",
+        "7": "dust-raising winds",
+        "8": "strong surface winds",
+        "9": "heat wave",
+        "10": "hot day",
+        "11": "warm night",
+        "12": "cold wave",
+        "13": "cold day",
+        "14": "ground frost",
+        "15": "fog",
+        "16": "very heavy rain",
+        "17": "extremely heavy rain"
+      },
+      "imdHead": "{{color}} warning from IMD for {{districts}}: {{hazards}}.",
+      "generic": "a weather hazard",
+      "whySachet": "Passed on as published by {{issuer}} through NDMA SACHET. Area: {{area}}. We add no advice of our own: follow the instructions of your district authorities.",
+      "whyImd": "IMD's 5-day district warning, updated {{time}}. {{color}} is IMD's level for this day. IMD does not say which crops are affected; our own crop alerts are separate.",
+      "checked": "Official warnings checked at {{time}}",
+      "late": "Official warnings are delayed. Last updated {{time}}. Until they are back, \"no alert\" here does not mean there is no warning: check IMD or your district office.",
+      "never": "Official warnings could not be checked yet. \"No alert\" here does not mean there is no warning: check IMD or your district office.",
+      "wholeDay": "{{day}}, the whole day",
+      "endOfDay": "End of {{day}}",
+      "cwcHead": "River gauge {{name}}, about {{km}} km from your field, is above its {{level}} level ({{trend}}).",
+      "whyCwc": "The Central Water Commission lists this gauge as above its {{level}} level when we last checked, {{time}}. A gauge shows the water in the river at that place, not in your field.",
+      "cwcLevel": {
+        "watch": "warning",
+        "warn": "danger"
+      },
+      "trend": {
+        "rising": "rising",
+        "steady": "steady",
+        "falling": "falling"
+      },
+      "asOf": "As of"
+    },
+    "moreRows": "Show {{count}} more",
+    "fewerRows": "Show fewer",
+    "flood": {
+      "title": "Flood and water",
+      "river": "River flow, regional forecast",
+      "gauge": "Nearest CWC gauge",
+      "riverHigh": "Unusually high flow forecast {{day}}: {{peak}} m³/s, where a high flow starts at {{p95}}.",
+      "riverOk": "Normal: {{now}} m³/s now, forecast peak {{peak}} m³/s (a high flow starts at {{p95}}).",
+      "riverNone": "No large river near this field, so there is no river signal here.",
+      "riverUnavailable": "The river forecast could not be loaded.",
+      "gaugeNone": "No CWC gauge within 25 km.",
+      "gaugeBelow": "{{name}}, about {{km}} km away: below its warning level.",
+      "gaugeAbove": "{{name}}, about {{km}} km away: above its {{level}} level ({{trend}}).",
+      "gaugeUnavailable": "The CWC gauges could not be checked.",
+      "note": "These are signals for the region, not a forecast for your field. They never say that your field will flood.",
+      "radar": {
+        "label": "Satellite radar, around your field",
+        "button": "Check the radar now",
+        "loading": "Checking the satellite…",
+        "none": "No new water seen in the radar image of {{date}} ({{usable}}% of the 500 m around the field could be read).",
+        "possible": "Possible new water: about {{pct}}% of the 500 m around your field looks newly under water in the radar image of {{date}}.",
+        "likely": "Likely flooding: about {{pct}}% of the 500 m around your field looks newly under water in the radar image of {{date}}.",
+        "tooLittle": "Too little of the ground around this field can be read by radar (hills or shadow), so nothing can be said.",
+        "noImage": "No radar image in the last {{days}} days. The last one was on {{date}}.",
+        "noImageEver": "No radar image found in the last {{days}} days.",
+        "busy": "The satellite service is busy. Please try again later.",
+        "many": "Too many satellite checks. Please wait a few minutes.",
+        "failed": "Satellite data is unavailable right now. Please try again shortly.",
+        "limits": "Radar does not see through thick crops or towns, wet paddy can look like water, and a short flood between two passes (every 6 to 12 days) is missed."
+      }
+    },
+    "news": {
+      "title": "What officials and papers say",
+      "papers": "In the news",
+      "official": "Official pages",
+      "loading": "Loading headlines…",
+      "failed": "The headlines and official pages could not be loaded right now. Please try again a little later.",
+      "empty": "No farming headlines have been saved yet. Please check again a little later.",
+      "seen": "first listed {{date}}",
+      "yourState": "About {{state}}",
+      "yourCrop": "Your crop",
+      "lang": {
+        "en": "English",
+        "hi": "Hindi"
+      },
+      "links": {
+        "imd-bulletin": {
+          "name": "IMD national agromet bulletin (PDF)",
+          "text": "The current national weather advisory for farmers, from the India Meteorological Department."
+        },
+        "imd-state": {
+          "name": "IMD state agromet bulletins",
+          "text": "Choose your state in the list to see its bulletin.",
+          "textState": "Choose {{state}} in the list to see its bulletin."
+        },
+        "dafw": {
+          "name": "Department of Agriculture & Farmers Welfare",
+          "text": "The Government of India’s agriculture department: schemes, notices and advisories."
+        },
+        "sachet": {
+          "name": "NDMA SACHET",
+          "text": "Every official disaster alert for India, as the NDMA publishes it."
+        }
+      },
+      "note": "We show headlines only and link to the publisher’s own page. Nothing is copied or summarised, and a headline is not advice for your field. For what to do on your field, follow the official pages."
+    },
+    "near": {
+      "panel": "Reports near your field",
+      "count": "{{value}} phones",
+      "text": "checked a {{crop}} leaf in the last {{window}} days, within about {{km}} km, and the AI read {{disease}}.",
+      "caveat": "Photo checks by other users of this app, read by AI and not confirmed by a lab. Where each one was taken stays private, and your own checks are not counted.",
+      "map": "See the disease map"
+    },
+    "fire": {
+      "panel": "Satellite fire detections",
+      "count": "{{count}} hot spots",
+      "text": "within about {{km}} km of your field, the last one seen {{time}}.",
+      "caveat": "A satellite sees a fire only when it passes, a few times a day. Not every hot spot is a crop fire, and no alert here does not mean there is no fire.",
+      "map": "Open NASA’s fire map",
+      "unavailable": "The satellite fire check could not be loaded right now, so a missing fire alert does not mean there is no fire."
+    },
+    "sourceSatellite": "Satellite (NASA FIRMS)",
+    "ruleReviewed": "Rule {{id}}, checked by an expert",
+    "help": {
+      "q": "Did this help?",
+      "acted": "I acted on it",
+      "notNeeded": "Not needed",
+      "wrong": "It was wrong",
+      "thanks": "Thank you. Your answer helps us judge this alert.",
+      "change": "Change answer",
+      "failed": "Your answer could not be saved. Please try again."
+    },
+    "prices": {
+      "title": "Mandi prices for {{item}}",
+      "item": {
+        "wheat": "wheat",
+        "rice": "paddy",
+        "sugarcane": "sugarcane",
+        "potato": "potato",
+        "maize": "maize",
+        "pigeonpea": "tur (pigeon pea)",
+        "groundnut": "groundnut",
+        "blackgram": "urad (black gram)",
+        "apple": "apple",
+        "banana": "banana"
+      },
+      "per": "{{price}} per quintal",
+      "many": "The middle price of {{n}} markets in {{state}}, reported on {{date}}.",
+      "one": "The price of the one market in {{state}} that reported on {{date}}.",
+      "old": "({{days}} days ago)",
+      "range": "Lowest {{min}}, highest {{max}}.",
+      "up": "Up {{pct}}% since {{since}}, in the {{n}} markets that reported on both days.",
+      "down": "Down {{pct}}% since {{since}}, in the {{n}} markets that reported on both days.",
+      "flat": "Unchanged since {{since}}, in the {{n}} markets that reported on both days.",
+      "local": "Markets in your district",
+      "none": "No mandi price for {{item}} was found in {{state}}.",
+      "stale": "No price for {{item}} has been reported in {{state}} in the last 14 days. The last one was on {{date}}.",
+      "failed": "The mandi prices could not be loaded right now. Please try again a little later.",
+      "note": "These are prices that market committees reported (Agmarknet, through data.gov.in), in rupees per quintal. They are what was paid, not what you will get, and not advice to sell or to wait: the variety, the quality and the day change the price.",
+      "source": "See the source"
     }
   }
 }

@@ -7,6 +7,7 @@ let app;
 beforeAll(async () => {
   // read when the app module loads; every Jest test file gets its own fresh modules
   process.env.PREDICT_RATE_LIMIT = '3';
+  process.env.ALERT_RATE_LIMIT = '2';
   process.env.CLIENT_ORIGINS = `${CLIENT}, https://other.example`;
   ({ default: app } = await import('../app.js'));
 });
@@ -21,6 +22,13 @@ test('POST /api/predict: 4th request from one IP within the window -> 429; other
   expect(blocked.body).toEqual({ message: 'Too many predictions from this device. Please wait a few minutes and try again.' });
   expect(blocked.headers['ratelimit-policy']).toBeDefined();
   expect((await request(app).get('/health')).status).toBe(200);
+});
+
+test('GET /api/fields: the 3rd request within the window -> 429 (the alerts call can reach Open-Meteo)', async () => {
+  for (let i = 0; i < 2; i++) expect((await request(app).get('/api/fields')).status).toBe(200); // no device id: an empty list, no database needed
+  const blocked = await request(app).get('/api/fields/alerts');
+  expect(blocked.status).toBe(429);
+  expect(blocked.body.message).toMatch(/alert checks/);
 });
 
 test('CORS grants only the configured origins', async () => {

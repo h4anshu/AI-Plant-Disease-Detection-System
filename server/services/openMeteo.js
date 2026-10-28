@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import axios from "axios";
 import mongoose from "mongoose";
+import { countUsage } from "./usage.js";
 
 // Open-Meteo (https://open-meteo.com): free for non-commercial use, no key, CC BY 4.0 (attribution shown
 // in the app); limits 10,000 calls/day, 5,000/hour, 600/minute. We ask at most once per grid cell per
@@ -10,6 +11,9 @@ const URL = () => process.env.OPEN_METEO_URL || 'https://api.open-meteo.com/v1/f
 const GRID = 0.05; // ~5 km: the weather models are ~11 km, and the exact point never leaves our server
 
 export const snap = (x) => Math.round(x / GRID) * GRID;
+
+// the cache window of a forecast: one hour by default; WEATHER_CACHE_HOURS=3 asks Open-Meteo three times less often (the alerts speak in days)
+const cacheWindow = (now) => { const h = Math.max(1, Math.min(6, Number(process.env.WEATHER_CACHE_HOURS) || 1)); return `${now.toISOString().slice(0, 10)}T${String(Math.floor(now.getUTCHours() / h) * h).padStart(2, '0')}`; };
 
 const weatherCacheSchema = new mongoose.Schema({
   key: { type: String, required: true, unique: true },
@@ -26,6 +30,7 @@ async function hourly(plainKey, params) {
   const cached = await WeatherCache.findOne({ key }).lean();
   if (cached) return cached.data;
   const { data } = await axios.get(URL(), { params: { hourly: HOURLY, timezone: 'auto', ...params }, timeout: 15000 });
+  await countUsage('open-meteo');
   const w = { time: data.hourly.time, temp: data.hourly.temperature_2m, rh: data.hourly.relative_humidity_2m,
     rain: data.hourly.precipitation, utcOffsetSeconds: data.utc_offset_seconds, timezone: data.timezone };
   await WeatherCache.updateOne({ key }, { $set: { data: w, createdAt: new Date() } }, { upsert: true });
@@ -38,7 +43,7 @@ async function hourly(plainKey, params) {
 export async function getWeather(lat, lon, now = new Date()) {
   const la = snap(lat).toFixed(2);
   const lo = snap(lon).toFixed(2);
-  return hourly(`${la},${lo}|${now.toISOString().slice(0, 13)}`,
+  return hourly(`${la},${lo}|${cacheWindow(now)}`,
     { latitude: la, longitude: lo, past_days: 14, forecast_days: 5 }); // +1 day: the 3rd outlook day's night
 }
 

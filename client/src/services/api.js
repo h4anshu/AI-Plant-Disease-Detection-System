@@ -72,6 +72,24 @@ export const putSoilTest = (id, body) => api.patch(`/predict/${id}/soil-test`, b
 export const getPredictionRisk = (id) => api.get(`/predict/${id}/disease-risk`);
 export const getDiseaseRisk = (params) => api.get('/disease-risk', { params });
 
+// --- Saved fields and their weather alerts (docs/FIELD_ALERTS.md). Fields belong to this browser like checkups do.
+// The alerts call returns every field with its alerts, 72-hour strip and conditions; a field whose weather
+// could not be loaded comes back with status 'weather_unavailable'.
+export const getFieldAlerts = () => api.get('/fields/alerts');
+export const getFields = () => api.get('/fields');
+// { crop, stage, lat, lon, name? } (at most 3 per browser); stage and name can change later, crop and place cannot
+export const createField = (body) => api.post('/fields', body);
+export const updateField = (id, body) => api.patch(`/fields/${id}`, body);
+export const deleteField = (id) => api.delete(`/fields/${id}`);
+// is the area around the field newly under water, from the newest Sentinel-1 radar image? (an Earth Engine call: only on request)
+export const getFloodExtent = (id) => api.get(`/fields/${id}/flood-extent`);
+// headlines (The Hindu, PIB) and official pages for the field's state and crop; the server never sends a place back
+export const getFieldNews = (id) => api.get(`/fields/${id}/news`);
+// the last mandi prices reported for the field's crop in its state ({ status: ok | stale | none | unavailable | disabled | no_state, ... })
+export const getFieldPrices = (id) => api.get(`/fields/${id}/prices`);
+// "Did this help?" on an alert: { alertId, level, answer: acted | not_needed | wrong }; the server stores no place
+export const sendAlertFeedback = (fieldId, body) => api.post(`/fields/${fieldId}/alerts/feedback`, body);
+
 // --- Public disease map: GeoJSON hexagons, { crop?, disease?, days: 7 | 30 | 90 }
 export const getMapReports = (params) => api.get('/map/reports', { params });
 

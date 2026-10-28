@@ -1,13 +1,20 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 
 // ponytail: in-memory counters, so each Cloud Run instance counts on its own (max-instances 3 => at
 // most 3x the limit). Move to a shared store (Redis) if that ever matters.
-const limiter = (limit, windowMinutes, message) => rateLimit({
+// `byDevice`: count each browser (its x-device-id, a UUID) on its own instead of each IP address. On a mobile network hundreds of farmers can
+// share one address, and one of them reading the alerts must not lock out the others. A made-up id only buys an attacker a fresh count for
+// calls that are cheap and cached, so only those limiters use it; the ones that cost an ML call, an upload or an Earth Engine run stay per IP,
+// and the global limiter (per IP, GLOBAL_RATE_LIMIT) is still the backstop for everything.
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const deviceKey = (req) => { const id = req.get('x-device-id'); return id && UUID.test(id) ? `device:${id.toLowerCase()}` : ipKeyGenerator(req.ip); };
+const limiter = (limit, windowMinutes, message, { byDevice = false } = {}) => rateLimit({
   windowMs: windowMinutes * 60 * 1000,
   limit,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { message },
+  ...(byDevice && { keyGenerator: deviceKey }),
 });
 
 // Every prediction costs an ML call, a Cloudinary upload and a MongoDB write
@@ -18,6 +25,10 @@ export const predictLimiter = limiter(Number(process.env.PREDICT_RATE_LIMIT) || 
 export const fieldLimiter = limiter(Number(process.env.FIELD_RATE_LIMIT) || 10, 10,
   'Too many satellite checks from this device. Please wait a few minutes.');
 
+// a radar flood-extent check is an Earth Engine computation too (about 1.3 EECU-seconds, docs/FIELD_ALERTS.md section 8)
+export const extentLimiter = limiter(Number(process.env.FLOOD_EXTENT_RATE_LIMIT) || 10, 10,
+  'Too many satellite checks from this device. Please wait a few minutes.');
+
 // the context card is loaded once per located result (weather + one geo-service call when not yet built)
 export const contextLimiter = limiter(Number(process.env.CONTEXT_RATE_LIMIT) || 30, 10,
   'Too many context checks from this device. Please wait a few minutes.');
@@ -25,6 +36,10 @@ export const contextLimiter = limiter(Number(process.env.CONTEXT_RATE_LIMIT) || 
 // weather-based risk: cheap (Open-Meteo, cached per hour) but keep one browser from walking the map
 export const riskLimiter = limiter(Number(process.env.RISK_RATE_LIMIT) || 60, 10,
   'Too many risk checks from this device. Please wait a few minutes.');
+
+// saved fields and their alerts: the alerts call may ask Open-Meteo for each field's grid cell (cached per hour)
+export const alertLimiter = limiter(Number(process.env.ALERT_RATE_LIMIT) || 60, 10,
+  'Too many alert checks from this device. Please wait a few minutes.', { byDevice: true });
 
 // a report fetches the photo, heatmap, map tiles and weather, and draws a PDF
 export const reportLimiter = limiter(Number(process.env.REPORT_RATE_LIMIT) || 20, 10,

@@ -23,10 +23,12 @@ from pydantic import BaseModel, Field
 
 import context as cx
 import field_health as fh
+import flood as fl
 
 PROJECT = os.environ.get("EE_PROJECT", "plant-disease-503711")
 WORKLOAD_TAG = "field-health"  # EECU usage per tag: Cloud Monitoring, docs/GEE_SETUP.md section 4
 CONTEXT_TAG = "context"
+FLOOD_TAG = "flood-extent"
 _state = {"ee": False}
 
 
@@ -188,4 +190,40 @@ def context(request: Request, q: ContextQuery, x_geo_token: str = Header("")):
         "requestId": rid, "workloadTag": CONTEXT_TAG, "eeLatencyMs": round((time.perf_counter() - t0) * 1000),
         "parts": result["parts"], "soil": result["soil"] is not None,
         "rain": (result["rain_anomaly"] or {}).get("status"), "era5Days": len(result["era5"] or [])}})
+    return result
+
+
+class ExtentQuery(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    date: str | None = None  # "now" for the radar images, YYYY-MM-DD (default: today); a past date replays an event
+
+
+# Flood extent from Sentinel-1 radar around a field (docs/FIELD_ALERTS.md section 8). POST only: the location stays out of the
+# request logs. Measured 26 Oct 2026: about 1.3 EECU-seconds and 3 to 4 seconds per call (workload tag "flood-extent").
+@app.post("/flood-extent")
+def flood_extent(request: Request, q: ExtentQuery, x_geo_token: str = Header("")):
+    _check_token(x_geo_token)
+    today = datetime.now(timezone.utc).date()
+    try:
+        end = min(Date.fromisoformat(q.date), today) if q.date else today
+    except ValueError:
+        raise HTTPException(status_code=400, detail="date must be YYYY-MM-DD")
+    if not _state["ee"]:
+        raise HTTPException(status_code=503, detail="Earth Engine is not available")
+    rid = _request_id(request)
+    t0 = time.perf_counter()
+    try:
+        with ee.data.workloadTagContext(FLOOD_TAG):
+            images = fl.recent_images(q.lat, q.lon, end)
+            if images:
+                latest = images[-1]["t"]
+                result = fl.summarize(fl.query(q.lat, q.lon, end, latest), latest_ms=latest, end=end)
+            else:
+                result = fl.summarize(None, latest_ms=None, end=end, last_seen=fl.last_image_before(q.lat, q.lon, end))
+    except ee.EEException as err:
+        _ee_error(err, rid, "flood extent")
+    log.info("flood extent", extra={"fields": {
+        "requestId": rid, "workloadTag": FLOOD_TAG, "eeLatencyMs": round((time.perf_counter() - t0) * 1000),
+        "status": result["status"], "flag": result.get("flag"), "recentImages": len(images)}})
     return result

@@ -5,6 +5,7 @@ import { LOCATION_SOURCES } from "../utils/geo.js";
 // Only "ok" results are diagnoses; records saved before the gate existed read as "ok".
 const STATUSES = ['ok', 'uncertain', 'rejected_quality', 'not_leaf'];
 export const FEEDBACK = ['correct', 'incorrect', 'unsure'];
+export const CROPS = ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea', 'groundnut', 'blackgram', 'apple', 'banana'];
 const hasPrediction = function () { return this.status === 'ok' || this.status === 'uncertain'; };
 
 const predictionSchema = new mongoose.Schema({
@@ -27,7 +28,7 @@ const predictionSchema = new mongoose.Schema({
     crop: {
         type: String,
         required: true,
-        enum: ['wheat', 'rice', 'sugarcane', 'potato', 'maize', 'pigeonpea', 'groundnut', 'blackgram', 'apple', 'banana']
+        enum: CROPS
     },
     status: {
         type: String,

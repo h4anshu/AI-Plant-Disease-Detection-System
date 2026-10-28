@@ -77,6 +77,76 @@ A check every 5 minutes also keeps one instance of each Cloud Run service warm, 
 cold start. It still costs nothing: about 8,600 requests per service per month against 2 million
 free, and an idle instance isn't billed with request-based billing.
 
+## Weather alerts (Field Alert Center)
+
+What the feature depends on, how to see its health and what to do when something breaks. Built in Task 40; the feature itself is described in `docs/FIELD_ALERTS.md`.
+
+### One page: the operator health call
+```
+curl -s https://<server>/api/alerts/health -H "x-alerts-token: $ALERTS_ADMIN_TOKEN"
+```
+(`ALERTS_ADMIN_TOKEN` is the operator secret; without it the route answers 503.) It returns, with no personal data:
+- **`sources`:** each feed (`sachet`, `imd`, `cwc`, `news`) with `state` ok / delayed / down / disabled, the last good fetch, the newest item and the last error. A feed is "delayed" after 3 intervals without a good fetch and "down" after 6 hours; the farmer's screen then says the official warnings may be late.
+- **`switches`:** which kill switches are on or off (below).
+- **`configured`:** whether the FIRMS key and the geo-service are set.
+- **`usage`:** today's calls to Open-Meteo (forecast, and the flood API weighted by locations x days / 14), NASA FIRMS and the satellite checks, with the share of Open-Meteo's 10,000 a day used.
+- `GET /api/alerts/feedback` (same token): the "Did this help?" answers per rule.
+- `POST /api/alerts/tick` (same token) fetches every feed now, for Cloud Scheduler or by hand.
+
+To be told without looking, point any monitor that can send a header at the health call and alert when the body contains `"state":"down"` (check that your UptimeRobot plan allows custom headers; if not, `POST /api/alerts/tick` from Cloud Scheduler plus the weekly look is enough).
+
+### Kill switches
+`ALERTS_DISABLED_SOURCES` is a comma-separated list; changing it needs no deploy: `gcloud run services update server --region asia-south1 --update-env-vars ALERTS_DISABLED_SOURCES=imd,news`. (A comma in `--update-env-vars` needs the escaped form in `gcloud topic escaping`; or set it in the console.)
+| Name | Stops | The farmer sees |
+|---|---|---|
+| `sachet` | NDMA warnings | no NDMA alerts (the feed notice says why) |
+| `imd` | IMD district warnings **and the district lookup of new fields** | no IMD alerts; new fields get no official warnings until it is back |
+| `cwc` | river gauges | "The CWC gauges could not be checked" |
+| `glofas` | river-flow forecast (Open-Meteo flood API) | the river row says unavailable; saves the most Open-Meteo allowance |
+| `radar` | the satellite flood check button | the button is not shown |
+| `news` | headlines (the official pages stay) | no headlines |
+| `fire` | NASA fire check | "fire check not available" is not shown: the check is off |
+| `community` | disease reports from other farmers | no such alert |
+Plus settings (no deploy needed): `WEATHER_CACHE_HOURS=3` (ask Open-Meteo three times less), `FLOOD_FORECAST_BUDGET_PCT` (default 80) and `FLOOD_CLIMATE_BUDGET_PCT` (default 50): the river forecast and a new river's history stop at those shares of the day's Open-Meteo allowance so that the weather, which every field needs, never runs out first.
+
+### When something breaks
+| Symptom | Likely cause | What to do |
+|---|---|---|
+| Screens say official warnings may be late | a feed is delayed or down | `health`: which one and its `errorReason`. A 5xx or a timeout from the source: wait. A format change (parse error): switch it off, then fix the adapter with a new captured fixture (`server/tests/fixtures`) |
+| `usage` shows Open-Meteo above 80% | many distinct places viewed in one day | set `WEATHER_CACHE_HOURS=3`; switch `glofas` off; see "Capacity" below |
+| Weather unavailable for every field, Open-Meteo answers 429 | the daily or hourly limit was passed | the same; the river code remembers a failure for 10 minutes, weather retries on the next view |
+| Fire check says unavailable | FIRMS key wrong or rotated (HTTP 400 "Invalid MAP_KEY."), or over 5,000 requests in 10 minutes | check the key in `FIRMS_MAP_KEY`; request a new one at `firms.modaps.eosdis.nasa.gov/api/area/` |
+| Satellite check says busy (503) | Earth Engine quota or the geo-service is down | `radar` off if it persists; see `docs/GEE_SETUP.md` for the quota (about 1.3 EECU-seconds a check) |
+| Real farmers get "Too many requests" | many users behind one mobile-network address share the per-address limit (`GLOBAL_RATE_LIMIT`, 300 per 15 minutes by default) | raise `GLOBAL_RATE_LIMIT` (for example 1500); the alert limiter already counts per browser |
+| The database grows | a collection without a TTL | none known: see the table below |
+
+### What is kept, and for how long (every cache has a TTL)
+| Collection | Kept |
+|---|---|
+| `OfficialAlert` (NDMA) | until a day after it expires |
+| `ImdWarning`, `CwcStation` | replaced on every fetch |
+| `WeatherCache` | 3 hours (the key holds the hour) |
+| `FloodForecast` | 6 hours |
+| `FloodClimate` (a river's usual range) | for good; it is about a river, not a person |
+| `FloodExtentCache` (radar answers) | 3 days; also removed by "Delete my data" |
+| `FireCache` | 30 minutes |
+| `NewsItem` | 30 days |
+| `ApiUsage` | 45 days |
+| `AlertFeedback` | 1 year |
+| `Field` | until the farmer deletes it |
+
+### Capacity on the free tier (from `npm run alerts-load`, 27 Oct 2026)
+- **Our own code is not the limit:** 1,000 fields over 334 browsers, 20 requests at a time, against fake services that answer in 40 ms: **0 errors; cold (nothing cached) median 0.3 s, 95% under 0.85 s, about 65 requests a second; warm median 0.13 s, 150 requests a second**; memory about 400 MB with the test data (set the instance memory to at least 512 MB; 1 GB is comfortable).
+- **Open-Meteo is the limit.** Per place newly looked at: weather 1 weighted call, the river forecast 3, and **a new river's 17-year history about 460** (once per river, kept for good). The free allowance is 10,000 a day and 5,000 an hour, so: at most **about 10 new rivers' histories a day** (the 50% guard), and, once those are kept, roughly **800 different places a day if each is looked at several times a day, up to about 2,500 if each is looked at once** (a place costs 1 weather call per cache window and 3 river calls per 6 hours). A pilot of a few hundred fields is far under that. **Thousands of fields need a paid Open-Meteo plan, or a cheaper history** (a shorter record, or one record shared by neighbouring cells) **before launch**; the river signal degrades first (it says unavailable) and the weather keeps going.
+- NASA FIRMS: 3 requests per place per half hour against 5,000 per 10 minutes: not a limit at this size.
+- Repeat it with `cd server && npm run alerts-load -- --fields 1000 --requests 600 --concurrency 20 [--clustered]`. It uses fake services and an in-memory database: it measures our code, not the real services' speed or their 429s.
+
+### Budget alerts (Owner, 10 minutes, free)
+1. **Google Cloud billing** (billing was disabled once, `task.md` Task 28): Console, Billing, **Budgets & alerts**, Create budget: the project, a small amount (for example 500 rupees), thresholds 50%, 90% and 100%, email to you. This is an alert, not a stop.
+2. **Open-Meteo:** no account; the health page's `usage.openMeteoPct` is the meter. Add it to the weekly look.
+3. **Earth Engine:** Cloud Console, Monitoring, Metrics Explorer, `earthengine.googleapis.com/project/cpu/usage_time`, filter the workload tag `flood-extent`; the free tier has 18,000 EECU-seconds a month.
+4. **No SMS, WhatsApp or voice is built**, so there is no such budget.
+
 ## Drift report
 
 ```powershell

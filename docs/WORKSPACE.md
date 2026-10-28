@@ -9,7 +9,7 @@ Design source (a Claude Design canvas, 13 artboards: map, pages, states, design 
 | Layout | Routes | Chrome |
 |---|---|---|
 | `SiteLayout` | `/`, `/map`, `/privacy`, `/login`, `/register` | demo banner + top navbar (landing look) |
-| `WorkspaceLayout` | `/overview`, `/predict`, `/history`, `/checkup/:id`, `/me` | left menu (≥ 1184 px) or top bar + bottom tab bar with a raised camera button (below) |
+| `WorkspaceLayout` | `/overview`, `/fields/new`, `/predict`, `/history`, `/checkup/:id`, `/me` | left menu (≥ 1184 px) or top bar + bottom tab bar with a raised camera button (below) |
 
 Unknown routes redirect to `/`. The navbar has a "My field" link to `/overview`.
 
@@ -19,7 +19,7 @@ Unknown routes redirect to `/`. The navbar has a "My field" link to `/overview`.
 
 | Page | File | What it shows | Data |
 |---|---|---|---|
-| Overview | `pages/Overview.jsx` | greeting, scan card, last checkup, four counts, needs-attention list (recheck due 7 days after a disease result), weather-risk strip, recent checkups, crop bars, accuracy of the user's crops | `GET /api/predict` (history, 50 newest) and counts from it; `GET /api/predict/:id/disease-risk` for the latest located potato or rice checkup; `data/accuracy.js` |
+| Overview | `pages/Overview.jsx` | a switch **My Field | Weather & Alerts** (the second half is described in [FIELD_ALERTS.md](FIELD_ALERTS.md)); My Field: greeting, scan card, last checkup, four counts, needs-attention list (recheck due 7 days after a disease result), weather-risk strip, recent checkups, crop bars, accuracy of the user's crops | `GET /api/predict` (history, 50 newest) and counts from it; `GET /api/predict/:id/disease-risk` for the latest located potato or rice checkup; `data/accuracy.js` |
 | New check | `pages/Predict.jsx` (+ `UploadBox`, `LocationConsent`) | crop tiles, photo (camera or file), location consent, Analyze | `POST /api/predict`. A saved result (has `_id`) opens `/checkup/:id` with the record in router state; one without an id still shows inline |
 | Checkup | `pages/Checkup.jsx` | photo / heatmap switch, confidence ring, severity, yield, other classes, tabs: Care plan, Field context, Satellite, Report & feedback | router state, else `GET /api/predict/:id`. Tabs reuse `RiskStrip`, `ContextCard`, `FieldHealth`, `ReportButton`, `Feedback`. A retake or not-sure result shows the existing `ResultCard` |
 | Field log | `pages/History.jsx` | status tabs with counts, crop chips, list or photo view, legend, load older | `GET /api/predict` |

@@ -9,6 +9,7 @@ import { readConsent, saveConsent } from '../services/location';
 import { useHistory } from '../components/workspace/useHistory';
 import { Lbl, PageHead, hasLocation } from '../components/workspace/parts';
 import { cropIcon } from '../components/workspace/cropIcon';
+import MyFields from '../components/workspace/MyFields';
 import { LeafMark } from '../components/heroIcons';
 
 const TABS = [['prefs', 'tPrefs'], ['privacy', 'tPriv'], ['data', 'tData'], ['about', 'tAbout']];
@@ -119,6 +120,7 @@ const Profile = () => {
             {del === 'done' && <p role="status" className="ws-note !bg-[#E4F0D8]">{t('privacy.done', { count: deleted })}</p>}
             {del === 'failed' && <p role="alert" className="ws-note ws-note-bad">{t('privacy.failed')}</p>}
           </article>
+          <MyFields key={del === 'done'} />   {/* remounts, so it reloads, once the data is deleted */}
         </div>
       )}
 

@@ -1,0 +1,63 @@
+<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+<cap:identifier>IN-1792830427901006_6</cap:identifier>
+<cap:sender>Kerala-SDMA</cap:sender>
+<cap:sent>2026-10-24T14:18:20+05:30</cap:sent>
+<cap:status>Actual</cap:status>
+<cap:msgType>Update</cap:msgType>
+<cap:scope>Public</cap:scope>
+<cap:restriction/>
+<cap:addresses/>
+<cap:note/>
+<cap:references>IMD-Thiruvananthapuram,IN-1792830427901006_64,2026-10-24T13:56:38+05:30</cap:references>
+<cap:incidents/>
+<cap:info>
+<cap:language>en-IN</cap:language>
+<cap:category>Met</cap:category>
+<cap:event>Flash Flood</cap:event>
+<cap:urgency>Expected</cap:urgency>
+<cap:severity>Moderate</cap:severity>
+<cap:certainty>Possible</cap:certainty>
+<cap:audience>1</cap:audience>
+<cap:effective>2026-10-24T13:54:00+05:30</cap:effective>
+<cap:onset>2026-10-24T14:18:20+05:30</cap:onset>
+<cap:expires>2026-10-25T13:54:00+05:30</cap:expires>
+<cap:headline>Flash Flood is likely to occur at isolated places over Ernakulam, Idukki, Kannur, Kasaragod, Kozhikode, Wayanad in next 24 hours.</cap:headline>
+<cap:description/>
+<cap:instruction>Please follow SDMA guidelines.</cap:instruction>
+<cap:contact/>
+<cap:parameter>
+<cap:valueName>Polygon URL</cap:valueName>
+<cap:value>https://sachet.ndma.gov.in/cap_public_website/FetchPolygonXMLFile?identifier=1792830427901006</cap:value>
+</cap:parameter>
+<cap:area>
+<cap:areaDesc>Flash Flood Risk</cap:areaDesc>
+<cap:altitude>0</cap:altitude>
+<cap:ceiling>0</cap:ceiling>
+</cap:area>
+</cap:info>
+<cap:info>
+<cap:language>ML</cap:language>
+<cap:category>Met</cap:category>
+<cap:event>Flash Flood</cap:event>
+<cap:urgency>Expected</cap:urgency>
+<cap:severity>Moderate</cap:severity>
+<cap:certainty>Possible</cap:certainty>
+<cap:audience>1</cap:audience>
+<cap:effective>2026-10-24T13:54:00+05:30</cap:effective>
+<cap:onset>2026-10-24T14:18:20+05:30</cap:onset>
+<cap:expires>2026-10-25T13:54:00+05:30</cap:expires>
+<cap:headline>അടുത്ത 24 മണിക്കൂറിൽ IDK, EKM, KZD, WYD, KNR, KSD ജില്ലകളിൽ ഒറ്റപ്പെട്ടയിടങ്ങളിൽ വെള്ളപ്പൊക്കത്തിന് സാധ്യത. 2.10 pm; 24/10/2026 IMD-KSDMA</cap:headline>
+<cap:description/>
+<cap:instruction>Please follow SDMA guidelines.</cap:instruction>
+<cap:contact/>
+<cap:parameter>
+<cap:valueName>Polygon URL</cap:valueName>
+<cap:value>https://sachet.ndma.gov.in/cap_public_website/FetchPolygonXMLFile?identifier=1792830427901006</cap:value>
+</cap:parameter>
+<cap:area>
+<cap:areaDesc>Flash Flood Risk</cap:areaDesc>
+<cap:altitude>0</cap:altitude>
+<cap:ceiling>0</cap:ceiling>
+</cap:area>
+</cap:info>
+</cap:alert>

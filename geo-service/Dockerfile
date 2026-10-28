@@ -6,7 +6,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --create-home --uid 10001 app
 
-COPY app.py field_health.py context.py ./
+COPY app.py field_health.py context.py flood.py ./
 
 USER app
 EXPOSE 8000

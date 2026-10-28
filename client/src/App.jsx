@@ -8,6 +8,7 @@ import { useSiteReturn } from "./components/workspace/siteReturn";
 import Home from "./pages/Home";
 import Predict from "./pages/Predict";
 import Overview from "./pages/Overview";
+import FieldNew from "./pages/FieldNew";
 import History from "./pages/History";
 import Checkup from "./pages/Checkup";
 import Profile from "./pages/Profile";
@@ -54,6 +55,7 @@ const App = () => (
     {/* the workspace: left menu on desktop, bottom tab bar on phones */}
     <Route element={<WorkspaceLayout />}>
       <Route path="/overview" element={<Overview />} />
+      <Route path="/fields/new" element={<FieldNew />} />
       <Route path="/predict" element={<Predict />} />
       <Route path="/history" element={<History />} />
       <Route path="/checkup/:id" element={<Checkup />} />

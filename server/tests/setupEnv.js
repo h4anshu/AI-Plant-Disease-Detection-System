@@ -12,3 +12,14 @@ process.env.OSM_TILE_URL = 'http://tiles.test/{z}/{x}/{y}.png';
 process.env.REPORT_RATE_LIMIT = '1000';
 process.env.OPEN_METEO_URL = 'http://meteo.test/v1/forecast';
 process.env.CONTEXT_RATE_LIMIT = '1000';
+process.env.ALERT_RATE_LIMIT = '1000';
+process.env.SACHET_FEED_URL = 'http://sachet.test/cap_public_website/rss/rss_india.xml';
+process.env.IMD_WFS_URL = 'http://imd.test/geoserver/wfs';
+process.env.ALERTS_ADMIN_TOKEN = 'test-alerts-token';
+process.env.ALERTS_DISABLED_SOURCES = 'sachet,imd,cwc,glofas,news'; // tests of the official warnings switch them on (tests/official.test.js)
+process.env.OPEN_METEO_FLOOD_URL = 'http://flood.test/v1/flood';
+process.env.CWC_URL = 'http://cwc.test';
+process.env.FLOOD_EXTENT_RATE_LIMIT = '1000';
+process.env.MANDI_GAP_MS = '0'; // no pause between data.gov.in requests in tests
+process.env.NEWS_HINDU_URL = 'https://www.thehindu.com/sci-tech/agriculture/feeder/default.rss';
+process.env.NEWS_PIB_URL = 'https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=3';

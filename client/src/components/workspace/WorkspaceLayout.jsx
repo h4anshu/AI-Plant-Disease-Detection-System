@@ -62,14 +62,14 @@ const WorkspaceLayout = () => {
         </div>
 
         <div className="min-w-0 flex-1 pb-28 lg:pb-0">
-          <header className="flex items-center justify-between px-5 py-3 lg:hidden">
+          <div className="flex items-center justify-between px-5 py-3 lg:hidden">
             <div className="flex items-center gap-1">
               <Link to={back} aria-label={t('ws.menu.back')} className="-ml-2 grid h-11 w-11 place-items-center rounded-full text-pine"><Icon name="back" /></Link>
               <Link to="/" className="flex items-center gap-2"><LeafMark className="h-7 w-8 text-leaf-text" /><span className="font-display text-[22px] text-ink">PlantGuard</span></Link>
             </div>
             <LangSeg />
-          </header>
-          <Outlet />
+          </div>
+          <main id="main"><Outlet /></main>
         </div>
       </div>
 

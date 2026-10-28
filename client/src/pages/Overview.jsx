@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Camera, Leaf } from '../components/heroIcons';
 import RiskStrip from '../components/RiskStrip';
@@ -11,6 +11,10 @@ import { CropTag, DAY, Lbl, PageHead, hasLocation, locOf, shortDate, titleOf } f
 import { cropIcon } from '../components/workspace/cropIcon';
 import Icon from '../components/workspace/icons';
 import plant from '../assets/hero/plant-560.webp';
+import ModeTabs from '../components/workspace/ModeTabs';
+import WeatherAlerts from '../components/workspace/WeatherAlerts';
+import { useFieldAlerts } from '../components/workspace/useFieldAlerts';
+import { feedNotice, summarize } from '../components/workspace/alertsLib';
 
 const Tile = ({ label, value, note, tone }) => (
   <article className="ws-card flex flex-col gap-1.5 p-5">
@@ -20,12 +24,28 @@ const Tile = ({ label, value, note, tone }) => (
   </article>
 );
 
+// The Overview has two halves, switched at the top: My Field (leaf checks, the page as it always was) and Weather & Alerts
+// (docs/FIELD_ALERTS.md). The half last looked at is remembered on this browser; ?mode=weather opens it directly.
+const MODE_KEY = 'overviewMode';
+const readMode = (params) => {
+  const q = params.get('mode');
+  if (q === 'field' || q === 'weather') return q;
+  try { return localStorage.getItem(MODE_KEY) === 'weather' ? 'weather' : 'field'; } catch { return 'field'; }
+};
+
 // The first screen of the workspace: what needs me today. Everything here is counted from this browser's history (GET /predict)
 // or comes from the existing risk endpoint; nothing is invented.
 const Overview = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { items, loading, error } = useHistory();
+  const [params, setParams] = useSearchParams();
+  const mode = readMode(params);
+  const setMode = (m) => {
+    setParams({ mode: m }, { replace: true });
+    try { localStorage.setItem(MODE_KEY, m); } catch { /* private mode: not remembered */ }
+  };
+  const alertState = useFieldAlerts();
   const now = Date.now();
   const hour = new Date().getHours();
   const hello = t(`ws.overview.hello.${hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'}`);
@@ -43,6 +63,26 @@ const Overview = () => {
   const accuracy = byCrop.map(([c]) => ACCURACY.find((a) => a.crop === c)).filter(Boolean).slice(0, 3);
 
   const title = !items.length ? t('ws.overview.first') : attention.length ? t('ws.overview.needsLook', { count: attention.length }) : t('ws.overview.allClear');
+  // what is waiting in each half, shown on the switch so nothing hides behind the other one
+  const sum = summarize(alertState.fields);
+  const late = !!feedNotice(alertState.data?.officialSources);
+  const fieldPills = loading ? [] : !items.length ? [{ level: 'info', label: t('alerts.mode.noChecks') }]
+    : attention.length ? [{ level: 'warn', label: t('alerts.mode.recheck', { count: attention.length }) }] : [{ level: 'calm', label: t('alerts.mode.clear') }];
+  const weatherPills = !alertState.data ? (alertState.loading ? [] : [{ level: 'stale', label: t('alerts.mode.unavailable') }])
+    : !sum.total ? [{ level: 'info', label: t('alerts.mode.addField') }]
+    : [...(sum.urgent ? [{ level: 'urgent', label: t('alerts.mode.urgent', { count: sum.urgent }) }] : []),
+      ...(sum.warn ? [{ level: 'warn', label: t('alerts.mode.warn', { count: sum.warn }) }] : []),
+      ...(sum.watch ? [{ level: 'watch', label: t('alerts.mode.watch', { count: sum.watch }) }] : []),
+      ...(!sum.urgent && !sum.warn && !sum.watch && sum.info ? [{ level: 'info', label: t('alerts.mode.info', { count: sum.info }) }] : []),
+      ...(sum.unavailable ? [{ level: 'stale', label: t('alerts.mode.unavailable') }] : []),
+      // "no alert" is only said when the official feeds are not late: a silent feed is not an all-clear
+      ...(!sum.urgent && !sum.warn && !sum.watch && !sum.info && !sum.unavailable ? [late ? { level: 'stale', label: t('alerts.mode.officialLate') } : { level: 'calm', label: t('alerts.mode.none') }] : [])];
+  const tabs = [
+    { id: 'field', icon: 'sprout', title: t('alerts.mode.field'), sub: t('alerts.mode.fieldSub'), pills: fieldPills },
+    { id: 'weather', icon: 'cloudsun', title: t('alerts.mode.weather'), sub: t('alerts.mode.weatherSub'), pills: weatherPills },
+  ];
+  const nAlerts = sum.urgent + sum.warn + sum.watch + sum.info;
+  const weatherTitle = !alertState.data ? '' : !sum.total ? t('alerts.title.noFields') : nAlerts ? t('alerts.title.alerts', { count: nAlerts }) : sum.ok ? t(late ? 'alerts.title.clearLate' : 'alerts.title.clear') : t('alerts.title.unavailable');
   const dueText = (p) => {
     const due = new Date(p.createdAt).getTime() + 7 * DAY;
     const days = Math.floor((now - due) / DAY);
@@ -51,7 +91,11 @@ const Overview = () => {
 
   return (
     <div className="mx-auto flex max-w-[1180px] flex-col gap-7 px-5 pb-12 pt-6 lg:px-11 lg:pt-9">
-      <PageHead eyebrow={t('ws.overview.eyebrow', { date: today })} title={<>{hello} <span className="italic text-leaf-text">{loading ? '' : title}</span></>} />
+      <PageHead eyebrow={t('ws.overview.eyebrow', { date: today })} title={<>{hello} <span className="italic text-leaf-text">{mode === 'weather' ? weatherTitle : loading ? '' : title}</span></>} />
+
+      <ModeTabs mode={mode} onChange={setMode} tabs={tabs} />
+      <div role="tabpanel" id="ws-mode-panel" aria-labelledby={`ws-mode-${mode}`} className="flex flex-col gap-7">
+      {mode === 'weather' ? <WeatherAlerts state={alertState} /> : (<>
 
       {error && <p role="alert" className="ws-note ws-note-bad">{error}</p>}
       {loading && !items.length && <p role="status" className="font-mono text-xs text-ink-2">{t('ws.loading')}</p>}
@@ -190,6 +234,9 @@ const Overview = () => {
           </section>
         </>
       )}
+
+      </>)}
+      </div>
 
       <p className="flex items-center gap-2 text-[13px] text-ink-2"><Leaf className="h-4 w-4 text-leaf-text" />{t('finale.legal')}</p>
     </div>

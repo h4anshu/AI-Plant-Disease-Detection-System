@@ -10,6 +10,7 @@ vi.mock('../services/api', () => ({
   getPrediction: async () => ({ data: api.predicted }),
   getDeviceId: () => 'abcd1234-0000-0000-0000-1234567890ab',
   deleteMyData: async () => ({ data: { deleted: 0 } }),
+  getFieldAlerts: async () => ({ data: { fields: [] } }),   // the Overview's Weather & Alerts half (no saved fields)
 }));
 import { levelOf, needsAttention } from '../components/workspace/status';
 import Overview from '../pages/Overview';

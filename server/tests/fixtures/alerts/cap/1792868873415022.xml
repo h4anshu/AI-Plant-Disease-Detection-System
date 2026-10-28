@@ -1,0 +1,82 @@
+<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+<cap:identifier>IN-1792868873415022_48</cap:identifier>
+<cap:sender>IMD-New-Delhi</cap:sender>
+<cap:sent>2026-10-25T00:37:19+05:30</cap:sent>
+<cap:status>Actual</cap:status>
+<cap:msgType>Update</cap:msgType>
+<cap:scope>Public</cap:scope>
+<cap:restriction/>
+<cap:addresses/>
+<cap:note/>
+<cap:references>IMD-New-Delhi,IN-1792868303431022_48,2026-10-25T00:27:50+05:30</cap:references>
+<cap:incidents/>
+<cap:info>
+<cap:language>en-IN</cap:language>
+<cap:category>Met</cap:category>
+<cap:event>Moderate Rain</cap:event>
+<cap:urgency>Expected</cap:urgency>
+<cap:severity>Severe</cap:severity>
+<cap:certainty>Likely</cap:certainty>
+<cap:audience>1</cap:audience>
+<cap:effective>2026-10-25T00:26:00+05:30</cap:effective>
+<cap:onset>2026-10-25T00:37:53+05:30</cap:onset>
+<cap:expires>2026-10-25T03:26:00+05:30</cap:expires>
+<cap:headline>Moderate Rain accompanied with Hail storm /Thunderstorm/Lightning (Wind Speed 30-40 KMPH gusting to 50 KMPH ) very likely at many places over Delhi. next 3 hours.</cap:headline>
+<cap:description/>
+<cap:instruction>Please follow SDMA guidelines.</cap:instruction>
+<cap:contact/>
+<cap:parameter>
+<cap:valueName>Polygon URL</cap:valueName>
+<cap:value>https://sachet.ndma.gov.in/cap_public_website/FetchPolygonXMLFile?identifier=1792868873415022</cap:value>
+</cap:parameter>
+<cap:area>
+<cap:areaDesc>Central, East, New Delhi, North, North East, North West, Shahdara, South, South East, South West, West districts of Delhi</cap:areaDesc>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>83</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>79</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>670</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>82</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>77</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>81</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>84</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>78</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>85</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>80</cap:value>
+</cap:geocode>
+<cap:geocode>
+<cap:valueName>LGD District Code</cap:valueName>
+<cap:value>671</cap:value>
+</cap:geocode>
+<cap:altitude>0</cap:altitude>
+<cap:ceiling>0</cap:ceiling>
+</cap:area>
+</cap:info>
+</cap:alert>

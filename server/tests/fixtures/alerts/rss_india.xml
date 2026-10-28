@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="feed.xsl"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>All India: CAP Disaster Alert Feeds</title>
+    <description>CAP Integrated Alert System Warning Updates</description>
+    <language>en</language>
+    <link>https://sachet.ndma.gov.in/cap_public_website/rss/rss_india.xml</link>
+    <atom:link href="https://sachet.ndma.gov.in/cap_public_website/rss/rss_india.xml" rel="self" type="application/rss+xml"/>
+    <copyright>public domain</copyright>
+    <pubDate>Fri, 16 Oct 2026 09:04:39 GMT</pubDate>
+        <item>
+      <title>River Gandak at Dumariaghat in Gopalganj district of Bihar continues to flow in above normal flood situation at 6:00 am today.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792897745415016</link>
+      <author>controlroom@ndma.gov.in (CWC)</author>
+      <guid isPermaLink="false">1792897745415016</guid>
+      <pubDate>Sun, 25 Oct 2026 03:09:06 GMT</pubDate>
+    </item>
+    <item>
+      <title>Moderate Rain accompanied with Hail storm /Thunderstorm/Lightning (Wind Speed 30-40 KMPH gusting to 50 KMPH ) very likely at many places over Delhi. next 3 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792868873415022</link>
+      <author>controlroom@ndma.gov.in (IMD New Delhi)</author>
+      <guid isPermaLink="false">1792868873415022</guid>
+      <pubDate>Sat, 24 Oct 2026 19:07:55 GMT</pubDate>
+    </item>
+    <item>
+      <title>Moderate Rain accompanied with Thunderstorm/Lightning (Wind Speed 30-40 KMPH gusting to 50 KMPH ) very likely at many places over Delhi. next 3 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792868303431022</link>
+      <author>controlroom@ndma.gov.in (IMD New Delhi)</author>
+      <guid isPermaLink="false">1792868303431022</guid>
+      <pubDate>Sat, 24 Oct 2026 18:58:25 GMT</pubDate>
+    </item>
+    <item>
+      <title>अगले 3 घंटों के आपके जनपद के कुछ इलाकों में आंधी-तूफान (हवा की गति 30-40 किमी/घंटा, जो 50 किमी/घंटा तक पहुंच सकती है) और बिजली कड़कने के साथ मध्यम से तेज बारिश होने की संभावना है।</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792857313859013</link>
+      <author>controlroom@ndma.gov.in (IMD Lucknow)</author>
+      <guid isPermaLink="false">1792857313859013</guid>
+      <pubDate>Sat, 24 Oct 2026 16:02:25 GMT</pubDate>
+    </item>
+    <item>
+      <title>ਅਗਲੇ 3 ਘੰਟਿਆਂ ਦੌਰਾਨ ਅੰਮ੍ਰਿਤਸਰ, ਬਠਿੰਡਾ, ਫਿਰੋਜ਼ਪੁਰ, ਮਾਨਸਾ ਅਤੇ ਤਰਨਤਾਰਨ ਦੇ ਕੁਝ ਇਲਾਕਿਆਂ ਵਿੱਚ  ਮੀਂਹ ਅਤੇ ਤੇਜ਼ ਹਵਾਵਾਂ ਚੱਲਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਕਿਸੇ ਵੀ ਐਮਰਜੈਂਸੀ ਦੀ ਸਥਿਤੀ ਵਿੱਚ 112 'ਤੇ ਕਾਲ ਕਰੋ। ਪੰਜਾਬ SDMA।</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792839894548036</link>
+      <author>controlroom@ndma.gov.in (IMD Chandigarh)</author>
+      <guid isPermaLink="false">1792839894548036</guid>
+      <pubDate>Sat, 24 Oct 2026 11:08:08 GMT</pubDate>
+    </item>
+    <item>
+      <title>Thunderstorm with Lightning, RAIN AND Gusty winds(40-60 KMPH) is likely to occur at isolated places over Hisar, Sirsa in next 3 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792839896152024</link>
+      <author>controlroom@ndma.gov.in (IMD Chandigarh)</author>
+      <guid isPermaLink="false">1792839896152024</guid>
+      <pubDate>Sat, 24 Oct 2026 11:06:40 GMT</pubDate>
+    </item>
+    <item>
+      <title>Light to Moderate rainfall with short intense spells, accompanied by thunderstorms with lightning and gusty winds reaching 30 to 40 kmph, is likely to occur at a few places over North Goa, South Goa and kushavati district during the next 3 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792836780086033</link>
+      <author>controlroom@ndma.gov.in (IMD Goa)</author>
+      <guid isPermaLink="false">1792836780086033</guid>
+      <pubDate>Sat, 24 Oct 2026 10:13:01 GMT</pubDate>
+    </item>
+    <item>
+      <title>Light to Moderate Rain  is likely to occur at isolated places over Ariyalur, Chennai, Cuddalore, Dindigul, Erode, Kallakurichi, Karur, Madurai, Namakkal, Perambalur, Ramanathapuram, Ranipet, Salem, Sivaganga, Tvallur, Thootkudi, Tiruchirappalli, Tnamalai, Vellore, Viluppuram, Pondicherry in next 3 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792835304359041</link>
+      <author>controlroom@ndma.gov.in (IMD Chennai)</author>
+      <guid isPermaLink="false">1792835304359041</guid>
+      <pubDate>Sat, 24 Oct 2026 09:51:05 GMT</pubDate>
+    </item>
+    <item>
+      <title>Light to Moderate Rain with thunderstorm and lightning  is likely to occur at a few places over Chengalpattu, Coimbatore, Dindigul, Kancheepuram, Kanniyakumari, Tenkasi, Theni, The Nilgiris, Tirunelveli, Tiruppur, Virudhunagar in next 3 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792835300823007</link>
+      <author>controlroom@ndma.gov.in (IMD Chennai)</author>
+      <guid isPermaLink="false">1792835300823007</guid>
+      <pubDate>Sat, 24 Oct 2026 09:48:23 GMT</pubDate>
+    </item>
+    <item>
+      <title>अगले 3 घंटो में, क्षेत्र में , कहीं-कहीं हल्की  वर्षा / बर्फ़बारी (3200 मीटर व उससे अधिक ऊँचाई वाले क्षेत्रो में) / गर्जन के साथ आकाशीय बिजली चमकने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792833003263009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1792833003263009</guid>
+      <pubDate>Sat, 24 Oct 2026 09:11:39 GMT</pubDate>
+    </item>
+    <item>
+      <title>Thunderstorm/Lightning/Gusty winds(30-40 kmph) is likely to occur at isolated places over Alwar, Bharatpur, Churu, Deeg, Dholpur, Ganganagar, Hanumangarh, Jhunjhunu, Khairthal-Tijara, Kotputli-Behror, Sikar in next 24 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792827317396028</link>
+      <author>controlroom@ndma.gov.in (IMD Jaipur)</author>
+      <guid isPermaLink="false">1792827317396028</guid>
+      <pubDate>Sat, 24 Oct 2026 08:53:54 GMT</pubDate>
+    </item>
+    <item>
+      <title>അടുത്ത 24 മണിക്കൂറിൽ IDK, EKM, KZD, WYD, KNR, KSD ജില്ലകളിൽ ഒറ്റപ്പെട്ടയിടങ്ങളിൽ വെള്ളപ്പൊക്കത്തിന് സാധ്യത. 2.10 pm; 24/10/2026 IMD-KSDMA</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792830427901006</link>
+      <author>controlroom@ndma.gov.in (IMD Thiruvananthapuram)</author>
+      <guid isPermaLink="false">1792830427901006</guid>
+      <pubDate>Sat, 24 Oct 2026 08:48:22 GMT</pubDate>
+    </item>
+    <item>
+      <title>*NOWCAST WEATHER WARNING ISSUED BY IMD GOA*   *DATED: 24 October 2026 | TOI: 1400 HRS IST*  Moderate rainfall with short intense spells, accompanied by thunderstorms with lightning and gusty winds reaching 30 to 40 kmph, is likely to occur at a few places over North Goa district during the next 3 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792831419331033</link>
+      <author>controlroom@ndma.gov.in (IMD Goa)</author>
+      <guid isPermaLink="false">1792831419331033</guid>
+      <pubDate>Sat, 24 Oct 2026 08:43:40 GMT</pubDate>
+    </item>
+    <item>
+      <title>पुढील ३ तासात कोल्हापूर, रत्नागिरी आणि सिंधुदुर्ग या जिल्ह्यात हलक्या पावसाच्या सरींसह मेघगर्जना आणि विजांच्या कडकडाटाची शक्यता आहे. नागरिकांनी सतर्क रहावे, मंत्रालय, मुंबई.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792828422281029</link>
+      <author>controlroom@ndma.gov.in (IMD Mumbai)</author>
+      <guid isPermaLink="false">1792828422281029</guid>
+      <pubDate>Sat, 24 Oct 2026 08:29:25 GMT</pubDate>
+    </item>
+    <item>
+      <title>അടുത്ത 24 മണിക്കൂറിൽ TSR, PKD, MLP, KZD, WYD, KNR, KSD ജില്ലകളിൽ ഒറ്റപ്പെട്ടയിടങ്ങളിൽ അതിശക്തമായ മഴയ്ക്ക് സാധ്യത 01.55 pm, 24.10.2026 IMD -KSDMA</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792829580238006</link>
+      <author>controlroom@ndma.gov.in (IMD Thiruvananthapuram)</author>
+      <guid isPermaLink="false">1792829580238006</guid>
+      <pubDate>Sat, 24 Oct 2026 08:17:52 GMT</pubDate>
+    </item>
+    <item>
+      <title>Thunderstorm with Lightning is likely to occur at isolated places over Ballari, Davanagere and Vijayanagara districts during next 3 hours. Source: IMD Bengaluru</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792828396099019</link>
+      <author>controlroom@ndma.gov.in (IMD Bengaluru)</author>
+      <guid isPermaLink="false">1792828396099019</guid>
+      <pubDate>Sat, 24 Oct 2026 07:57:59 GMT</pubDate>
+    </item>
+    <item>
+      <title>మీ ప్రాంతంలో పిడుగులు పడే అవకాశం ఉంది.ఉరుములు మెరుపులతో కూడిన వర్షం పడేప్పుడు చెట్లు,టవర్స్,పోల్స్,పొలాలు,బహిరంగ ప్రదేశాల్లో ఉండరాదు.సురక్షితమైన భవనాల్లో ఆశ్రయం పొందండి-ఆంధ్రప్రదేశ్ ప్రభుత్వం.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1792827900941008</link>
+      <author>controlroom@ndma.gov.in (Andhra Pradesh SDMA)</author>
+      <guid isPermaLink="false">1792827900941008</guid>
+      <pubDate>Sat, 24 Oct 2026 07:45:38 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

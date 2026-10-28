@@ -38,6 +38,8 @@ one the app already runs in, `plant-disease-503711`.
    150,000 uncached checks a month, and repeat views come from the cache for free. (The Quotas page
    showed ~400 EECU-seconds right after the first tests; that figure included interactive setup queries.)
 
+   **Flood extent (Sentinel-1), measured 26 Oct 2026:** about 1.3 EECU-seconds per check (workload tag `flood-extent`), read from Cloud Monitoring (`earthengine.googleapis.com/project/cpu/usage_time`, grouped by `workload_tag`).
+
    Going over the tier isn't a hard stop: the project gets *slower* until the month resets.
 4. Turn on the API:
    ```powershell

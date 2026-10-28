@@ -404,3 +404,41 @@ body {
 .ws-hover { transition: translate .3s var(--ease, ease), box-shadow .3s; }
 .ws-hover:hover { translate: 0 -4px; }
 :lang(hi) .ws-st { letter-spacing: normal; font-family: var(--font-body); }
+
+/* ---- Weather & Alerts (components/workspace/ModeTabs.jsx, WeatherAlerts.jsx, Horizon.jsx; docs/FIELD_ALERTS.md) ---- */
+.ws-mode { position: relative; display: flex; align-items: center; gap: 16px; width: 100%; min-height: 92px; padding: 16px 20px; border-radius: 24px; border: 1.5px solid rgba(22,47,34,.14); background: var(--color-paper, #FBF8F0); color: var(--color-ink); text-align: left; cursor: pointer; transition: translate .25s ease, box-shadow .25s ease, background .25s ease; }
+.ws-mode:hover { translate: 0 -3px; box-shadow: 0 22px 36px -26px rgba(25,61,43,.55); }
+.ws-mode-disc { display: grid; place-items: center; width: 52px; height: 52px; flex: none; border-radius: 50%; background: var(--color-sage-wash); color: var(--color-pine); }
+.ws-mode-pills { display: flex; flex: none; flex-direction: column; align-items: flex-end; gap: 6px; }
+.ws-mode-sub { font: 500 13px/1.4 var(--font-body); color: var(--color-ink-2); }
+.ws-mode[aria-selected=true] { background: var(--color-pine); border-color: var(--color-pine); color: var(--color-parchment); box-shadow: 0 26px 44px -28px rgba(7,38,24,.85); }
+.ws-mode[aria-selected=true] .ws-mode-disc { background: rgba(245,240,226,.14); color: var(--color-butter); }
+.ws-mode[aria-selected=true] .ws-mode-sub { color: #D5D5C7; }
+.ws-mode[aria-selected=true]::after { content: ''; position: absolute; left: 50%; bottom: -9px; width: 18px; height: 18px; border-radius: 3px; background: var(--color-pine); transform: translateX(-50%) rotate(45deg); }
+.ws-mode:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 3px; }
+.ws-mode[aria-selected=true]:focus-visible { outline-color: var(--color-butter); }
+@media (max-width: 639px) {
+  .ws-mode { flex-wrap: wrap; min-height: 84px; padding: 14px 16px; gap: 12px; }
+  .ws-mode-disc { width: 44px; height: 44px; }
+  .ws-mode-pills { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; padding-left: 56px; }   /* the pills drop under the title instead of pushing the card wider than the screen */
+}
+@media (prefers-reduced-motion: reduce) { .ws-mode { transition: none; } .ws-mode:hover { translate: none; } }
+
+/* the 72-hour strip: 3 days x 4 parts of the day */
+.hz-grid { display: grid; grid-template-columns: 88px repeat(12, minmax(0, 1fr)); }
+.hz-lbl { display: flex; align-items: center; gap: 8px; padding-right: 8px; font: 500 12px/1.2 var(--font-body); color: var(--color-ink-2); }
+.hz-cell { border-left: 1px solid rgba(22,47,34,.08); position: relative; }
+.hz-day { text-align: center; padding: 10px 0 8px; border-left: 1px solid rgba(22,47,34,.14); font: 600 13px/1.2 var(--font-body); }
+.hz-day small { display: block; font: 500 11px/1.4 var(--font-mono); letter-spacing: .08em; color: var(--color-ink-2); text-transform: uppercase; }
+.hz-day.today { background: rgba(108,133,77,.14); }
+.hz-part { text-align: center; font: 500 11px/1 var(--font-mono); letter-spacing: .04em; color: var(--color-ink-2); padding: 6px 0; border-left: 1px solid rgba(22,47,34,.08); }
+.hz-past { background-image: repeating-linear-gradient(135deg, rgba(22,47,34,.08) 0 2px, transparent 2px 8px); }
+.hz-now { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px solid var(--color-rust-deep); z-index: 3; pointer-events: none; }
+.hz-now span { position: absolute; top: 6px; left: 8px; background: var(--color-rust-deep); color: #fff; font: 600 11px/1 var(--font-mono); letter-spacing: .08em; padding: 5px 8px; border-radius: 999px; white-space: nowrap; }
+.hz-chip { display: flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 10px 0 8px; border-radius: 12px; border: 1.5px solid; font: 600 12px/1.15 var(--font-body); overflow: hidden; white-space: nowrap; }
+.hz-chip span { overflow: hidden; text-overflow: ellipsis; }
+.hz-chip svg { width: 15px; height: 15px; flex: none; }
+.hz-chip[data-l=info] { color: #2F493B; background: #EEE1CD; border-color: #2F493B; border-style: dashed; }
+.hz-chip[data-l=watch] { color: #473D00; background: #F0ECD2; border-color: #AE9900; }
+.hz-chip[data-l=warn] { color: #6A2202; background: #FFE5DC; border-color: #98370C; }
+.hz-chip[data-l=urgent] { color: #4A1700; background: #F3C9B8; border-color: #6A2202; border-width: 2px; }

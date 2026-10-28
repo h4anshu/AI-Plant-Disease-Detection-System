@@ -1,0 +1,38 @@
+<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+<cap:identifier>IN-1792836780086033_55</cap:identifier>
+<cap:sender>IMD-Goa</cap:sender>
+<cap:sent>2026-10-24T15:42:24+05:30</cap:sent>
+<cap:status>Actual</cap:status>
+<cap:msgType>Update</cap:msgType>
+<cap:scope>Public</cap:scope>
+<cap:restriction/>
+<cap:addresses/>
+<cap:note/>
+<cap:references>IMD-Goa,IN-1792831419331033_55,2026-10-24T14:13:11+05:30</cap:references>
+<cap:incidents/>
+<cap:info>
+<cap:language>en-IN</cap:language>
+<cap:category>Met</cap:category>
+<cap:event>Moderate Rain</cap:event>
+<cap:urgency>Expected</cap:urgency>
+<cap:severity>Moderate</cap:severity>
+<cap:certainty>Possible</cap:certainty>
+<cap:audience>1</cap:audience>
+<cap:effective>2026-10-24T15:30:00+05:30</cap:effective>
+<cap:onset>2026-10-24T15:43:00+05:30</cap:onset>
+<cap:expires>2026-10-24T19:00:00+05:30</cap:expires>
+<cap:headline>Light to Moderate rainfall with short intense spells, accompanied by thunderstorms with lightning and gusty winds reaching 30 to 40 kmph, is likely to occur at a few places over North Goa, South Goa and kushavati district during the next 3 hours.</cap:headline>
+<cap:description/>
+<cap:instruction>Please follow SDMA guidelines.</cap:instruction>
+<cap:contact/>
+<cap:parameter>
+<cap:valueName>Polygon URL</cap:valueName>
+<cap:value>https://sachet.ndma.gov.in/cap_public_website/FetchPolygonXMLFile?identifier=1792836780086033</cap:value>
+</cap:parameter>
+<cap:area>
+<cap:areaDesc>Pernem, Mapusa</cap:areaDesc>
+<cap:altitude>0</cap:altitude>
+<cap:ceiling>0</cap:ceiling>
+</cap:area>
+</cap:info>
+</cap:alert>

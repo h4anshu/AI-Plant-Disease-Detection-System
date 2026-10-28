@@ -9,6 +9,9 @@ import { parseCapturedAt, soilCacheKey } from "../utils/context.js";
 import { getTreatment, LANGUAGES, localizedTreatment, treatmentMap } from "../utils/treatmentMap.js";
 import getYieldLoss, { yieldLossTable } from "../utils/yieldLoss.js";
 import Report from "../models/Report.js";
+import FieldModel from "../models/Field.js";
+import AlertFeedback from "../models/AlertFeedback.js";
+import { FloodExtentCache, extentKey } from "../models/Flood.js";
 import { BadImage, cleanImage } from "../utils/image.js";
 import { GUEST_ID } from "../middleware/guestDevice.js";
 import logger, { logError } from "../utils/logger.js";
@@ -261,6 +264,12 @@ const deleteMine = async (req, res) => {
     const results = await Promise.allSettled(images.map((id) => cloudinary.uploader.destroy(id)));
     const imagesFailed = results.filter((r) => r.status === 'rejected').length;
     const { deletedCount } = await PredictionModel.deleteMany(owner);
+    // radar answers cached for the fields' places (3 days; the key is a hash of the place rounded to about 100 m, which can be tried out) go with them
+    const fields = await FieldModel.find(owner).select('location').lean();
+    const days = [0, 1, 2, 3].map((n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10));
+    await FloodExtentCache.deleteMany({ key: { $in: fields.flatMap((f) => days.map((d) => extentKey(f.location.coordinates[1], f.location.coordinates[0], d))) } });
+    await FieldModel.deleteMany(owner); // saved fields hold a private location too
+    await AlertFeedback.deleteMany(owner); // answers to "Did this help?"
     // cached satellite answers for those fields go too (their keys are hashes of the location)
     await FieldHealthCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map(keyForPrediction) } });
     // and the soil answers cached for those cells (a hash of a ~250 m cell can be reversed by trying them all)

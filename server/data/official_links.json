@@ -1,0 +1,9 @@
+{
+  "national": [
+    { "id": "imd-bulletin", "url": "https://mausam.imd.gov.in/imd_latest/contents/agromet/agromet-data/national/current/current-pdf/national_current.pdf" },
+    { "id": "imd-state", "url": "https://mausam.imd.gov.in/responsive/agromet_adv_ser_state_current.php" },
+    { "id": "dafw", "url": "https://agriwelfare.gov.in/" },
+    { "id": "sachet", "url": "https://sachet.ndma.gov.in/" }
+  ],
+  "states": {}
+}

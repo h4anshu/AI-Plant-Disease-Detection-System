@@ -110,6 +110,10 @@ It is not an official loss assessment.
 
 After the landing page, `/overview`, `/predict` (new check), `/history` (field log), `/checkup/:id` and `/me` form one workspace (left menu on desktop, tab bar on phones): last result and counts, a result page with Care plan, Field context, Satellite and Report tabs, a filterable log, and a profile and privacy page. Built from the "My Field" design; routes, data sources, scaling and limits are in [docs/WORKSPACE.md](docs/WORKSPACE.md).
 
+## Weather & Alerts (saved fields)
+
+The Overview has a switch between **My Field** (leaf checks, as before) and **Weather & Alerts**. A farmer saves up to 3 fields (crop, growth stage, a private place) at `/fields/new`, and gets up to 3 alerts per field for the next 3 days: frost, heat, heavy rain, rain at harvest or after spraying. The alerts are computed on every read from the Open-Meteo forecast the server already caches, by 8 **draft** rules (not yet reviewed by an agronomist) that depend on the crop and its stage; the screen shows the numbers, the rule id and "not an official warning". English and Hindi. Official warnings for the field's district from **NDMA SACHET** and **IMD** are passed on as published and marked "Official" (issuer, time, expiry, link), and the screen says so when those feeds are late instead of showing "no alert". Three flood signals are shown for the field's region, never as "your field will flood": the river flow forecast (Open-Meteo/GloFAS, judged against that river's own history), the nearest CWC river gauge that is above its warning level, and, when asked, a Sentinel-1 radar check (through the geo-service and Earth Engine) of whether the 500 m around the field is newly under water. The exact place is stored but never returned or logged, and only the 5 km grid cell goes to Open-Meteo and IMD. Rules, sources, API, privacy and limits: [docs/FIELD_ALERTS.md](docs/FIELD_ALERTS.md); why and what comes next: [docs/FIELD_ALERT_PLAN.md](docs/FIELD_ALERT_PLAN.md).
+
 ## Landing page and colour system
 
 The home page (7 sections, English + Hindi, one viewport per section on desktop, stacked on phones and tablets) is described in [docs/LANDING_PAGE.md](docs/LANDING_PAGE.md); the colour system, with the experiments behind it, is [docs/COLOUR_SYSTEM.md](docs/COLOUR_SYSTEM.md).
@@ -270,6 +274,11 @@ The golden tests need the ONNX files built from the tracked weights; without the
 | GET | `/api/disease-risk?lat=&lon=&crop=` | Weather risk for a point (potato, rice) |
 | GET | `/api/predict/:id/report.pdf?lang=en\|hi` | PDF field report of a checkup (owner only) |
 | GET | `/api/reports/:reportId` | Public check of a report: hashes and key values |
+| GET, POST | `/api/fields` | This browser's saved fields (max 3); never returns the place |
+| PATCH, DELETE | `/api/fields/:id` | Change a field's name or stage; delete it |
+| GET | `/api/fields/alerts` | The fields with their 3-day weather alerts, official NDMA SACHET / IMD warnings, 72-hour strip and conditions |
+| GET | `/api/fields/:id/flood-extent` | Radar check of the area around a field (owner only; geo-service, cached, limited) |
+| GET, POST | `/api/alerts/health`, `/api/alerts/tick` | Operator routes (header `x-alerts-token`): freshness of the official sources; fetch them now |
 | GET | `/health` | Health check |
 
 Auth uses the raw JWT in the `Authorization` header, with no `Bearer` prefix — this matches how the frontend's Axios interceptor sends it, so don't "fix" it to add the prefix without updating both sides.
