@@ -103,7 +103,9 @@ describe('the radar flood check of a field', () => {
   test('a geo-service that cannot be reached is a 502, and the log carries no place', async () => {
     const id = await save();
     const errors = jest.spyOn(logger, 'error');
-    nock(GEO).post('/flood-extent').replyWithError(Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' }));
+    // a REAL refused connection (nothing listens on port 1), not nock's simulated one: replyWithError sometimes raised an unhandled socket
+    // error on a slow machine and failed the whole suite in CI
+    process.env.GEO_SERVICE_URL = 'http://127.0.0.1:1';
     expect((await check(id)).status).toBe(502);
     expect(errors).toHaveBeenCalled();
     expect(JSON.stringify(errors.mock.calls)).not.toMatch(/31\.93|74\.68/);

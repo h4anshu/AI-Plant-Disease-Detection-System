@@ -1307,3 +1307,11 @@ Asked: "thik h pending work pahle karo". What in the Pending list could be done 
 **Tested:** server **730 pass** (30 suites; +20 mandi, +8 district list, usage and health updated), client **204 pass** (+9 prices), oxlint no errors, build OK. Real browser with the real data.gov.in key and IMD district lookup: the price card for a Ludhiana potato field (47 markets), "stale" for Punjab wheat and Odisha paddy. A radar-check test failed once in 3 full runs while the end-to-end server was running in the background (6 later runs all passed): it is a timing test, noted.
 **Not done (needs you):** the rest of the Pending list.
 **Cleanup:** Playwright closed; e2e server and Vite stopped (ports 4010, 5190 free); temporary scripts, screenshots, `.playwright-mcp/`, `client/dist` and the throwaway Python environment (in the temp folder) removed or outside the project.
+
+## Task 42 — Fix: a flaky test failed the CI run (29 Oct 2026)
+
+The owner pushed `main` and the GitHub Actions run failed with 1 of 730 server tests: `floodExtent.test.js`, "a geo-service that cannot be reached is a 502": `Unhandled error. (Error: connect ECONNREFUSED)` raised by nock's `MockHttpSocket`.
+
+**Cause:** the test simulated the refused connection with nock's `replyWithError`, which on a slower or busier machine sometimes emits the socket error with no listener left, so Jest counts it as an unhandled error. I had seen it twice locally (3 failures in about 10 full runs, only while a background server was using the CPU) and noted it as a timing test on 28 Oct; CI's slower machine made it visible. It is a test problem, not a product bug: the server's answer (502, no place in the log) was right every time.
+
+**Fix:** the test now points `GEO_SERVICE_URL` at `http://127.0.0.1:1`, where nothing listens, so the connection is **really** refused and no simulated error is involved. Checked: 12 runs of the file while 3 other Jest processes used the CPU: 0 failures; 3 full server runs: 730 of 730. The other `replyWithError` use (`official.test.js`, a plain `{ code }` object) has never failed.
