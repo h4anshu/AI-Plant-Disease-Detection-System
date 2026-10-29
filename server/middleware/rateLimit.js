@@ -27,6 +27,10 @@ export const loginLimiter = limiter(Number(process.env.LOGIN_RATE_LIMIT) || 20, 
 export const registerLimiter = limiter(Number(process.env.REGISTER_RATE_LIMIT) || 10, 60,
   'Too many accounts created from this network. Please try again later.');
 
+// The operator's token (docs/ADMIN.md): only wrong attempts count, per IP, so guessing it is slow and the operator is never blocked
+export const adminLimiter = limiter(Number(process.env.ADMIN_RATE_LIMIT) || 10, 15,
+  'Too many failed attempts. Please wait a few minutes and try again.', { skipSuccessfulRequests: true });
+
 // Deleting an account asks for the password again, so it is guessable like a sign-in is
 export const accountLimiter = limiter(Number(process.env.ACCOUNT_RATE_LIMIT) || 20, 15,
   'Too many requests. Please wait a few minutes and try again.', { skipSuccessfulRequests: true });

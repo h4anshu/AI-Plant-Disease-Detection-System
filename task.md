@@ -1395,3 +1395,12 @@ Asked: the big gaps one by one. Fourth: satellite crop health (Earth Engine was 
 **Tested:** server **815 pass** (+10), client **343 pass** (+4), lint 0 errors. Real browser against a stand-in geo-service: nothing asked until the button, the verdict and chart drawn, the second look served from the cache (one call seen). **Not checked:** the real geo-service for a saved field (same path as a checkup's, which was checked on 26 Sep 2026).
 **Not built:** an alert or a push from it (needs an Earth Engine budget guard first); the three pilot fields would show whether "below neighbours" matches what farmers see.
 **Cleanup:** e2e server, the stand-in geo-service and the preview stopped (ports 4010, 4020, 5190 free), `server/_e2e.mjs`, `client/dist` and `.playwright-mcp/` removed.
+
+## Task 48 — The operator's page (29 Oct 2026)
+
+Asked: the big gaps one by one. Last of the four: the operator had only `curl` and JSON. `docs/ADMIN.md`.
+
+**Built:** `/admin` (lazy page, `noindex`, not linked): token form (kept in `sessionStorage` for the tab), then use of the app (accounts, fields, checkups 7/30/all, outcomes, notifications by language), **how often the model is right per crop from the users' own "Was this correct?" answers**, the most common diseases, "Did the alerts help?" per rule, the feeds and switches, today's use of the free services. `GET /api/admin/summary` returns counts only (a test searches it for names, emails, ids, device ids, places and photos). `adminGuard` is shared with the older operator routes, and wrong tokens are limited per IP (`ADMIN_RATE_LIMIT`).
+**Tested:** server **822 pass** (+7), client **356 pass** (+13 incl. axe), lint 0 errors. Real browser with seeded data: wrong token message, right token, counts, the page, robots meta; **a bug found there:** the first card was wider than a phone (fixed with `min-w-0`), then no sideways scroll at 360, 390 and 768 px.
+**Needs you:** set `ALERTS_ADMIN_TOKEN` on the server (`docs/PUSH.md` §4), then open `/admin`.
+**Cleanup:** e2e server and preview stopped (ports 4010, 5190 free), `server/_e2e.mjs`, `client/dist` and `.playwright-mcp/` removed.

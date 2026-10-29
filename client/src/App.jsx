@@ -14,6 +14,9 @@ import Profile from "./pages/Profile";
 import Privacy from "./pages/Privacy";
 import Auth from "./pages/Auth";
 
+// The operator's page: read-only counts behind a token, not linked from anywhere (docs/ADMIN.md)
+const Admin = lazy(() => import("./pages/Admin"));
+
 // Leaflet and the map code load only when someone opens the map
 const MapPage = lazy(() => import("./pages/MapPage"));
 
@@ -38,6 +41,7 @@ const App = () => (
       <Route path="/register" element={<Auth mode="register" />} />
       <Route path="/map" element={<Suspense fallback={null}><MapPage /></Suspense>} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route path="/admin" element={<Suspense fallback={null}><Admin /></Suspense>} />
     </Route>
 
     {/* the workspace: left menu on desktop, bottom tab bar on phones */}

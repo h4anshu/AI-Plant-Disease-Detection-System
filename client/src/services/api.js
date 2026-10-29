@@ -115,6 +115,12 @@ export const subscribePush = (subscription, lang) => api.post('/push/subscribe',
 export const unsubscribePush = (endpoint) => api.post('/push/unsubscribe', { endpoint });
 export const testPush = (endpoint) => api.post('/push/test', { endpoint });
 
+// --- The operator's page (docs/ADMIN.md): the token travels in a header, typed by the operator and kept for the tab only
+const asOperator = (token) => ({ headers: { 'x-alerts-token': token } });
+export const getAdminSummary = (token) => api.get('/admin/summary', asOperator(token));
+export const getAdminHealth = (token) => api.get('/alerts/health', asOperator(token));
+export const getAdminFeedback = (token) => api.get('/alerts/feedback', asOperator(token));
+
 // --- Public disease map: GeoJSON hexagons, { crop?, disease?, days: 7 | 30 | 90 }
 export const getMapReports = (params) => api.get('/map/reports', { params });
 

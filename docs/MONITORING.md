@@ -228,3 +228,5 @@ FLAGGED: wheat - mean confidence dropped more than 10 points
       if a golden photo's answer changed on purpose, then deploy (docs/DEPLOY.md). New predictions
       carry the new `modelVersion`, so the drift report and feedback can be compared before and
       after.
+
+The same numbers, and the model's field accuracy, are on one page: `/admin` (`docs/ADMIN.md`).

@@ -1,6 +1,6 @@
 import express from "express";
-import { timingSafeEqual } from "node:crypto";
-import { alertLimiter } from "../middleware/rateLimit.js";
+import { adminLimiter, alertLimiter } from "../middleware/rateLimit.js";
+import adminGuard from "../middleware/adminGuard.js";
 import { SOURCES, isEnabled, refresh, sourceStatus } from "../services/alerts/ingest.js";
 import { usageToday } from "../services/usage.js";
 import AlertFeedback from "../models/AlertFeedback.js";
@@ -13,14 +13,7 @@ import logger from "../utils/logger.js";
 const alertsRouter = express.Router();
 alertsRouter.use(alertLimiter);
 
-const guard = (req, res, next) => {
-  const token = process.env.ALERTS_ADMIN_TOKEN;
-  if (!token) return res.status(503).json({ message: 'Alerts admin is not configured' });
-  const got = Buffer.from(req.get('x-alerts-token') ?? '');
-  const want = Buffer.from(token);
-  if (got.length !== want.length || !timingSafeEqual(got, want)) return res.status(401).json({ message: 'Unauthorized' });
-  next();
-};
+const guard = [adminLimiter, adminGuard];   // wrong tokens are counted per IP
 
 // Everything an operator needs on one page (docs/MONITORING.md, "Weather alerts"): how fresh each feed is, which kill switches are on, which
 // optional keys and services are configured, and today's calls to the free services against their limits. Names and numbers only.
