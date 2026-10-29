@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import FormData from "form-data";
 import cloudinary, { publicIdFromUrl, uploadBuffer } from "../config/cloudinary.js";
 import PredictionModel, { FEEDBACK } from "../models/Prediction.js";
-import FieldHealthCache, { keyForPrediction } from "../models/FieldHealthCache.js";
+import FieldHealthCache, { fieldCacheKey, keyForPrediction } from "../models/FieldHealthCache.js";
 import SoilCache from "../models/SoilCache.js";
 import { parseCapturedAt, soilCacheKey } from "../utils/context.js";
 import { getTreatment, LANGUAGES, localizedTreatment, treatmentMap } from "../utils/treatmentMap.js";
@@ -263,10 +263,13 @@ export const wipeOwner = async (owner, requestId) => {
   const imagesFailed = results.filter((r) => r.status === 'rejected').length;
   const { deletedCount } = await PredictionModel.deleteMany(owner);
   // radar answers cached for the fields' places (3 days; the key is a hash of the place rounded to about 100 m, which can be tried out) go with them
-  const fields = await FieldModel.find(owner).select('location').lean();
+  const fields = await FieldModel.find(owner).select('location crop').lean();
   const days = [0, 1, 2, 3].map((n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10));
   await FloodExtentCache.deleteMany({ key: { $in: fields.flatMap((f) => days.map((d) => extentKey(f.location.coordinates[1], f.location.coordinates[0], d))) } });
   await FieldModel.deleteMany(owner); // saved fields hold a private location too
+  // and the crop-health answers of those fields: one per day for 30 days, under a hash of the place (docs/CROP_HEALTH.md)
+  const healthDays = Array.from({ length: 31 }, (_, n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10));
+  await FieldHealthCache.deleteMany({ key: { $in: fields.flatMap((f) => healthDays.map((d) => fieldCacheKey(f.location.coordinates[1], f.location.coordinates[0], d, f.crop))) } });
   await AlertFeedback.deleteMany(owner); // answers to "Did this help?"
   await PushSubscription.deleteMany(owner); // this browser's notifications
   // cached satellite answers for those fields go too (their keys are hashes of the location)

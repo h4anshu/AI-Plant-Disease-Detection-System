@@ -74,8 +74,9 @@ export const getCropClasses = () => api.get('/predict/classes');
 // Removes every checkup of this browser (and its photos) from the server: /privacy page
 export const deleteMyData = () => api.delete('/predict').then((res) => { clearLast(); return res; });   // the copy kept for offline goes too
 
-// Satellite view of the diagnosed field (only for checkups with a consented location)
+// Satellite view of the diagnosed field (only for checkups with a consented location), and of a saved field (docs/CROP_HEALTH.md)
 export const getFieldHealth = (id) => api.get(`/predict/${id}/field-health`, { timeout: 120000 });
+export const getSavedFieldHealth = (id) => api.get(`/fields/${id}/health`, { timeout: 120000 });
 
 // Weather-based disease risk (docs/DISEASE_RISK.md): for a checkup (its private location) or a map point
 // One-click PDF report of a checkup (docs/REPORT.md)

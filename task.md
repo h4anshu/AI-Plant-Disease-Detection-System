@@ -1386,3 +1386,12 @@ Asked: the big gaps one by one. Third of the list: the pilot states speak Punjab
 **Tested:** client **339 pass** (+50: locale files, names, fallback, dates, the server-language mapping, axe in four languages), server **805 pass** (+1; the report-font test now skips the Punjabi and Odia names, which never reach a PDF), lint 0 errors. Real browser: the fonts load, a Punjabi date is right, no sideways scroll at 360 and 390 px in any language.
 **Needs you:** a Punjabi reader and an Odia reader for `pa.json`, `or.json` and the names (AI-drafted; Odia is the less certain); then the advice can follow the Hindi review.
 **Cleanup:** e2e server and preview stopped (ports 4010, 5190 free), `server/_e2e.mjs`, `client/dist`, `.playwright-mcp/` and the translation helper files removed.
+
+## Task 47 — Crop health from space for a saved field (29 Oct 2026)
+
+Asked: the big gaps one by one. Fourth: satellite crop health (Earth Engine was set up but only the radar flood check and the checkup's view used it). Design in `docs/CROP_HEALTH.md`.
+
+**Built:** `GET /api/fields/:id/health` (owner only, on request, cached per place and day, rate-limited, counted as `earth-engine-health`), sharing one function with the checkup's `field-health`; the Weather & Alerts card "Crop health from space" around the existing `FieldHealth` (now takes `fieldId`); "Delete my data"/"Delete my account" remove the field's cached answers; the Privacy page says the exact point also goes to Earth Engine for this view (30 m circle, answer kept 30 days under a hash).
+**Tested:** server **815 pass** (+10), client **343 pass** (+4), lint 0 errors. Real browser against a stand-in geo-service: nothing asked until the button, the verdict and chart drawn, the second look served from the cache (one call seen). **Not checked:** the real geo-service for a saved field (same path as a checkup's, which was checked on 26 Sep 2026).
+**Not built:** an alert or a push from it (needs an Earth Engine budget guard first); the three pilot fields would show whether "below neighbours" matches what farmers see.
+**Cleanup:** e2e server, the stand-in geo-service and the preview stopped (ports 4010, 4020, 5190 free), `server/_e2e.mjs`, `client/dist` and `.playwright-mcp/` removed.

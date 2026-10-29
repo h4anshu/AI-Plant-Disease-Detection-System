@@ -200,7 +200,7 @@
     "contextTitle": "Weather and soil for a checkup",
     "context": "The first time you open a checkup that has a location, our server looks up the weather around the photo date (Open-Meteo, the same point rounded to about 5 km), the rainfall compared with normal and a modelled soil map (through Google Earth Engine, which is sent only the centre of a square of about 250 m around your point, never the exact location). The result is saved with the checkup, without coordinates. Soil Health Card values you type in are saved with that checkup only. \"Delete my data\" removes all of it.",
     "alertsTitle": "Weather alerts: what leaves our server",
-    "alerts": "The weather and the river forecast are asked for with a point rounded to about 5 km, never your field's exact place. Fires are asked for from NASA with the same rounded area (a box of about 22 km); the distance to a fire is worked out on our server. Official warnings (NDMA, IMD, the river gauges) news headlines and mandi prices are fetched by our server for everyone (for a state and a crop, never for a person), so nothing about you is sent for them. Saved fields stay until you delete them. Weather, river, fire and satellite answers are kept from half an hour to a few days and hold no personal data. The satellite flood check, which runs only when you press its button, is the one place where the exact point of your field goes to Google (Earth Engine): it reads a circle of 500 m around that point from public satellite images, and the answer is kept for 3 days under a code that does not show the place.",
+    "alerts": "The weather and the river forecast are asked for with a point rounded to about 5 km, never your field's exact place. Fires are asked for from NASA with the same rounded area (a box of about 22 km); the distance to a fire is worked out on our server. Official warnings (NDMA, IMD, the river gauges) news headlines and mandi prices are fetched by our server for everyone (for a state and a crop, never for a person), so nothing about you is sent for them. Saved fields stay until you delete them. Weather, river, fire and satellite answers are kept from half an hour to a few days and hold no personal data. The satellite flood check and the crop-health view, which run only when you press their buttons, are the two places where the exact point of your field goes to Google (Earth Engine): the flood check reads a circle of 500 m around that point from public satellite images, and the answer is kept for 3 days; the crop-health view reads a circle of 30 m and the answer is kept for 30 days. Both answers are kept under a code that does not show the place.",
     "reportsTitle": "Reports from other farmers, and your answers",
     "reports": "\"Disease reports near you\" uses the same data as the public disease map: a disease counts only when at least 3 different browsers reported it, your own browser is never counted, and the alert shows a disease and a number, never a place. \"Did this help?\" stores the rule, the date, your answer and the field's crop and growth stage, with no place; it is kept for a year, and \"Delete my data\" removes it.",
     "accountsTitle": "Accounts",
@@ -1178,7 +1178,10 @@
       "note": "These are prices that market committees reported (Agmarknet, through data.gov.in), in rupees per quintal. They are what was paid, not what you will get, and not advice to sell or to wait: the variety, the quality and the day change the price.",
       "source": "See the source"
     },
-    "offline": "No connection. Showing the alerts last checked on {{when}}; they may be out of date."
+    "offline": "No connection. Showing the alerts last checked on {{when}}; they may be out of date.",
+    "health": {
+      "title": "Crop health from space: {{name}}"
+    }
   },
   "auth": {
     "loginEyebrow": "Welcome back",

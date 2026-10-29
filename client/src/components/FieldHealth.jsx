@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getFieldHealth } from '../services/api';
+import { getFieldHealth, getSavedFieldHealth } from '../services/api';
 
 import { formatDate } from '../locales/dates';
 const W = 320;
@@ -47,16 +47,16 @@ export function SeriesChart({ rows, window, keys, bandKey, yMin, yMax, lang, lab
 // dates with the month's name: "9/6/2026" reads as 9 June in India but meant 6 September
 const longDate = (d, lang) => formatDate(new Date(d), lang, { day: 'numeric', month: 'short', year: 'numeric' });
 
-// "How does the whole field look from space?" for a checkup with a consented location. Loaded only on
-// request: every uncached answer is an Earth Engine computation (docs/FIELD_HEALTH.md).
-const FieldHealth = ({ predictionId, crop }) => {
+// "How does the whole field look from space?" for a checkup with a consented location (`predictionId`) or a saved field (`fieldId`). Loaded
+// only on request: every uncached answer is an Earth Engine computation (docs/FIELD_HEALTH.md, docs/CROP_HEALTH.md).
+const FieldHealth = ({ predictionId, fieldId, crop }) => {
   const { t, i18n } = useTranslation();
   const [state, setState] = useState({ status: 'idle' });
 
   const load = async () => {
     setState({ status: 'loading' });
     try {
-      setState({ status: 'done', data: (await getFieldHealth(predictionId)).data });
+      setState({ status: 'done', data: (await (fieldId ? getSavedFieldHealth(fieldId) : getFieldHealth(predictionId))).data });
     } catch (err) {
       setState({ status: 'error', message: err.response?.data?.message || t('field.failed') });
     }

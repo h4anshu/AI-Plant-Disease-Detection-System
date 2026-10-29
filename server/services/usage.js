@@ -8,6 +8,7 @@ export const LIMITS = {
   'open-meteo-flood': { perDay: 10000, note: 'flood API calls weighted by locations x days / 14; shares the Open-Meteo allowance' },
   firms: { perDay: null, note: 'NASA FIRMS requests; 5,000 per 10 minutes' },
   'data-gov': { perDay: null, note: 'data.gov.in mandi price requests (about one per state and crop every 6 hours); it answers 429 to bursts' },
+  'earth-engine-health': { perDay: null, note: 'crop-health views of saved fields and checkups (Sentinel-2 series; each uncached one is an Earth Engine computation, docs/CROP_HEALTH.md)' },
   'earth-engine-radar': { perDay: null, note: 'satellite flood checks (about 1.3 EECU-seconds each; the free tier has 18,000 EECU-seconds a month)' },
 };
 

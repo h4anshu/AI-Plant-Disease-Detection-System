@@ -6,6 +6,7 @@ import { cropIcon } from './cropIcon';
 import Icon from './icons';
 import Horizon from './Horizon';
 import PushCard from './PushCard';
+import CropHealthCard from './CropHealthCard';
 import NewsPanel from './NewsPanel';
 import PricesCard from './PricesCard';
 import { AlertPill, useAlertText } from './alertParts';
@@ -454,6 +455,7 @@ const WeatherAlerts = ({ state }) => {
 
       <PushCard />
 
+      {shown[0] && <CropHealthCard field={stripField ?? shown[0]} name={nameOf(stripField ?? shown[0])} />}
       {(stripField ?? shown[0])?.flood && <FloodCard field={stripField ?? shown[0]} name={nameOf(stripField ?? shown[0])} />}
       {shown[0] && <NewsPanel field={stripField ?? shown[0]} name={nameOf(stripField ?? shown[0])} />}
       {shown[0] && <PricesCard field={stripField ?? shown[0]} name={nameOf(stripField ?? shown[0])} />}
