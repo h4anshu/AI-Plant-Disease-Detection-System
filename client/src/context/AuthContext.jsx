@@ -1,5 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { deleteAccount, getMe, loginUser, registerUser } from "../services/api";
+import { clearLast } from "../services/offlineCache";
 
 // The default lets pages render without a provider (tests, previews): a guest.
 export const AuthContext = createContext({ user: null, isAuthenticated: false, loading: false });
@@ -15,6 +16,7 @@ const store = (data) => {
 };
 const forget = () => {
   try { localStorage.removeItem('token'); localStorage.removeItem('user'); } catch { /* private mode */ }
+  clearLast();   // the next person to use this phone must not see the last alerts and log
 };
 
 // Who is signed in (docs/AUTH.md). Signing in is optional: without it the browser is a guest.
@@ -23,7 +25,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // the server says a token is no longer good (api.js): sign out
-    const expired = () => setUser(null);
+    const expired = () => { clearLast(); setUser(null); };
     window.addEventListener('auth:expired', expired);
     // a saved session is checked once per visit; offline or a server error keeps it (only a 401 'invalid_token' signs out, in api.js)
     if (read()) getMe().catch(() => {});

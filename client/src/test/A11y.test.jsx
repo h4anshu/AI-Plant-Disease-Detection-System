@@ -103,6 +103,7 @@ describe.each([['en'], ['hi']])('accessibility (axe), language %s', (lang) => {
     await screen.findByText(i18n.t('alerts.empty.title'));
     expect(await check(container)).toEqual([]);
     unmount();
+    localStorage.clear();   // the empty answer was kept for offline: without it the failure below would show that copy instead of the error
     api.getFieldAlerts.mockRejectedValue(new Error('offline'));
     const again = open();
     await screen.findByText(i18n.t('alerts.error.title'));

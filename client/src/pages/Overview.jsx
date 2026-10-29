@@ -66,6 +66,8 @@ const Overview = () => {
   // what is waiting in each half, shown on the switch so nothing hides behind the other one
   const sum = summarize(alertState.fields);
   const late = !!feedNotice(alertState.data?.officialSources);
+  // an old copy: no signal, or a refresh that failed. "No alert" is never said from an old copy as if it were today's.
+  const stale = !!alertState.error && !!alertState.data;
   const fieldPills = loading ? [] : !items.length ? [{ level: 'info', label: t('alerts.mode.noChecks') }]
     : attention.length ? [{ level: 'warn', label: t('alerts.mode.recheck', { count: attention.length }) }] : [{ level: 'calm', label: t('alerts.mode.clear') }];
   const weatherPills = !alertState.data ? (alertState.loading ? [] : [{ level: 'stale', label: t('alerts.mode.unavailable') }])
@@ -75,14 +77,15 @@ const Overview = () => {
       ...(sum.watch ? [{ level: 'watch', label: t('alerts.mode.watch', { count: sum.watch }) }] : []),
       ...(!sum.urgent && !sum.warn && !sum.watch && sum.info ? [{ level: 'info', label: t('alerts.mode.info', { count: sum.info }) }] : []),
       ...(sum.unavailable ? [{ level: 'stale', label: t('alerts.mode.unavailable') }] : []),
-      // "no alert" is only said when the official feeds are not late: a silent feed is not an all-clear
-      ...(!sum.urgent && !sum.warn && !sum.watch && !sum.info && !sum.unavailable ? [late ? { level: 'stale', label: t('alerts.mode.officialLate') } : { level: 'calm', label: t('alerts.mode.none') }] : [])];
+      ...(stale ? [{ level: 'stale', label: t('alerts.mode.old') }] : []),
+      // "no alert" is only said when the official feeds are not late and the answer is today's: a silent feed is not an all-clear
+      ...(!sum.urgent && !sum.warn && !sum.watch && !sum.info && !sum.unavailable && !stale ? [late ? { level: 'stale', label: t('alerts.mode.officialLate') } : { level: 'calm', label: t('alerts.mode.none') }] : [])];
   const tabs = [
     { id: 'field', icon: 'sprout', title: t('alerts.mode.field'), sub: t('alerts.mode.fieldSub'), pills: fieldPills },
     { id: 'weather', icon: 'cloudsun', title: t('alerts.mode.weather'), sub: t('alerts.mode.weatherSub'), pills: weatherPills },
   ];
   const nAlerts = sum.urgent + sum.warn + sum.watch + sum.info;
-  const weatherTitle = !alertState.data ? '' : !sum.total ? t('alerts.title.noFields') : nAlerts ? t('alerts.title.alerts', { count: nAlerts }) : sum.ok ? t(late ? 'alerts.title.clearLate' : 'alerts.title.clear') : t('alerts.title.unavailable');
+  const weatherTitle = !alertState.data ? '' : !sum.total ? t('alerts.title.noFields') : nAlerts ? t('alerts.title.alerts', { count: nAlerts }) : sum.ok ? t(stale ? 'alerts.title.old' : late ? 'alerts.title.clearLate' : 'alerts.title.clear') : t('alerts.title.unavailable');
   const dueText = (p) => {
     const due = new Date(p.createdAt).getTime() + 7 * DAY;
     const days = Math.floor((now - due) / DAY);

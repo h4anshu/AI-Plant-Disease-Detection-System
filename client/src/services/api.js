@@ -1,5 +1,6 @@
 import axios from 'axios';
 import i18n from '../i18n';
+import { clearLast } from './offlineCache';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -71,7 +72,7 @@ export const sendFeedback = (id, body) => api.patch(`/predict/${id}/feedback`, b
 export const getCropClasses = () => api.get('/predict/classes');
 
 // Removes every checkup of this browser (and its photos) from the server: /privacy page
-export const deleteMyData = () => api.delete('/predict');
+export const deleteMyData = () => api.delete('/predict').then((res) => { clearLast(); return res; });   // the copy kept for offline goes too
 
 // Satellite view of the diagnosed field (only for checkups with a consented location)
 export const getFieldHealth = (id) => api.get(`/predict/${id}/field-health`, { timeout: 120000 });

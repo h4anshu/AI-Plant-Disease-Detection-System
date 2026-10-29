@@ -729,7 +729,8 @@
       "st2": "Reading the leaf",
       "st3": "Drawing the heatmap",
       "st4": "Adding weather and soil notes"
-    }
+    },
+    "offline": "No connection. Showing the log as you last saw it; new checkups appear when you are online again."
   },
   "alerts": {
     "mode": {
@@ -753,7 +754,8 @@
       "info_other": "{{count}} tips",
       "urgent_one": "{{count}} urgent",
       "urgent_other": "{{count}} urgent",
-      "officialLate": "Official feed late"
+      "officialLate": "Official feed late",
+      "old": "Old copy"
     },
     "title": {
       "noFields": "Add a field to get weather alerts.",
@@ -761,7 +763,8 @@
       "alerts_other": "{{count}} weather alerts for your fields.",
       "clear": "No weather alert ahead.",
       "unavailable": "The weather could not be checked.",
-      "clearLate": "No alert from our forecast."
+      "clearLate": "No alert from our forecast.",
+      "old": "The last copy shows no alert, but it may be out of date."
     },
     "level": {
       "info": "Tip",
@@ -901,7 +904,9 @@
     "calm": {
       "title": "No weather alert for the next 3 days",
       "text": "Checked {{time}}. We looked for frost, heat and heavy rain for your crop stage. A forecast can change, so look again tomorrow.",
-      "titleLate": "No alert from our forecast"
+      "titleLate": "No alert from our forecast",
+      "titleOld": "No alert in the last copy",
+      "textOld": "This copy was saved the last time you had a connection. A forecast can change: connect and look again before you decide anything."
     },
     "cond": {
       "title": "Field conditions",
@@ -1172,7 +1177,8 @@
       "failed": "The mandi prices could not be loaded right now. Please try again a little later.",
       "note": "These are prices that market committees reported (Agmarknet, through data.gov.in), in rupees per quintal. They are what was paid, not what you will get, and not advice to sell or to wait: the variety, the quality and the day change the price.",
       "source": "See the source"
-    }
+    },
+    "offline": "No connection. Showing the alerts last checked on {{when}}; they may be out of date."
   },
   "auth": {
     "loginEyebrow": "Welcome back",

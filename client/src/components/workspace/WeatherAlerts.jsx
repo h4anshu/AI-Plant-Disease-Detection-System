@@ -299,6 +299,7 @@ const WeatherAlerts = ({ state }) => {
   const nameOf = (f) => fieldName(f, lang);
   const checked = new Date(data.checkedAt).toLocaleTimeString(locOf(lang), { hour: 'numeric', minute: '2-digit' });
   const notice = feedNotice(data.officialSources);
+  const old = !!error;   // an old copy (no signal, or a refresh that failed): "no alert" is never said from it as if it were today's
 
   const changeStage = async (f, stage) => {
     setSaving(true);
@@ -411,9 +412,9 @@ const WeatherAlerts = ({ state }) => {
       {!top && unavailable.length < shown.length && (
         <section aria-labelledby="al-calm" className="ws-sage flex flex-wrap items-center gap-8 border border-ink/15 p-6 sm:p-9">
           <div className="flex min-w-[260px] flex-1 flex-col gap-4">
-            <AlertPill level={notice ? 'stale' : 'calm'} className="self-start" />
-            <h2 id="al-calm" className="font-display text-[clamp(1.9rem,3.4vw,2.7rem)] leading-[1.1]">{notice ? t('alerts.calm.titleLate') : t('alerts.calm.title')}</h2>
-            <p className="max-w-[54ch] text-[16px] text-ink-2">{t('alerts.calm.text', { time: checked })}</p>
+            <AlertPill level={old || notice ? 'stale' : 'calm'} label={old ? t('alerts.mode.old') : undefined} className="self-start" />
+            <h2 id="al-calm" className="font-display text-[clamp(1.9rem,3.4vw,2.7rem)] leading-[1.1]">{old ? t('alerts.calm.titleOld') : notice ? t('alerts.calm.titleLate') : t('alerts.calm.title')}</h2>
+            <p className="max-w-[54ch] text-[16px] text-ink-2">{old ? t('alerts.calm.textOld') : t('alerts.calm.text', { time: checked })}</p>
           </div>
           <img src={cropIcon(shown[0].crop)} alt="" className="h-40 w-40 object-contain max-sm:hidden" />
         </section>
