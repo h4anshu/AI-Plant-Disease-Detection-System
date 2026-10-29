@@ -1,6 +1,8 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { deleteAccount, getMe, loginUser, registerUser } from "../services/api";
 import { clearLast } from "../services/offlineCache";
+import { disablePush, resyncPush } from "../services/push";
+import i18n from "../i18n";
 
 // The default lets pages render without a provider (tests, previews): a guest.
 export const AuthContext = createContext({ user: null, isAuthenticated: false, loading: false });
@@ -28,7 +30,8 @@ export const AuthProvider = ({ children }) => {
     const expired = () => { clearLast(); setUser(null); };
     window.addEventListener('auth:expired', expired);
     // a saved session is checked once per visit; offline or a server error keeps it (only a 401 'invalid_token' signs out, in api.js)
-    if (read()) getMe().catch(() => {});
+    // (the server also sends a fresh token when the old one is half used, which keeps people who open the app now and then signed in)
+    if (read()) getMe().then((res) => { if (res.data.token) store({ token: res.data.token, user: read() }); }).catch(() => {});
     return () => window.removeEventListener('auth:expired', expired);
   }, []);
 
@@ -36,6 +39,7 @@ export const AuthProvider = ({ children }) => {
     const res = await request;
     store(res.data);
     setUser(res.data.user);
+    resyncPush(i18n.language);   // notifications already on follow the person who signed in
     return res.data;
   }, []);
 
@@ -45,9 +49,10 @@ export const AuthProvider = ({ children }) => {
     loading: false,
     login: (email, password) => start(loginUser({ email, password })),
     register: (name, email, password) => start(registerUser({ name, email, password })),
-    logout: () => { forget(); setUser(null); },
+    // notifications go off first: on a shared phone the next person must not be sent this one's warnings
+    logout: () => { disablePush(); forget(); setUser(null); },
     // erases the account and everything of it on the server, then signs out
-    removeAccount: async (password) => { const res = await deleteAccount(password); forget(); setUser(null); return res.data; },
+    removeAccount: async (password) => { const res = await deleteAccount(password); disablePush(); forget(); setUser(null); return res.data; },
   }), [user, start]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

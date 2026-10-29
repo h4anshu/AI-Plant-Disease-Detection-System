@@ -108,6 +108,12 @@ export const getFieldPrices = (id) => api.get(`/fields/${id}/prices`);
 // "Did this help?" on an alert: { alertId, level, answer: acted | not_needed | wrong }; the server stores no place
 export const sendAlertFeedback = (fieldId, body) => api.post(`/fields/${fieldId}/alerts/feedback`, body);
 
+// --- Notifications (docs/PUSH.md). 503 from getPushKey means the server has no push keys: the feature is off.
+export const getPushKey = () => api.get('/push/key');
+export const subscribePush = (subscription, lang) => api.post('/push/subscribe', { subscription, lang });
+export const unsubscribePush = (endpoint) => api.post('/push/unsubscribe', { endpoint });
+export const testPush = (endpoint) => api.post('/push/test', { endpoint });
+
 // --- Public disease map: GeoJSON hexagons, { crop?, disease?, days: 7 | 30 | 90 }
 export const getMapReports = (params) => api.get('/map/reports', { params });
 

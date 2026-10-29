@@ -180,64 +180,68 @@ async function floodFor(f, now, sources, requestId) {
 // What is seen around the field rather than forecast: disease reports from other browsers (kill switch `community`) and fires seen by
 // satellite (kill switch `fire`, needs FIRMS_MAP_KEY). A failure only leaves that alert out; for fires it is said, so that "no fire"
 // is never shown when the fires could not be asked for. -> { alerts, fire: { status: ok | unavailable | disabled } }
-async function observedAlerts(f, req, now) {
+async function observedAlerts(f, owner, requestId, now) {
   const out = { alerts: [], fire: { status: 'disabled' } };
   if (isEnabled('community')) {
-    try { const a = await nearbyDisease(f, ownerFilter(req), now); if (a) out.alerts.push(a); } catch (err) { logger.warn({ requestId: req.id, message: err.message }, 'Disease reports nearby failed'); }
+    try { const a = await nearbyDisease(f, owner, now); if (a) out.alerts.push(a); } catch (err) { logger.warn({ requestId, message: err.message }, 'Disease reports nearby failed'); }
   }
   if (process.env.FIRMS_MAP_KEY && isEnabled('fire')) {
     try { const a = await fireFor(f, now); out.fire = { status: 'ok' }; if (a) out.alerts.push(a); } catch (err) {
       out.fire = { status: 'unavailable' };
-      logger.warn({ requestId: req.id, status: err.response?.status ?? null, code: err.code ?? null, message: err.message }, 'Fire check failed'); // the key is in the request URL, never in these fields
+      logger.warn({ requestId, status: err.response?.status ?? null, code: err.code ?? null, message: err.message }, 'Fire check failed'); // the key is in the request URL, never in these fields
     }
   }
   return out;
 }
 
-// Computed on read from the weather the server already caches per grid cell (services/openMeteo.js).
-// A field whose weather could not be loaded says so (status "weather_unavailable"): never an empty list.
+// Every saved field of one owner with its alerts, 72-hour strip and conditions: computed on read from the weather the server already caches
+// per grid cell (services/openMeteo.js). Used by GET /api/fields/alerts and by the push notifications (services/push.js), so what a phone is
+// told is what the screen shows. A field whose weather could not be loaded says so (status "weather_unavailable"): never an empty list.
+// `owner` is an ownerFilter result (null = nothing of theirs).
+export async function computeFieldAlerts(owner, { now = new Date(), requestId } = {}) {
+  const fields = owner ? await FieldModel.find(owner).sort({ createdAt: 1 }).lean() : [];
+  // official warnings (NDMA SACHET, IMD): refreshed when due, matched through each field's districts; a failure here never fails the answer
+  let official = new Map();
+  let sources = [];
+  if (fields.length) {
+    try {
+      await Promise.all([ensureFresh({ now }), ensureDistricts(fields, now)]);
+      [official, sources] = await Promise.all([officialFor(fields, now), sourceStatus(now)]);
+    } catch (err) {
+      logger.error({ requestId, message: err.message }, 'Official warnings failed');
+    }
+  }
+  const floods = new Map(await Promise.all(fields.map(async (f) => [String(f._id), await floodFor(f, now, sources, requestId)])));
+  // fields in one grid cell share one weather call (they would all miss the cache at the same moment)
+  const calls = new Map();
+  const weatherOf = (lat, lon) => {
+    const key = `${snap(lat).toFixed(2)},${snap(lon).toFixed(2)}`;
+    if (!calls.has(key)) calls.set(key, getWeather(lat, lon, now));
+    return calls.get(key);
+  };
+  const results = await Promise.all(fields.map(async (f) => {
+    const flood = floods.get(String(f._id));
+    const seen = await observedAlerts(f, owner, requestId, now);
+    const near = seen.alerts;
+    const base = { ...toResponse(f), official: sortOfficial([...(official.get(String(f._id)) ?? []), ...flood.official]), flood: { river: flood.river, gauge: flood.gauge, radar: flood.radar }, fire: seen.fire };
+    try {
+      const [lon, lat] = f.location.coordinates;
+      const w = await weatherOf(lat, lon);
+      const nowHour = localHour(w.utcOffsetSeconds, now);
+      const today = nowHour.slice(0, 10);
+      return { ...base, status: 'ok', today, timezone: w.timezone, alerts: [...evaluate(f, w, now), ...flood.alerts, ...near],
+        horizon: horizon(w, today, localHourFraction(w.utcOffsetSeconds, now)), conditions: conditions(w, today, nowHour) };
+    } catch (err) {
+      logger.error({ requestId, status: err.response?.status ?? null, code: err.code ?? null, message: err.message }, 'Field weather failed');
+      return { ...base, status: 'weather_unavailable', alerts: [...flood.alerts, ...near] };
+    }
+  }));
+  return { checkedAt: now.toISOString(), weatherSource: ATTRIBUTION, officialSources: sources.filter((s) => s.source !== 'news').map(({ source, state, fetchedAt }) => ({ source, state, fetchedAt })), fields: results };
+}
+
 export const getAlerts = async (req, res) => {
   try {
-    const now = new Date();
-    const owner = ownerFilter(req);
-    const fields = owner ? await FieldModel.find(owner).sort({ createdAt: 1 }).lean() : [];
-    // official warnings (NDMA SACHET, IMD): refreshed when due, matched through each field's districts; a failure here never fails the answer
-    let official = new Map();
-    let sources = [];
-    if (fields.length) {
-      try {
-        await Promise.all([ensureFresh({ now }), ensureDistricts(fields, now)]);
-        [official, sources] = await Promise.all([officialFor(fields, now), sourceStatus(now)]);
-      } catch (err) {
-        logger.error({ requestId: req.id, message: err.message }, 'Official warnings failed');
-      }
-    }
-    const floods = new Map(await Promise.all(fields.map(async (f) => [String(f._id), await floodFor(f, now, sources, req.id)])));
-    // fields in one grid cell share one weather call (they would all miss the cache at the same moment)
-    const calls = new Map();
-    const weatherOf = (lat, lon) => {
-      const key = `${snap(lat).toFixed(2)},${snap(lon).toFixed(2)}`;
-      if (!calls.has(key)) calls.set(key, getWeather(lat, lon, now));
-      return calls.get(key);
-    };
-    const results = await Promise.all(fields.map(async (f) => {
-      const flood = floods.get(String(f._id));
-      const seen = await observedAlerts(f, req, now);
-      const near = seen.alerts;
-      const base = { ...toResponse(f), official: sortOfficial([...(official.get(String(f._id)) ?? []), ...flood.official]), flood: { river: flood.river, gauge: flood.gauge, radar: flood.radar }, fire: seen.fire };
-      try {
-        const [lon, lat] = f.location.coordinates;
-        const w = await weatherOf(lat, lon);
-        const nowHour = localHour(w.utcOffsetSeconds, now);
-        const today = nowHour.slice(0, 10);
-        return { ...base, status: 'ok', today, timezone: w.timezone, alerts: [...evaluate(f, w, now), ...flood.alerts, ...near],
-          horizon: horizon(w, today, localHourFraction(w.utcOffsetSeconds, now)), conditions: conditions(w, today, nowHour) };
-      } catch (err) {
-        logger.error({ requestId: req.id, status: err.response?.status ?? null, code: err.code ?? null, message: err.message }, 'Field weather failed');
-        return { ...base, status: 'weather_unavailable', alerts: [...flood.alerts, ...near] };
-      }
-    }));
-    res.json({ checkedAt: now.toISOString(), weatherSource: ATTRIBUTION, officialSources: sources.filter((s) => s.source !== 'news').map(({ source, state, fetchedAt }) => ({ source, state, fetchedAt })), fields: results });
+    res.json(await computeFieldAlerts(ownerFilter(req), { requestId: req.id }));
   } catch (error) {
     logError(req, 'Field alerts failed', error);
     res.status(500).json({ message: 'Server error' });

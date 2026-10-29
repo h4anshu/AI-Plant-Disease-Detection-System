@@ -26,3 +26,5 @@ process.env.NEWS_PIB_URL = 'https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid
 process.env.LOGIN_RATE_LIMIT = '1000'; // tests/auth.test.js loads the app with low limits
 process.env.REGISTER_RATE_LIMIT = '1000';
 process.env.ACCOUNT_RATE_LIMIT = '1000';
+process.env.PUSH_RATE_LIMIT = '1000';
+process.env.PUSH_TEST_RATE_LIMIT = '1000';

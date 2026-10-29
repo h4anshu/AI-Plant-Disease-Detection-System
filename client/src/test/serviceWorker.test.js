@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 // public/sw.js run against a fake worker scope: it must keep the app's own files and never anything of a person (docs/OFFLINE.md)
 const code = readFileSync(resolve(process.cwd(), 'public/sw.js'), 'utf8');   // vitest runs from client/
 const ORIGIN = 'https://app.example';
-let listeners; let store; let fetchImpl; let skipped; let claimed;
+let listeners; let store; let fetchImpl; let skipped; let claimed; let worker; let windows = [];
 
 const keyOf = (req) => (typeof req === 'string' ? new URL(req, ORIGIN).href : req.url);
 const boot = () => {
@@ -20,8 +20,10 @@ const boot = () => {
     addEventListener: (type, fn) => { listeners[type] = fn; },
     location: { origin: ORIGIN },
     skipWaiting: () => { skipped = true; },
-    clients: { claim: async () => { claimed = true; } },
+    clients: { claim: async () => { claimed = true; }, matchAll: vi.fn(async () => windows), openWindow: vi.fn(async () => ({})) },
+    registration: { showNotification: vi.fn(async () => {}) },
   };
+  worker = scope;
   new Function('self', 'caches', 'fetch', code)(scope, caches, (...a) => fetchImpl(...a));
   return caches;
 };
@@ -121,5 +123,51 @@ describe('built files and fonts', () => {
   test('the font style sheet offline with nothing saved is a failed request (the page uses its own font), not a crash', async () => {
     fetchImpl = vi.fn(async () => { throw new TypeError('offline'); });
     expect(await call(get('https://fonts.googleapis.com/css2?family=Inter')).mock.calls[0][0]).toBeUndefined();   // no Response: the browser treats it as a failed request and uses its own font
+  });
+});
+
+// ---- notifications (docs/PUSH.md) ----
+const push = (payload) => { const waits = []; listeners.push({ data: { json: () => (typeof payload === 'function' ? payload() : payload) }, waitUntil: (p) => waits.push(p) }); return Promise.all(waits); };
+const click = (data) => { const waits = []; const close = vi.fn(); listeners.notificationclick({ notification: { close, data }, waitUntil: (p) => waits.push(p) }); return Promise.all(waits).then(() => close); };
+
+describe('push', () => {
+  beforeEach(() => { windows = []; });
+
+  test('draws the notification the server sent, with the app icon and a tag that replaces the same warning', async () => {
+    await push({ title: 'Frost: Warning', body: 'Your wheat field, tomorrow.', tag: 'FROST|2027-02-25', url: '/overview?mode=weather' });
+    expect(worker.registration.showNotification).toHaveBeenCalledWith('Frost: Warning', expect.objectContaining({
+      body: 'Your wheat field, tomorrow.', tag: 'FROST|2027-02-25', icon: '/icons/icon-192.png', data: { url: '/overview?mode=weather' } }));
+  });
+
+  test('shows nothing for a message that is not ours (no title, or not JSON)', async () => {
+    await push({ body: 'no title' });
+    await push(() => { throw new SyntaxError('not json'); });
+    listeners.push({ data: null, waitUntil: () => {} });
+    expect(worker.registration.showNotification).not.toHaveBeenCalled();
+  });
+
+  test.each([['//evil.example/x'], ['https://evil.example/x'], ['javascript:alert(1)'], [undefined], [42]])('a tap opens the app, never %s', async (url) => {
+    await push({ title: 't', url });
+    expect(worker.registration.showNotification.mock.calls[0][1].data.url).toBe('/overview');
+  });
+
+  test('a tap closes the notification and opens the app at its page when no window is open', async () => {
+    const close = await click({ url: '/overview?mode=weather' });
+    expect(close).toHaveBeenCalled();
+    expect(worker.clients.openWindow).toHaveBeenCalledWith(`${ORIGIN}/overview?mode=weather`);
+  });
+
+  test('with the app already open, that window is brought forward and sent to the page', async () => {
+    const win = { url: `${ORIGIN}/history`, focus: vi.fn(async function focus() { return this; }), navigate: vi.fn(async () => {}) };
+    windows = [{ url: 'https://other.example/', focus: vi.fn() }, win];
+    await click({ url: '/overview?mode=weather' });
+    expect(win.focus).toHaveBeenCalled();
+    expect(win.navigate).toHaveBeenCalledWith(`${ORIGIN}/overview?mode=weather`);
+    expect(worker.clients.openWindow).not.toHaveBeenCalled();
+  });
+
+  test('a notification with no page goes to the overview', async () => {
+    await click(undefined);
+    expect(worker.clients.openWindow).toHaveBeenCalledWith(`${ORIGIN}/overview`);
   });
 });

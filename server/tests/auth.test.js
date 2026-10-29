@@ -42,7 +42,7 @@ describe('register', () => {
     expect(res.body.user).toMatchObject({ name: 'Asha Devi', email: 'asha@example.com' });
     const claims = jwt.verify(res.body.token, process.env.JWT_SECRET);
     expect(claims.id).toBe(res.body.user.id);
-    expect(claims.exp - claims.iat).toBe(7 * 86400);
+    expect(claims.exp - claims.iat).toBe(30 * 86400);
     const stored = await User.findOne({}).lean();
     expect(stored.passwordHash).toMatch(/^\$2[aby]\$10\$/);
     expect(JSON.stringify(stored)).not.toContain(PASSWORD);
@@ -118,6 +118,18 @@ describe('the token', () => {
       expect(res.status).toBe(401);
       expect(res.body.code).toBe('invalid_token');
     }
+  });
+
+  test('/me renews a token that is more than half used, and leaves a fresh one alone', async () => {
+    const fresh = (await signUp()).body.token;
+    expect((await request(app).get('/api/auth/me').set('authorization', `Bearer ${fresh}`)).body.token).toBeUndefined();
+    const user = await User.findOne({});
+    const old = jwt.sign({ id: String(user._id), email: user.email }, process.env.JWT_SECRET, { expiresIn: '5d' });
+    const res = await request(app).get('/api/auth/me').set('authorization', `Bearer ${old}`);
+    const renewed = jwt.verify(res.body.token, process.env.JWT_SECRET);
+    expect(renewed.id).toBe(String(user._id));
+    expect(renewed.exp - renewed.iat).toBe(30 * 86400);
+    expect((await request(app).get('/api/auth/me').set('authorization', `Bearer ${res.body.token}`)).status).toBe(200);
   });
 
   test('the bare token (as the older client sent it) still works', async () => {

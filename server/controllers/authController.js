@@ -4,6 +4,7 @@ import UserModel from "../models/User.js";
 import PredictionModel from "../models/Prediction.js";
 import FieldModel, { MAX_FIELDS } from "../models/Field.js";
 import AlertFeedback from "../models/AlertFeedback.js";
+import PushSubscription from "../models/PushSubscription.js";
 import { GUEST_ID, UUID } from "../middleware/guestDevice.js";
 import { wipeOwner } from "./predictController.js";
 import { logError } from "../utils/logger.js";
@@ -25,10 +26,11 @@ const passwordProblem = (p) => {
     return null;
 };
 
-const session = (user) => ({
-    token: jwt.sign({ id: String(user._id), email: user.email }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '7d' }),
-    user: { id: String(user._id), name: user.name, email: user.email },
-});
+// A token lasts 30 days and is renewed when the app is opened with less than half of that left (GET /api/auth/me), so a farmer who uses the
+// app now and then stays signed in. There is no password reset yet, so being signed out by the calendar must be rare.
+const LIFETIME_DAYS = 30;
+const token = (user) => jwt.sign({ id: String(user._id), email: user.email }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: `${LIFETIME_DAYS}d` });
+const session = (user) => ({ token: token(user), user: { id: String(user._id), name: user.name, email: user.email } });
 
 // @route  POST /api/auth/register  { name, email, password }
 const register = async (req, res) => {
@@ -74,12 +76,13 @@ const login = async (req, res) => {
     }
 };
 
-// @route  GET /api/auth/me -> the signed-in user (the token was already checked, and the account still exists)
+// @route  GET /api/auth/me -> the signed-in user (the token was already checked, and the account still exists), with a fresh `token` when the old one is half used
 const me = async (req, res) => {
     try {
         const user = await UserModel.findById(req.user.id).lean();
         if (!user) return res.status(401).json({ message: 'Your session has ended. Please sign in again.', code: 'invalid_token' });
-        res.json({ id: String(user._id), name: user.name, email: user.email, createdAt: user.createdAt });
+        const renew = req.user.exp - Date.now() / 1000 < (LIFETIME_DAYS / 2) * 86400;
+        res.json({ id: String(user._id), name: user.name, email: user.email, createdAt: user.createdAt, ...(renew && { token: token(user) }) });
     } catch (error) {
         logError(req, 'Auth failed', error);
         res.status(500).json({ message: 'Server error' });
@@ -137,6 +140,9 @@ const claimGuest = async (req, res) => {
         const room = Math.max(0, MAX_FIELDS - await FieldModel.countDocuments({ userId: req.user.id }));
         const ids = (await FieldModel.find(guest).sort({ createdAt: 1 }).limit(room).select('_id').lean()).map((f) => f._id);
         const fields = ids.length ? (await FieldModel.updateMany({ _id: { $in: ids } }, { $set: mine })).modifiedCount : 0;
+
+        // this browser's notifications follow its fields into the account
+        await PushSubscription.updateMany(guest, { $set: mine });
 
         // answers to "Did this help?" are unique per owner and alert: one the account already gave wins, the guest's copy is dropped
         const answers = await AlertFeedback.find(guest).select('_id').lean();

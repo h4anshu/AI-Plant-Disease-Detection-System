@@ -204,7 +204,7 @@
     "reportsTitle": "Reports from other farmers, and your answers",
     "reports": "\"Disease reports near you\" uses the same data as the public disease map: a disease counts only when at least 3 different browsers reported it, your own browser is never counted, and the alert shows a disease and a number, never a place. \"Did this help?\" stores the rule, the date, your answer and the field's crop and growth stage, with no place; it is kept for a year, and \"Delete my data\" removes it.",
     "accountsTitle": "Accounts",
-    "accounts": "Signing in is optional. If you create an account we store your name, your email and a scrambled (hashed) form of your password; we never see the password itself. Your checkups and fields then belong to the account instead of the browser, so they follow you to other phones. The sign-in is a token kept in this browser for 7 days, until you sign out; we use no cookies. You can delete the account, with everything in it, under Profile › My data."
+    "accounts": "Signing in is optional. If you create an account we store your name, your email and a scrambled (hashed) form of your password; we never see the password itself. Your checkups and fields then belong to the account instead of the browser, so they follow you to other phones. The sign-in is a token kept in this browser until you sign out, for at most 30 days (renewed each time you open the app); we use no cookies. You can delete the account, with everything in it, under Profile › My data."
   },
   "field": {
     "show": "See this field from space",
@@ -1219,5 +1219,22 @@
     "passwordConfirm": "Type your password to confirm",
     "wrongPassword": "That password is not right.",
     "accountDeleted": "Your account and its data were deleted."
+  },
+  "push": {
+    "title": "Alerts on this phone",
+    "off": "Get a notification when a serious warning is issued for one of your fields, even when the app is closed. It is free.",
+    "privacy": "The notification names only the crop and the kind of warning, never the name or the place of your field. Only Warning and Urgent alerts are sent.",
+    "on": "Notifications are on for this phone.",
+    "turnOn": "Turn on notifications",
+    "turnOff": "Turn off",
+    "test": "Send a test",
+    "blocked": "Notifications are blocked for this site. Allow them in your browser's site settings, then come back here.",
+    "ios": "On an iPhone: tap Share, then Add to Home Screen, open PlantGuard from the home screen, then turn notifications on here.",
+    "note": {
+      "tested": "Test sent. It should arrive in a few seconds.",
+      "testFailed": "The test could not be sent. Please try again, or turn notifications off and on.",
+      "failed": "Could not turn notifications on. Please try again.",
+      "limit": "Too many devices have notifications on. Turn them off on one first."
+    }
   }
 }

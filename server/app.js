@@ -9,6 +9,7 @@ import riskRouter from './routes/risk.routes.js';
 import reportRouter from './routes/report.routes.js';
 import fieldRouter from './routes/field.routes.js';
 import alertsRouter from './routes/alerts.routes.js';
+import pushRouter from './routes/push.routes.js';
 import { globalLimiter } from './middleware/rateLimit.js';
 import { logError, requestLogger } from './utils/logger.js';
 
@@ -44,6 +45,7 @@ app.use('/api/disease-risk', riskRouter);
 app.use('/api/reports', reportRouter);
 app.use('/api/fields', fieldRouter);
 app.use('/api/alerts', alertsRouter);
+app.use('/api/push', pushRouter);
 
 // Upload problems (non-image file, file too large) are the client's fault: 400, not Express's default 500 page
 // eslint-disable-next-line no-unused-vars

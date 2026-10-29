@@ -333,3 +333,5 @@ gcloud run services update server --region asia-south1 --update-env-vars GLOBAL_
 ```
 
 The project-wide `secretmanager.secretAccessor` grant of A7 already lets the server read new secrets. Check afterwards: `GET /api/alerts/health` with the `x-alerts-token` header shows `configured` for both keys. A key that appeared in a chat or a screenshot should be regenerated on its provider's site and added as a new secret version.
+
+Notifications (VAPID keys and the Cloud Scheduler job) are set up in `docs/PUSH.md` §4.

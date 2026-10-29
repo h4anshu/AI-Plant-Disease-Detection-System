@@ -5,6 +5,7 @@ import { getFloodExtent, sendAlertFeedback, updateField } from '../../services/a
 import { cropIcon } from './cropIcon';
 import Icon from './icons';
 import Horizon from './Horizon';
+import PushCard from './PushCard';
 import NewsPanel from './NewsPanel';
 import PricesCard from './PricesCard';
 import { AlertPill, useAlertText } from './alertParts';
@@ -449,6 +450,8 @@ const WeatherAlerts = ({ state }) => {
           </article>
         </div>
       )}
+
+      <PushCard />
 
       {(stripField ?? shown[0])?.flood && <FloodCard field={stripField ?? shown[0]} name={nameOf(stripField ?? shown[0])} />}
       {shown[0] && <NewsPanel field={stripField ?? shown[0]} name={nameOf(stripField ?? shown[0])} />}

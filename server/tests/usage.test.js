@@ -91,7 +91,7 @@ describe('GET /api/alerts/health', () => {
     const res = await request(app).get('/api/alerts/health').set(H, 'test-alerts-token');
     expect(res.status).toBe(200);
     expect(res.body.switches).toEqual({ sachet: 'off', imd: 'off', cwc: 'off', glofas: 'off', radar: 'on', news: 'off', fire: 'on', community: 'on', mandi: 'on' });
-    expect(res.body.configured).toEqual({ firmsKey: false, geoService: false });
+    expect(res.body.configured).toEqual({ firmsKey: false, geoService: false, push: false });
     expect(res.body.usage.services.find((s) => s.service === 'open-meteo').calls).toBe(5);
     expect(res.body.sources.map((s) => s.source)).toEqual(['sachet', 'imd', 'cwc', 'news']);
     expect(JSON.stringify(res.body)).not.toMatch(/test-alerts-token|FIRMS_MAP_KEY=/);

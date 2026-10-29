@@ -26,7 +26,7 @@ a signed-in user is scoped by their account. This page covers what protects the 
 - **The device id is not authentication.** It's a random 122-bit secret held by the browser. Anyone
   who gets it (for example, someone using the same browser) sees that guest history. Clearing site data
   loses the history. Signing in and adding the guest records to the account removes this limit.
-- **A token lives in the browser's storage for 7 days** (not in a cookie): a script injected into the page could read it, so the
+- **A token lives in the browser's storage for 30 days (renewed on use)** (not in a cookie): a script injected into the page could read it, so the
   page must stay free of third-party scripts. Signing out only forgets it in that browser; there is no "sign out everywhere" and
   no password reset yet (`docs/AUTH.md`, "Not built"). Deleting the account invalidates its tokens at once.
 - **Rate limits count per Cloud Run instance** (in memory). With `max-instances 3`, a determined

@@ -11,6 +11,7 @@ import getYieldLoss, { yieldLossTable } from "../utils/yieldLoss.js";
 import Report from "../models/Report.js";
 import FieldModel from "../models/Field.js";
 import AlertFeedback from "../models/AlertFeedback.js";
+import PushSubscription from "../models/PushSubscription.js";
 import { FloodExtentCache, extentKey } from "../models/Flood.js";
 import { BadImage, cleanImage } from "../utils/image.js";
 import { GUEST_ID } from "../middleware/guestDevice.js";
@@ -267,6 +268,7 @@ export const wipeOwner = async (owner, requestId) => {
   await FloodExtentCache.deleteMany({ key: { $in: fields.flatMap((f) => days.map((d) => extentKey(f.location.coordinates[1], f.location.coordinates[0], d))) } });
   await FieldModel.deleteMany(owner); // saved fields hold a private location too
   await AlertFeedback.deleteMany(owner); // answers to "Did this help?"
+  await PushSubscription.deleteMany(owner); // this browser's notifications
   // cached satellite answers for those fields go too (their keys are hashes of the location)
   await FieldHealthCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map(keyForPrediction) } });
   // and the soil answers cached for those cells (a hash of a ~250 m cell can be reversed by trying them all)

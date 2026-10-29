@@ -18,11 +18,11 @@ const authMiddleware = async (req, res, next) => {
   } catch {
     return res.status(401).json({ message: 'Your session has ended. Please sign in again.', code: 'invalid_token' });
   }
-  // a deleted account's token must stop working at once (not after its 7 days); one indexed read
+  // a deleted account's token must stop working at once (not after its 30 days); one indexed read
   if (!mongoose.isValidObjectId(claims.id) || !(await UserModel.exists({ _id: claims.id }))) {
     return res.status(401).json({ message: 'Your session has ended. Please sign in again.', code: 'invalid_token' });
   }
-  req.user = { id: String(claims.id), email: claims.email };
+  req.user = { id: String(claims.id), email: claims.email, exp: claims.exp };
   next();
 };
 

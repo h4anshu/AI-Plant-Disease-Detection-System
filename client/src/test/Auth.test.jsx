@@ -179,6 +179,15 @@ describe('the session', () => {
     expect(screen.queryByRole('button', { name: 'Sign out' })).not.toBeInTheDocument();
   });
 
+  test('a token the server renews (it was half used) replaces the saved one, and the user stays signed in', async () => {
+    signedIn();
+    api.getMe.mockResolvedValue({ data: { ...USER, token: 'tok-renewed' } });
+    app('/');
+    await waitFor(() => expect(localStorage.getItem('token')).toBe('tok-renewed'));
+    expect(JSON.parse(localStorage.getItem('user'))).toEqual(USER);
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
+  });
+
   test('a broken saved session is ignored, not a crash', () => {
     localStorage.setItem('token', 'tok-1'); localStorage.setItem('user', '{not json');
     app('/');

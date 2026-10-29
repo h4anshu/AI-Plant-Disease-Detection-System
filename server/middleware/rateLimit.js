@@ -55,6 +55,12 @@ export const riskLimiter = limiter(Number(process.env.RISK_RATE_LIMIT) || 60, 10
 export const alertLimiter = limiter(Number(process.env.ALERT_RATE_LIMIT) || 60, 10,
   'Too many alert checks from this device. Please wait a few minutes.', { byDevice: true });
 
+// push subscriptions: the app syncs one on each visit, so this is generous; a test notification is a real send to the phone
+export const pushLimiter = limiter(Number(process.env.PUSH_RATE_LIMIT) || 60, 10,
+  'Too many notification requests from this device. Please wait a few minutes.', { byDevice: true });
+export const pushTestLimiter = limiter(Number(process.env.PUSH_TEST_RATE_LIMIT) || 5, 10,
+  'Too many test notifications. Please wait a few minutes.', { byDevice: true });
+
 // a report fetches the photo, heatmap, map tiles and weather, and draws a PDF
 export const reportLimiter = limiter(Number(process.env.REPORT_RATE_LIMIT) || 20, 10,
   'Too many reports from this device. Please wait a few minutes.');
