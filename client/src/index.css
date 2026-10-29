@@ -2,10 +2,10 @@
 
 @theme {
   --breakpoint-lg: 74rem;   /* 1184px: from here the sections use their one-viewport canvases; below it they stack (phones and tablets) */
-  /* Noto Sans Devanagari second in each stack: the Latin fonts have no Devanagari glyphs */
-  --font-display: "Fraunces", "Noto Sans Devanagari", serif;
-  --font-body: "Inter", "Noto Sans Devanagari", sans-serif;
-  --font-mono: "IBM Plex Mono", "Noto Sans Devanagari", monospace;
+  /* The Indic fonts come after the Latin one in each stack: the Latin fonts have no Devanagari, Gurmukhi or Odia glyphs */
+  --font-display: "Fraunces", "Noto Sans Devanagari", "Noto Sans Gurmukhi", "Noto Sans Oriya", serif;
+  --font-body: "Inter", "Noto Sans Devanagari", "Noto Sans Gurmukhi", "Noto Sans Oriya", sans-serif;
+  --font-mono: "IBM Plex Mono", "Noto Sans Devanagari", "Noto Sans Gurmukhi", "Noto Sans Oriya", monospace;
 
   /* Colour system v2, docs/COLOUR_SYSTEM.md. parchment and ink moved by ΔE < 3; the rest are the old tokens below */
   --color-parchment: #F5F0E2;
@@ -89,10 +89,10 @@ body {
     width: calc(var(--u) * var(--w)); font-size: max(14px, calc(var(--u) * 14.5)); }
 }
 /* Devanagari needs more size than Latin at the same px */
-:lang(hi) .hero-eyebrow { font-size: 14px; }
-:lang(hi) .hero-label { font-size: max(11px, calc(var(--u) * 13)); }
-:lang(hi) .hero-card { font-size: 14px; }   /* floors below keep every label at 11px or more */
-@media (min-width: 1184px) { :lang(hi) .hero-card { font-size: max(14px, calc(var(--u) * 17)); } }
+:is(:lang(hi), :lang(pa), :lang(or)) .hero-eyebrow { font-size: 14px; }
+:is(:lang(hi), :lang(pa), :lang(or)) .hero-label { font-size: max(11px, calc(var(--u) * 13)); }
+:is(:lang(hi), :lang(pa), :lang(or)) .hero-card { font-size: 14px; }   /* floors below keep every label at 11px or more */
+@media (min-width: 1184px) { :is(:lang(hi), :lang(pa), :lang(or)) .hero-card { font-size: max(14px, calc(var(--u) * 17)); } }
 @media (prefers-reduced-motion: no-preference) {
   .hero-scan { opacity: 1; animation: hero-scan 4.2s ease-in-out infinite; }
   .hero-dot::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1.5px solid var(--color-rust); animation: hero-ping 2.4s ease-out infinite; }
@@ -103,28 +103,28 @@ body {
 @keyframes hero-ping { from { transform: scale(.6); opacity: .9; } to { transform: scale(1.8); opacity: 0; } }
 @keyframes hero-rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-/* Hindi (html lang="hi", set by src/i18n.js). Letter-spacing pulls Devanagari conjuncts and the
+/* Hindi, Punjabi and Odia (html lang="hi", "pa" or "or", set by src/i18n.js). Letter-spacing pulls Devanagari conjuncts and the
    headline bar apart, 10-11px Devanagari is unreadable, and tight headings clip the matras. */
-:lang(hi) [class*="tracking-"],
-:lang(hi) .stamp {
+:is(:lang(hi), :lang(pa), :lang(or)) [class*="tracking-"],
+:is(:lang(hi), :lang(pa), :lang(or)) .stamp {
   letter-spacing: normal;
 }
-:lang(hi) .text-\[10px\],
-:lang(hi) .text-\[11px\] {
+:is(:lang(hi), :lang(pa), :lang(or)) .text-\[10px\],
+:is(:lang(hi), :lang(pa), :lang(or)) .text-\[11px\] {
   font-size: 12px;
 }
-:lang(hi) h1,
-:lang(hi) h2,
-:lang(hi) h3 {
+:is(:lang(hi), :lang(pa), :lang(or)) h1,
+:is(:lang(hi), :lang(pa), :lang(or)) h2,
+:is(:lang(hi), :lang(pa), :lang(or)) h3 {
   line-height: 1.35;
 }
-:lang(hi) .font-mono,
-:lang(hi) .stamp {
+:is(:lang(hi), :lang(pa), :lang(or)) .font-mono,
+:is(:lang(hi), :lang(pa), :lang(or)) .stamp {
   font-family: var(--font-body); /* a monospace space is as wide as a letter: gaps between Hindi words */
 }
-:lang(hi) em,
-:lang(hi) .italic {
-  font-style: normal; /* Noto Sans Devanagari has no italic; a fake slant looks broken */
+:is(:lang(hi), :lang(pa), :lang(or)) em,
+:is(:lang(hi), :lang(pa), :lang(or)) .italic {
+  font-style: normal; /* the Noto Sans Indic fonts have no italic; a fake slant looks broken */
 }
 
 /* ---- How it works (components/HowItWorks.jsx). Desktop: a 1672 x 1010 canvas of layers, sized in units (--u).
@@ -174,8 +174,8 @@ body {
 @keyframes how-sweep { 0%, 6% { top: 4%; opacity: 0; } 18% { opacity: 1; } 82% { opacity: 1; } 94%, 100% { top: 96%; opacity: 0; } }
 @keyframes how-float { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-9px) rotate(calc(var(--r, 0deg) + 6deg)); } }
 @keyframes how-ring { 0%, 100% { opacity: .75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.04); } }
-:lang(hi) .how-wrap h2 { line-height: 1.18; }   /* the global Hindi heading line-height (1.35) pushes the subtitle into step 2 */
-:lang(hi) .how-wrap header h2 { font-size: calc(var(--u) * 62); }
+:is(:lang(hi), :lang(pa), :lang(or)) .how-wrap h2 { line-height: 1.18; }   /* the global Hindi heading line-height (1.35) pushes the subtitle into step 2 */
+:is(:lang(hi), :lang(pa), :lang(or)) .how-wrap header h2 { font-size: calc(var(--u) * 62); }
 
 /* ---- Honest by design (components/Honest.jsx). Desktop: a 1900 x 941 unit canvas (wider than the reference's 16:9 so the content can sit further left), scaled so it fits one viewport
    (min of width and height). Phones: a normal stacked layout. The top of the background is the exact bottom of the "How it works" gradient. ---- */
@@ -204,9 +204,9 @@ body {
   .has-art .hon-inner { padding: calc(var(--u) * 12) calc(var(--u) * 30) calc(var(--u) * 8) calc(var(--u) * 84); }
   .has-art .hon-inner > p:last-child { padding-right: calc(var(--u) * 110); }
 }
-:lang(hi) .hon-bg h2 { line-height: 1.16; font-size: max(34px, calc(var(--u) * 58)) !important; }
-:lang(hi) .hon-bg ul h3 { line-height: 1.25; }
-:lang(hi) .hon-bg header > p:last-child { font-size: max(16px, calc(var(--u) * 19)) !important; line-height: 1.5; }
+:is(:lang(hi), :lang(pa), :lang(or)) .hon-bg h2 { line-height: 1.16; font-size: max(34px, calc(var(--u) * 58)) !important; }
+:is(:lang(hi), :lang(pa), :lang(or)) .hon-bg ul h3 { line-height: 1.25; }
+:is(:lang(hi), :lang(pa), :lang(or)) .hon-bg header > p:last-child { font-size: max(16px, calc(var(--u) * 19)) !important; line-height: 1.5; }
 
 /* ---- The map section (components/MapSection.jsx). Desktop: a 1900 x 941 unit canvas scaled to fit one viewport, like "Honest by design".
    The visual group (.map-vis) has its own 940 x 720 unit space so that on phones it can scale as one picture, with the cards stacked under it. ---- */
@@ -244,8 +244,8 @@ body {
 @keyframes map-dash { to { stroke-dashoffset: -24; } }
 @keyframes map-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 @keyframes map-glow { 0%, 100% { opacity: .35; transform: scale(.9); } 50% { opacity: .9; transform: scale(1.12); } }
-:lang(hi) .map-bg h2 { line-height: 1.2; }
-:lang(hi) .map-bg .font-mono { font-size: max(14px, calc(var(--u) * 21)) !important; letter-spacing: normal; }
+:is(:lang(hi), :lang(pa), :lang(or)) .map-bg h2 { line-height: 1.2; }
+:is(:lang(hi), :lang(pa), :lang(or)) .map-bg .font-mono { font-size: max(14px, calc(var(--u) * 21)) !important; letter-spacing: normal; }
 
 /* ---- Section edges. Every section after the hero paints its background on a ::before layer (under all content) whose TOP edge is its own
    asymmetric wave and which reaches --edge-h up over the bottom of the section above, so the page reads as separate overlapping sheets
@@ -283,10 +283,10 @@ body {
     radial-gradient(40% 40% at 6% 12%, color-mix(in oklab, var(--color-butter) 14%, transparent), transparent 70%),
     linear-gradient(172deg, var(--color-pine) 0%, #0d2f20 50%, #072618 100%); }
 .cta-bg::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .09; mix-blend-mode: soft-light; background: url('./assets/hero/paper.webp') 0 0 / 640px repeat; }
-:lang(hi) .bey-bg h2, :lang(hi) .rep-bg h2, :lang(hi) .cta-bg h2 { line-height: 1.2; }
+:is(:lang(hi), :lang(pa), :lang(or)) .bey-bg h2, :is(:lang(hi), :lang(pa), :lang(or)) .rep-bg h2, :is(:lang(hi), :lang(pa), :lang(or)) .cta-bg h2 { line-height: 1.2; }
 /* Hindi in the three closing sections: small mono labels need more size and no letter-spacing */
-:lang(hi) :is(.bey-bg, .rep-bg, .cta-bg) .font-mono { font-size: 14px !important; letter-spacing: normal; }
-:lang(hi) .bey-bg ol li span { font-size: 13px; }
+:is(:lang(hi), :lang(pa), :lang(or)) :is(.bey-bg, .rep-bg, .cta-bg) .font-mono { font-size: 14px !important; letter-spacing: normal; }
+:is(:lang(hi), :lang(pa), :lang(or)) .bey-bg ol li span { font-size: 13px; }
 
 /* Tablets and phones: the hero picture keeps phone proportions instead of growing with the width */
 @media (max-width: 1183px) { .hero-wrap { max-width: 34rem; margin-inline: auto; width: 100%; } }
@@ -403,7 +403,7 @@ body {
 @media (min-width: 640px) { .ws-row-grid { display: grid; } }   /* unlayered .ws-row would beat a Tailwind sm:grid */
 .ws-hover { transition: translate .3s var(--ease, ease), box-shadow .3s; }
 .ws-hover:hover { translate: 0 -4px; }
-:lang(hi) .ws-st { letter-spacing: normal; font-family: var(--font-body); }
+:is(:lang(hi), :lang(pa), :lang(or)) .ws-st { letter-spacing: normal; font-family: var(--font-body); }
 
 /* ---- Weather & Alerts (components/workspace/ModeTabs.jsx, WeatherAlerts.jsx, Horizon.jsx; docs/FIELD_ALERTS.md) ---- */
 .ws-mode { position: relative; display: flex; align-items: center; gap: 16px; width: 100%; min-height: 92px; padding: 16px 20px; border-radius: 24px; border: 1.5px solid rgba(22,47,34,.14); background: var(--color-paper, #FBF8F0); color: var(--color-ink); text-align: left; cursor: pointer; transition: translate .25s ease, box-shadow .25s ease, background .25s ease; }

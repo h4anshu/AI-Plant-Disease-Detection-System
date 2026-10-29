@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatDate } from '../locales/dates';
 const LEVEL_STYLE = {
   low: 'bg-field/15 text-field border-field/40',
   medium: 'bg-wheat/25 text-ink border-wheat',
@@ -28,7 +29,7 @@ const RiskStrip = ({ load, reloadKey }) => {
   if (state.status === 'error') return <p role="alert" className="font-mono text-xs text-clay mt-3">{state.message}</p>;
 
   const d = state.data;
-  const day = (date) => new Date(`${date}T00:00:00`).toLocaleDateString(i18n.language === 'en' ? 'en-IN' : i18n.language, { weekday: 'short', day: 'numeric' });
+  const day = (date) => formatDate(new Date(`${date}T00:00:00`), i18n.language, { weekday: 'short', day: 'numeric' });
   const today = d.days.find((x) => x.date === d.today)?.conditions;
 
   return (

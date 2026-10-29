@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { serverLang } from '../i18n';
 import { ArrowUpRight, Leaf } from './heroIcons';
 import LangButtons from './LangButtons';
 import { d } from './motion';
@@ -11,7 +12,7 @@ const Check = () => <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" str
 
 const ReportSection = () => {
   const { t, i18n } = useTranslation();
-  const hi = i18n.language === 'hi';
+  const hi = serverLang(i18n.language) === 'hi';
   const front = hi ? reportHi : reportEn, back = hi ? reportEn : reportHi;   // the page in the reader's language is on top
   return (
     <section id="report" className="rep-bg scroll-mt-[4.6rem] px-5 pb-[calc(var(--edge-h)+2rem)] pt-16 sm:px-8 lg:flex lg:min-h-[calc(100svh-4.6rem)] lg:items-center lg:pb-[calc(var(--edge-h)+1.5rem)] lg:pt-[clamp(64px,6.4vw,124px)]">

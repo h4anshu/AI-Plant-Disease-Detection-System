@@ -9,9 +9,10 @@ import PushCard from './PushCard';
 import NewsPanel from './NewsPanel';
 import PricesCard from './PricesCard';
 import { AlertPill, useAlertText } from './alertParts';
-import { Lbl, locOf } from './parts';
+import { Lbl } from './parts';
 import { MAX_FIELDS, STAGES, alertKey, chartScale, collect, dayLabel, dayMonth, feedNotice, fieldName, hourLabel, iconOf, pct, readDone, readHelp, stamp, weekday, writeDone, writeHelp } from './alertsLib';
 
+import { formatTime } from '../../locales/dates';
 const barColor = (crit) => (crit ? '#F2DB8F' : 'rgba(245,240,226,.3)');
 const BAR = 110; // px of the tallest bar
 const ROWS = 4;    // alerts listed under the main one before "show more"
@@ -298,7 +299,7 @@ const WeatherAlerts = ({ state }) => {
     writeDone(next);
   };
   const nameOf = (f) => fieldName(f, lang);
-  const checked = new Date(data.checkedAt).toLocaleTimeString(locOf(lang), { hour: 'numeric', minute: '2-digit' });
+  const checked = formatTime(new Date(data.checkedAt), lang, { hour: 'numeric', minute: '2-digit' });
   const notice = feedNotice(data.officialSources);
   const old = !!error;   // an old copy (no signal, or a refresh that failed): "no alert" is never said from it as if it were today's
 

@@ -77,7 +77,7 @@ const STATES = {
   'two fields, one whose weather could not be loaded': () => answer(field(), { _id: 'f2', name: 'South plot', crop: 'rice', stage: 'sowing', createdAt: '2027-02-01T00:00:00Z', status: 'weather_unavailable', official: [], alerts: [], flood: { river: { status: 'disabled' }, gauge: { status: 'disabled' }, radar: { status: 'disabled' } }, fire: { status: 'unavailable' } }),
 };
 
-describe.each([['en'], ['hi']])('accessibility (axe), language %s', (lang) => {
+describe.each([['en'], ['hi'], ['pa'], ['or']])('accessibility (axe), language %s', (lang) => {
   test.each(Object.keys(STATES))('%s', async (name) => {
     await i18n.changeLanguage(lang);
     api.getFieldAlerts.mockResolvedValue(STATES[name]());
@@ -111,7 +111,7 @@ describe.each([['en'], ['hi']])('accessibility (axe), language %s', (lang) => {
   });
 });
 
-describe.each([['en'], ['hi']])('accessibility (axe) of the other screens of the feature, language %s', (lang) => {
+describe.each([['en'], ['hi'], ['pa'], ['or']])('accessibility (axe) of the other screens of the feature, language %s', (lang) => {
   test('adding a field', async () => {
     await i18n.changeLanguage(lang);
     const { container } = render(<MemoryRouter initialEntries={['/fields/new']}><FieldNew /></MemoryRouter>);

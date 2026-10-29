@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { getPredictionContext, putSoilTest } from '../services/api';
 import { diseaseName } from '../locales/terms';
 
+import { formatDate } from '../locales/dates';
 // fill = how strongly the environment points at the disease; never green/red alone (text says it too)
 const LEVEL_STYLE = {
   favourable: 'bg-clay/15 text-clay border-clay',
@@ -14,7 +15,7 @@ const CARD_FIELDS = [['ph', '0.1'], ['ocPct', '0.01'], ['availableN', '1'], ['av
   ['zn', '0.01'], ['fe', '0.1'], ['s', '0.1']];
 
 const num = (v, lang, digits = 1) => (v == null ? '–' : Number(v).toLocaleString(lang === 'en' ? 'en-IN' : lang, { maximumFractionDigits: digits }));
-const longDate = (d, lang) => new Date(`${d}T00:00:00`).toLocaleDateString(lang === 'en' ? 'en-IN' : lang, { day: 'numeric', month: 'short' });
+const longDate = (d, lang) => formatDate(new Date(`${d}T00:00:00`), lang, { day: 'numeric', month: 'short' });
 
 const Badge = ({ level }) => {
   const { t } = useTranslation();

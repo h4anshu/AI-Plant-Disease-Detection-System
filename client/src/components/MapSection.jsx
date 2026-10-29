@@ -23,6 +23,7 @@ const at = (x, y, w, h) => ({ left: U(x), top: U(y), width: U(w), ...(h && { hei
 const CROPS = Object.keys(terms.crops);
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);   // English crop and disease names are stored lower-case; Hindi has no case
 const DAYS = [7, 30, 90];
+const DAY_WORD = { hi: ' दिन', pa: ' ਦਿਨ', or: ' ଦିନ' };   // "d" in English
 const EXAMPLE = { crop: 'potato', disease: 'Early_blight', reports: 12 };
 
 // Optional generated art: drop a transparent, tinted-glass hexagon cluster into assets/map/hex-clear.webp and it replaces the drawn one below.
@@ -174,7 +175,7 @@ const MapSection = () => {
               <p className="mt-[0.5em] font-body text-ink" style={fs(17, 13)}>{t('mapsec.filterDisease')}</p>
               <div className="mt-1"><Dd icon={<Leaf className="text-leaf-text" style={{ width: U(24), height: U(24) }} />}>{din(EXAMPLE.crop, EXAMPLE.disease)}</Dd></div>
               <div className="mt-[0.8em] grid grid-cols-3 gap-2 text-center" style={fs(16, 12)}>
-                {DAYS.map((d) => <span key={d} className={`rounded-full py-[0.45em] ${d === 30 ? 'bg-pine text-parchment' : 'border border-ink/10 bg-white/70 text-ink'}`}>{d}{lang === 'hi' ? ' दिन' : 'd'}</span>)}
+                {DAYS.map((d) => <span key={d} className={`rounded-full py-[0.45em] ${d === 30 ? 'bg-pine text-parchment' : 'border border-ink/10 bg-white/70 text-ink'}`}>{d}{DAY_WORD[lang] ?? 'd'}</span>)}
               </div>
             </div>
             <div data-rv="right" className="map-glass" style={{ padding: U(22), borderRadius: U(28), ...d(.78) }}>

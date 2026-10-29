@@ -105,7 +105,9 @@ describe('report content', () => {
 
   test('the fonts can draw every character: both languages, every crop, disease and severity name', () => {
     const terms = JSON.parse(readFileSync(new URL('../assets/terms.json', import.meta.url), 'utf8'));
-    expect(missingGlyphs(JSON.stringify(terms))).toEqual([]);
+    // the report is made in English or Hindi only (a Punjabi or Odia reader asks for Hindi or English, client i18n.js serverLang): the Punjabi
+    // and Odia names in the same file never reach the PDF, so the fonts need not draw them
+    expect(missingGlyphs(JSON.stringify(terms, (key, value) => (key === 'pa' || key === 'or' ? undefined : value)))).toEqual([]);
     for (const lang of ['en', 'hi']) expect(missingGlyphs(JSON.stringify(buildReport(input({ lang }))))).toEqual([]);
     expect(missingGlyphs('a → b')).toEqual(['→']); // the check itself works
   });

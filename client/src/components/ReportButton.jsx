@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getReport } from '../services/api';
+import { serverLang } from '../i18n';
 
 // One-click PDF of this checkup (docs/REPORT.md), in the app's language. Fetched with the device id
 // header like every checkup call, then saved from a blob URL.
@@ -11,7 +12,7 @@ const ReportButton = ({ predictionId, hasLocation }) => {
   const download = async () => {
     setState('loading');
     try {
-      const { data } = await getReport(predictionId, i18n.language === 'hi' ? 'hi' : 'en');
+      const { data } = await getReport(predictionId, serverLang(i18n.language));
       const url = URL.createObjectURL(new Blob([data], { type: 'application/pdf' }));
       const a = Object.assign(document.createElement('a'), { href: url, download: `plantguard-report-${predictionId}.pdf` });
       document.body.appendChild(a);

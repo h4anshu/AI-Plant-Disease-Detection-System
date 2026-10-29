@@ -1,5 +1,5 @@
 import axios from 'axios';
-import i18n from '../i18n';
+import i18n, { serverLang } from '../i18n';
 import { clearLast } from './offlineCache';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -29,8 +29,8 @@ api.interceptors.request.use((config) => {
   config.headers['x-device-id'] = getDeviceId();
   // one id per request, logged by the server and the ML service (docs/MONITORING.md)
   config.headers['x-request-id'] = crypto.randomUUID();
-  // the server answers treatment advice in this language when it has it (English otherwise)
-  config.headers['Accept-Language'] = i18n.language;
+  // the server answers treatment advice in this language when it has it (English otherwise); Punjabi asks for Hindi, Odia for English
+  config.headers['Accept-Language'] = serverLang(i18n.language);
   return config;
 });
 

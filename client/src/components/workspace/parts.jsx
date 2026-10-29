@@ -1,10 +1,11 @@
 import { cropName, diseaseName } from '../../locales/terms';
 import { cropIcon } from './cropIcon';
 
+import { formatDate } from '../../locales/dates';
 export const DAY = 864e5;
 export const locOf = (lang) => (lang === 'en' ? 'en-IN' : lang);   // Indian date order in English
-export const shortDate = (d, lang) => new Date(d).toLocaleDateString(locOf(lang), { day: 'numeric', month: 'short' });
-export const longDate = (d, lang) => new Date(d).toLocaleDateString(locOf(lang), { day: 'numeric', month: 'long', year: 'numeric' });
+export const shortDate = (d, lang) => formatDate(new Date(d), lang, { day: 'numeric', month: 'short' });
+export const longDate = (d, lang) => formatDate(new Date(d), lang, { day: 'numeric', month: 'long', year: 'numeric' });
 export const hasLocation = (p) => ['gps', 'exif'].includes(p.locationSource);
 
 // What a checkup is called: the disease, or why there is no diagnosis

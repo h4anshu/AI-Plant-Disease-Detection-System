@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getFieldHealth } from '../services/api';
 
+import { formatDate } from '../locales/dates';
 const W = 320;
 const H = 150;
 const PAD = { left: 30, right: 8, top: 8, bottom: 22 };
@@ -18,7 +19,7 @@ export function SeriesChart({ rows, window, keys, bandKey, yMin, yMax, lang, lab
   const withBand = rows.filter((r) => r.neighbours.enough && r.neighbours[bandKey]?.[0] != null);
   const band = [...withBand.map((r) => `${x(r.date).toFixed(1)},${y(r.neighbours[bandKey][2]).toFixed(1)}`),
     ...[...withBand].reverse().map((r) => `${x(r.date).toFixed(1)},${y(r.neighbours[bandKey][0]).toFixed(1)}`)].join(' ');
-  const fmt = (d) => new Date(d).toLocaleDateString(lang, { day: 'numeric', month: 'short' });
+  const fmt = (d) => formatDate(new Date(d), lang, { day: 'numeric', month: 'short' });
   const ticks = [yMin, (yMin + yMax) / 2, yMax];
 
   return (
@@ -44,7 +45,7 @@ export function SeriesChart({ rows, window, keys, bandKey, yMin, yMax, lang, lab
 }
 
 // dates with the month's name: "9/6/2026" reads as 9 June in India but meant 6 September
-const longDate = (d, lang) => new Date(d).toLocaleDateString(lang === 'en' ? 'en-IN' : lang, { day: 'numeric', month: 'short', year: 'numeric' });
+const longDate = (d, lang) => formatDate(new Date(d), lang, { day: 'numeric', month: 'short', year: 'numeric' });
 
 // "How does the whole field look from space?" for a checkup with a consented location. Loaded only on
 // request: every uncached answer is an Earth Engine computation (docs/FIELD_HEALTH.md).

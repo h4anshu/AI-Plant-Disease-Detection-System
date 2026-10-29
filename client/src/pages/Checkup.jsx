@@ -10,10 +10,11 @@ import Feedback from '../components/Feedback';
 import { getPrediction, getPredictionRisk } from '../services/api';
 import { cropName, diseaseName, severityName } from '../locales/terms';
 import { StatusPill, levelOf } from '../components/workspace/status';
-import { DAY, Lbl, hasLocation, locOf, shortDate } from '../components/workspace/parts';
+import { DAY, Lbl, hasLocation, shortDate } from '../components/workspace/parts';
 import { cropIcon } from '../components/workspace/cropIcon';
 import Icon from '../components/workspace/icons';
 
+import { formatDateTime } from '../locales/dates';
 const TABS = [['care', 'tCare', ''], ['context', 'tContext', 'tagLoc'], ['sat', 'tSat', 'tagReq'], ['report', 'tReport', '']];
 const SEVERITY = [['early', 'sevEarly'], ['moderate', 'sevModerate'], ['severe', 'sevSevere']];
 const heatSrc = (g) => (/^(https?:|data:)/.test(g) ? g : `data:image/png;base64,${g}`);
@@ -64,7 +65,7 @@ const Checkup = () => {
   const level = levelOf(p);
   const located = hasLocation(p);
   const diagnosed = level !== 'retake';
-  const when = new Date(p.createdAt).toLocaleString(locOf(lang), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const when = formatDateTime(new Date(p.createdAt), lang, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   const pct = Math.round((p.confidence || 0) * 100);
   const title = diagnosed ? diseaseName(p.crop, p.disease, lang) : null;
   const recheckOn = shortDate(new Date(p.createdAt).getTime() + 7 * DAY, lang);

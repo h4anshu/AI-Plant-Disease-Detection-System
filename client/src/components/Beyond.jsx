@@ -4,6 +4,7 @@ import { CountUp, d } from './motion';
 import leafA from '../assets/how/leaf-a.webp';
 import leafC from '../assets/how/leaf-c.webp';
 
+import { formatDate } from '../locales/dates';
 // Illustrative values for the landing page only (labelled "Example data"); the real ones come from /api/disease-risk, the context layer and the geo-service.
 const RISK = ['low', 'low', 'medium', 'high', 'high', 'medium'];   // past 2 days, today, next 3
 const TODAY = 2;
@@ -34,8 +35,7 @@ const Tag = ({ t }) => <span className="ml-auto rounded-full bg-butter px-2.5 py
 
 const Beyond = () => {
   const { t, i18n } = useTranslation();
-  const loc = i18n.language === 'en' ? 'en-IN' : i18n.language;
-  const day = (i) => new Date(Date.now() + (i - TODAY) * 864e5).toLocaleDateString(loc, { weekday: 'short' });
+  const day = (i) => formatDate(new Date(Date.now() + (i - TODAY) * 864e5), i18n.language, { weekday: 'short' });
   return (
     <section id="around" className="bey-bg scroll-mt-[4.6rem] px-5 py-16 sm:px-8 lg:flex lg:min-h-[calc(100svh-4.6rem)] lg:items-center lg:pb-12 lg:pt-[clamp(64px,6.4vw,124px)]">
       <img src={leafA} alt="" aria-hidden="true" className="map-float pointer-events-none absolute left-[41%] top-[11%] w-12 max-lg:hidden" style={{ '--r': '-20deg' }} />

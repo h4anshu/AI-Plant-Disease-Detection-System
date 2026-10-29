@@ -9,12 +9,13 @@ import { FALLBACK_TREATMENT_HI, treatmentMapHi } from '../utils/treatmentMap.hi.
 
 const ROOT = new URL('../../', import.meta.url);
 export const CSV_PATH = new URL('docs/TRANSLATION_REVIEW.csv', ROOT);
-const COLUMNS = ['type', 'crop', 'key', 'english', 'hindi_draft', 'source', 'needs_review',
-  'hindi_corrected', 'reviewer', 'notes'];
+// punjabi_draft and odia_draft: the names added on 29 Oct 2026 (no treatment advice in those languages: it falls back, docs/LANGUAGES.md)
+const COLUMNS = ['type', 'crop', 'key', 'english', 'hindi_draft', 'punjabi_draft', 'odia_draft', 'source', 'needs_review',
+  'hindi_corrected', 'punjabi_corrected', 'odia_corrected', 'reviewer', 'notes'];
 
 export function reviewRows() {
   const terms = JSON.parse(fs.readFileSync(new URL('client/src/locales/terms.json', ROOT), 'utf8'));
-  const row = (type, crop, key, en, hi) => ({ type, crop, key, english: en, hindi_draft: hi.hi ?? hi.text,
+  const row = (type, crop, key, en, hi) => ({ type, crop, key, english: en, hindi_draft: hi.hi ?? hi.text, punjabi_draft: hi.pa, odia_draft: hi.or,
     source: hi.source, needs_review: hi.needs_review });
   const rows = [
     ...Object.entries(terms.crops).map(([c, e]) => row('crop_name', c, c, e.en, e)),

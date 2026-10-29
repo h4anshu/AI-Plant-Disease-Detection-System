@@ -1,7 +1,7 @@
 // Pure helpers for the weather alerts (server/controllers/fieldController.js, docs/FIELD_ALERTS.md).
 import { cropName } from '../../locales/terms';
-import { locOf } from './parts';
 
+import { formatDate, formatDateTime, formatTime } from '../../locales/dates';
 export const RANK = { info: 0, watch: 1, warn: 2, urgent: 3 };
 export const HAZARD_ICON = { frost: 'frost', heat: 'sun', heatwave: 'sun', rain_harvest: 'harvest', rain_heavy: 'rain', rain_spray: 'rain', flood_river: 'rain', dry_spell: 'sun', disease_near: 'sprout', fire_near: 'fire' };
 // official alerts (NDMA SACHET, IMD) have a hazard family instead of one of our rules' hazards
@@ -62,15 +62,15 @@ const dayNumber = (date) => Math.round(Date.parse(`${date}T00:00:00Z`) / 864e5);
 export const daysBetween = (from, to) => dayNumber(to) - dayNumber(from);
 const asDate = (local) => new Date(Number(local.slice(0, 4)), Number(local.slice(5, 7)) - 1, Number(local.slice(8, 10)), Number(local.slice(11, 13) || 0));
 
-export const dayLabel = (date, lang) => asDate(`${date}T12:00`).toLocaleDateString(locOf(lang), { weekday: 'short', day: 'numeric', month: 'short' });
-export const dayMonth = (date, lang) => asDate(`${date}T12:00`).toLocaleDateString(locOf(lang), { day: 'numeric', month: 'short' });
-export const weekday = (date, lang) => asDate(`${date}T12:00`).toLocaleDateString(locOf(lang), { weekday: 'short' });
+export const dayLabel = (date, lang) => formatDate(asDate(`${date}T12:00`), lang, { weekday: 'short', day: 'numeric', month: 'short' });
+export const dayMonth = (date, lang) => formatDate(asDate(`${date}T12:00`), lang, { day: 'numeric', month: 'short' });
+export const weekday = (date, lang) => formatDate(asDate(`${date}T12:00`), lang, { weekday: 'short' });
 // IMD writes districts in capitals ("SOUTH 24 PARGANAS")
 export const titleCase = (s) => String(s).toLowerCase().replace(/(^|[\s-])(\p{L})/gu, (m, sep, c) => sep + c.toUpperCase());
 
 // "25 Oct, 11:44 am": when something was issued, from an ISO time
-export const stamp = (iso, lang) => new Date(iso).toLocaleString(locOf(lang), { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
-export const hourLabel = (local, lang) => asDate(local).toLocaleTimeString(locOf(lang), { hour: 'numeric' });
+export const stamp = (iso, lang) => formatDateTime(new Date(iso), lang, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+export const hourLabel = (local, lang) => formatTime(asDate(local), lang, { hour: 'numeric' });
 
 // where a local time falls on the 72-hour strip: 4 parts per day, so 0 to 12 (fractional)
 export const stripPos = (today, local) => daysBetween(today, local.slice(0, 10)) * 4 + Number(local.slice(11, 13)) / 6;

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getFieldAlerts } from '../../services/api';
 import { readLast, saveLast, unreachable } from '../../services/offlineCache';
+import { formatDateTime } from '../../locales/dates';
 
 // The saved fields with their weather alerts (GET /api/fields/alerts). `error` is set when the request failed; if an earlier answer exists it
 // stays in `data`, so a failed refresh never empties the page. With no signal on a first look, the last good answer kept in this browser
@@ -28,7 +29,7 @@ export const useFieldAlerts = () => {
       const last = unreachable(err) ? readLast('alerts') : null;
       if (last) {
         setData((shown) => shown ?? last.data);
-        setError(tRef.current('alerts.offline', { when: new Date(last.at).toLocaleString(i18nRef.current.language === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) }));
+        setError(tRef.current('alerts.offline', { when: formatDateTime(new Date(last.at), i18nRef.current.language, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) }));
       } else {
         setError(err.response?.data?.message || tRef.current('alerts.error.load'));
       }

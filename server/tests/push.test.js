@@ -110,6 +110,13 @@ describe('who may subscribe', () => {
     expect(String(rows[0].userId)).not.toBe(GUEST);
   });
 
+  test('Punjabi and Odia are kept as chosen, and their notifications are in their own script', async () => {
+    await subscribe(sub(1, { lang: 'pa' })); await subscribe(sub(2, { lang: 'or' }));
+    expect((await PushSubscription.find({}).sort({ endpoint: 1 }).lean()).map((s) => s.lang)).toEqual(['pa', 'or']);
+    expect(pushMessage({ hazard: 'frost', level: 'warn', offset: 1 }, 'wheat', 'pa').title).toBe('ਪਾਲਾ: ਚੇਤਾਵਨੀ');
+    expect(pushMessage({ hazard: 'frost', level: 'warn', offset: 1 }, 'wheat', 'or').body).toContain('ଗହମ');
+  });
+
   test('an unknown language is English; at most 5 devices per owner', async () => {
     await subscribe(sub(1, { lang: 'xx' }));
     expect((await PushSubscription.findOne({}).lean()).lang).toBe('en');

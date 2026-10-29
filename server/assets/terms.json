@@ -1,65 +1,95 @@
 {
-  "_about": "Crop, disease and severity names shown in the app. Hindi names were drafted by Claude (AI) and must be reviewed by an agronomist: when an entry is confirmed or corrected, set needs_review to false and put the reviewer and reference in source. Keys match ml-service/data/label_maps.json. docs/TRANSLATION_REVIEW.csv lists everything still to review (npm run translation-review in server/).",
+  "_about": "Crop, disease and severity names shown in the app. Hindi names were drafted by Claude (AI) and must be reviewed by an agronomist: when an entry is confirmed or corrected, set needs_review to false and put the reviewer and reference in source. Keys match ml-service/data/label_maps.json. docs/TRANSLATION_REVIEW.csv lists everything still to review (npm run translation-review in server/). Punjabi (pa) and Odia (or) names were added on 2026-10-29, drafted by Claude (AI) like the Hindi, and are covered by the same review (also_drafted).",
   "crops": {
     "wheat": {
       "en": "wheat",
       "hi": "गेहूँ",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਕਣਕ",
+      "or": "ଗହମ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "rice": {
       "en": "rice",
       "hi": "धान",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਝੋਨਾ",
+      "or": "ଧାନ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "sugarcane": {
       "en": "sugarcane",
       "hi": "गन्ना",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਗੰਨਾ",
+      "or": "ଆଖୁ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "potato": {
       "en": "potato",
       "hi": "आलू",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਆਲੂ",
+      "or": "ଆଳୁ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "maize": {
       "en": "maize",
       "hi": "मक्का",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਮੱਕੀ",
+      "or": "ମକା",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "pigeonpea": {
       "en": "pigeonpea",
       "hi": "अरहर (तूर)",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਅਰਹਰ (ਤੂਰ)",
+      "or": "ଅରହର (କନ୍ଦୁଲ)",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "groundnut": {
       "en": "groundnut",
       "hi": "मूंगफली",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਮੂੰਗਫਲੀ",
+      "or": "ଚିନାବାଦାମ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "blackgram": {
       "en": "blackgram",
       "hi": "उड़द",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਮਾਂਹ (ਉੜਦ)",
+      "or": "ବିରି",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "apple": {
       "en": "apple",
       "hi": "सेब",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਸੇਬ",
+      "or": "ସେଓ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "banana": {
       "en": "banana",
       "hi": "केला",
       "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਕੇਲਾ",
+      "or": "କଦଳୀ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     }
   },
   "diseases": {
@@ -68,31 +98,46 @@
         "en": "BlackPoint",
         "hi": "काला सिरा (ब्लैक पॉइंट)",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਕਾਲਾ ਸਿਰਾ (ਬਲੈਕ ਪੁਆਇੰਟ)",
+        "or": "କଳା ଅଗ୍ର (ବ୍ଲାକ୍ ପଏଣ୍ଟ)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "FusariumFootRot": {
         "en": "FusariumFootRot",
         "hi": "जड़ व तना-आधार सड़न (फ्यूज़ेरियम)",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਜੜ੍ਹ ਤੇ ਤਣੇ ਦੇ ਮੁੱਢ ਦਾ ਗਲਣ (ਫ਼ਿਊਜ਼ੇਰੀਅਮ)",
+        "or": "ଚେର ଓ କାଣ୍ଡ ମୂଳ ସଢ଼ା (ଫ୍ୟୁଜାରିଅମ୍)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "HealthyLeaf": {
         "en": "HealthyLeaf",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "LeafBlight": {
         "en": "LeafBlight",
         "hi": "पत्ती झुलसा (स्पॉट ब्लॉच)",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੱਤਾ ਝੁਲਸ (ਸਪਾਟ ਬਲੌਚ)",
+        "or": "ପତ୍ର ଝଲସା (ସ୍ପଟ୍ ବ୍ଲଚ୍)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "WheatBlast": {
         "en": "WheatBlast",
         "hi": "गेहूँ का झोंका (ब्लास्ट)",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਕਣਕ ਦਾ ਬਲਾਸਟ",
+        "or": "ଗହମର ବ୍ଲାଷ୍ଟ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "rice": {
@@ -100,31 +145,46 @@
         "en": "Bacterialblight",
         "hi": "जीवाणु पत्ती झुलसा",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਜੀਵਾਣੂ ਪੱਤਾ ਝੁਲਸ",
+        "or": "ଜୀବାଣୁ ପତ୍ର ଝଲସା",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Blast": {
         "en": "Blast",
         "hi": "झोंका (ब्लास्ट)",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਝੋਨੇ ਦਾ ਬਲਾਸਟ",
+        "or": "ଧାନର ବ୍ଲାଷ୍ଟ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Brownspot": {
         "en": "Brownspot",
         "hi": "भूरा धब्बा",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਭੂਰਾ ਧੱਬਾ",
+        "or": "ଧୂସର ଦାଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Healthy": {
         "en": "Healthy",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Tungro": {
         "en": "Tungro",
         "hi": "टुंगरो",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਟੁੰਗਰੋ",
+        "or": "ଟୁଙ୍ଗ୍ରୋ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "sugarcane": {
@@ -132,67 +192,100 @@
         "en": "Banded Chlorosis",
         "hi": "पट्टीदार पीलापन (ठंड से चोट)",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਧਾਰੀਦਾਰ ਪੀਲਾਪਣ (ਠੰਢ ਨਾਲ ਸੱਟ)",
+        "or": "ଧାରିଆ ହଳଦିଆ ପଡ଼ିବା (ଥଣ୍ଡାରୁ କ୍ଷତି)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "BrownRust": {
         "en": "BrownRust",
         "hi": "भूरा रतुआ (गेरुई)",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਭੂਰਾ ਕੁੰਗੀ",
+        "or": "ବାଦାମୀ କଳଙ୍କି",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Brown_Spot": {
         "en": "Brown Spot",
         "hi": "भूरा धब्बा",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਭੂਰਾ ਧੱਬਾ",
+        "or": "ଧୂସର ଦାଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Dried_Leaves": {
         "en": "Dried Leaves",
         "hi": "सूखी पत्तियाँ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਸੁੱਕੇ ਪੱਤੇ",
+        "or": "ଶୁଖିଲା ପତ୍ର",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Grassy_shoot": {
         "en": "Grassy shoot",
         "hi": "घासीय प्ररोह (ग्रासी शूट)",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਘਾਹ ਵਰਗੀਆਂ ਕਰੂੰਬਲਾਂ (ਗ੍ਰਾਸੀ ਸ਼ੂਟ)",
+        "or": "ଘାସିଆ କୁଣ୍ଡ (ଗ୍ରାସି ଶୁଟ୍)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Healthy_Leaves": {
         "en": "Healthy Leaves",
         "hi": "स्वस्थ पत्तियाँ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ ਪੱਤੇ",
+        "or": "ସୁସ୍ଥ ପତ୍ର",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Pokkah_Boeng": {
         "en": "Pokkah Boeng",
         "hi": "पोक्का बोइंग",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੋਕਾ ਬੋਇੰਗ",
+        "or": "ପୋକ୍କା ବୋଇଙ୍ଗ୍",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Sett_Rot": {
         "en": "Sett Rot",
         "hi": "बीज-टुकड़ा सड़न (अनानास रोग)",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਬੀਜ ਟੁਕੜੇ ਦਾ ਗਲਣ (ਅਨਾਨਾਸ ਰੋਗ)",
+        "or": "ବିହନ ଖଣ୍ଡ ସଢ଼ା (ଅନାନାସ ରୋଗ)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Viral_Disease": {
         "en": "Viral Disease",
         "hi": "विषाणु रोग (मोज़ेक)",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਵਿਸ਼ਾਣੂ ਰੋਗ (ਮੋਜ਼ੇਕ)",
+        "or": "ଭାଇରସ୍ ରୋଗ (ମୋଜାଇକ୍)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Yellow_Leaf": {
         "en": "Yellow Leaf",
         "hi": "पीली पत्ती रोग",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੀਲੇ ਪੱਤੇ ਦਾ ਰੋਗ",
+        "or": "ହଳଦିଆ ପତ୍ର ରୋଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "smut": {
         "en": "smut",
         "hi": "कंडुआ (स्मट)",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਕਾਂਗਿਆਰੀ (ਸਮੱਟ)",
+        "or": "କଣ୍ଡୁଆ (ସ୍ମଟ୍)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "potato": {
@@ -200,19 +293,28 @@
         "en": "Early blight",
         "hi": "अगेती झुलसा",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਅਗੇਤਾ ਝੁਲਸ",
+        "or": "ଅଗୁଆ ଝଲସା",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Late_blight": {
         "en": "Late blight",
         "hi": "पछेती झुलसा",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪਿਛੇਤਾ ਝੁਲਸ",
+        "or": "ପଛୁଆ ଝଲସା",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "healthy": {
         "en": "healthy",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "maize": {
@@ -220,25 +322,37 @@
         "en": "Blight",
         "hi": "पत्ती झुलसा",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੱਤਾ ਝੁਲਸ",
+        "or": "ପତ୍ର ଝଲସା",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Common_Rust": {
         "en": "Common Rust",
         "hi": "रतुआ (गेरुई)",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਕੁੰਗੀ",
+        "or": "କଳଙ୍କି",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Gray_Leaf_Spot": {
         "en": "Gray Leaf Spot",
         "hi": "स्लेटी पत्ती धब्बा",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਸਲੇਟੀ ਪੱਤਾ ਧੱਬਾ",
+        "or": "ଧୂସର ପତ୍ର ଦାଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Healthy": {
         "en": "Healthy",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "pigeonpea": {
@@ -246,25 +360,37 @@
         "en": "Healthy",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Leaf_Spot": {
         "en": "Leaf Spot",
         "hi": "पत्ती धब्बा",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੱਤਾ ਧੱਬਾ",
+        "or": "ପତ୍ର ଦାଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Leaf_webber": {
         "en": "Leaf webber",
         "hi": "पत्ती लपेटक कीट",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੱਤਾ ਲਪੇਟ ਸੁੰਡੀ",
+        "or": "ପତ୍ର ଗୁଡ଼ାଉଥିବା ପୋକ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Sterilic_mosaic": {
         "en": "Sterilic mosaic",
         "hi": "बाँझपन मोज़ेक",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਬਾਂਝਪਣ ਮੋਜ਼ੇਕ",
+        "or": "ବନ୍ଧ୍ୟା ମୋଜାଇକ୍",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "groundnut": {
@@ -272,37 +398,55 @@
         "en": "Alternaria Leaf Spot",
         "hi": "आल्टरनेरिया पत्ती धब्बा",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਅਲਟਰਨੇਰੀਆ ਪੱਤਾ ਧੱਬਾ",
+        "or": "ଅଲ୍ଟରନାରିଆ ପତ୍ର ଦାଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Healthy": {
         "en": "Healthy",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Leaf_Spot": {
         "en": "Leaf Spot",
         "hi": "टिक्का रोग (पत्ती धब्बा)",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਟਿੱਕਾ ਰੋਗ (ਪੱਤਾ ਧੱਬਾ)",
+        "or": "ଟିକ୍କା ରୋଗ (ପତ୍ର ଦାଗ)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Nutrition_Deficiency": {
         "en": "Nutrition Deficiency",
         "hi": "पोषक तत्व की कमी",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੋਸ਼ਕ ਤੱਤਾਂ ਦੀ ਕਮੀ",
+        "or": "ପୋଷକ ତତ୍ତ୍ୱର ଅଭାବ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Rosette": {
         "en": "Rosette",
         "hi": "रोज़ेट (गुच्छा) रोग",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਰੋਜ਼ੈੱਟ (ਗੁੱਛਾ) ਰੋਗ",
+        "or": "ରୋଜେଟ୍ (ଗୁଚ୍ଛ) ରୋଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Rust": {
         "en": "Rust",
         "hi": "रतुआ (गेरुई)",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਕੁੰਗੀ",
+        "or": "କଳଙ୍କି",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "blackgram": {
@@ -310,31 +454,46 @@
         "en": "Anthracnose",
         "hi": "एन्थ्रेक्नोज़",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਐਂਥ੍ਰੈਕਨੋਜ਼",
+        "or": "ଆନ୍ଥ୍ରାକ୍ନୋଜ୍",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Healthy": {
         "en": "Healthy",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Leaf_Crinkle": {
         "en": "Leaf Crinkle",
         "hi": "पत्ती मरोड़ (लीफ क्रिंकल)",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੱਤਾ ਮੁੜਨਾ (ਲੀਫ਼ ਕ੍ਰਿੰਕਲ)",
+        "or": "ପତ୍ର କୁଞ୍ଚିବା (ଲିଫ୍ କ୍ରିଙ୍କଲ୍)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Powdery_Mildew": {
         "en": "Powdery Mildew",
         "hi": "चूर्णिल आसिता (सफ़ेद चूर्ण)",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਚਿੱਟਾ ਚੂਰਨੀ ਰੋਗ",
+        "or": "ଧଳା ଗୁଣ୍ଡିଆ ରୋଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Yellow_Mosaic": {
         "en": "Yellow Mosaic",
         "hi": "पीला मोज़ेक",
         "source": "Common Hindi farming term; drafted by Claude (AI) from general knowledge on 2026-09-26, not checked against a publication",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੀਲਾ ਮੋਜ਼ੇਕ",
+        "or": "ହଳଦିଆ ମୋଜାଇକ୍",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "apple": {
@@ -342,19 +501,28 @@
         "en": "Alternaria Leaf Blotch",
         "hi": "आल्टरनेरिया पत्ती धब्बा",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਅਲਟਰਨੇਰੀਆ ਪੱਤਾ ਧੱਬਾ",
+        "or": "ଅଲ୍ଟରନାରିଆ ପତ୍ର ଦାଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Healthy": {
         "en": "Healthy",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Mosaic": {
         "en": "Mosaic",
         "hi": "मोज़ेक",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਮੋਜ਼ੇਕ",
+        "or": "ମୋଜାଇକ୍",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     },
     "banana": {
@@ -362,43 +530,64 @@
         "en": "Bract Mosaic Virus",
         "hi": "ब्रैक्ट मोज़ेक (विषाणु)",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਬ੍ਰੈਕਟ ਮੋਜ਼ੇਕ (ਵਿਸ਼ਾਣੂ)",
+        "or": "ବ୍ରାକ୍ଟ ମୋଜାଇକ୍ (ଭାଇରସ୍)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Healthy": {
         "en": "Healthy",
         "hi": "स्वस्थ",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਤੰਦਰੁਸਤ",
+        "or": "ସୁସ୍ଥ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Insect_Pest": {
         "en": "Insect Pest",
         "hi": "कीट से नुकसान",
         "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਕੀੜੇ ਨਾਲ ਨੁਕਸਾਨ",
+        "or": "ପୋକରୁ କ୍ଷତି",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Moko_Wilt": {
         "en": "Moko Wilt",
         "hi": "मोको उकठा (जीवाणु)",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਮੋਕੋ ਮੁਰਝਾਉਣਾ (ਜੀਵਾਣੂ)",
+        "or": "ମୋକୋ ମ୍ଲାନ (ଜୀବାଣୁ)",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Panama_Wilt": {
         "en": "Panama Wilt",
         "hi": "पनामा उकठा",
         "source": "Common Hindi term plus the English name in brackets; drafted by Claude (AI) on 2026-09-26",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪਨਾਮਾ ਮੁਰਝਾਉਣਾ",
+        "or": "ପାନାମା ମ୍ଲାନ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Pestalotiopsis_Leaf_Spot": {
         "en": "Pestalotiopsis Leaf Spot",
         "hi": "पेस्टालोटिओप्सिस पत्ती धब्बा",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਪੈਸਟਾਲੋਟੀਓਪਸਿਸ ਪੱਤਾ ਧੱਬਾ",
+        "or": "ପେଷ୍ଟାଲୋଟିଓପ୍ସିସ୍ ପତ୍ର ଦାଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       },
       "Sigatoka_Leaf_Spot": {
         "en": "Sigatoka Leaf Spot",
         "hi": "सिगाटोका पत्ती धब्बा",
         "source": "Transliteration of the English name; the drafter knows no widely used Hindi name",
-        "needs_review": true
+        "needs_review": true,
+        "pa": "ਸਿਗਾਟੋਕਾ ਪੱਤਾ ਧੱਬਾ",
+        "or": "ସିଗାଟୋକା ପତ୍ର ଦାଗ",
+        "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
       }
     }
   },
@@ -407,25 +596,37 @@
       "en": "healthy",
       "hi": "स्वस्थ",
       "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਤੰਦਰੁਸਤ",
+      "or": "ସୁସ୍ଥ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "early": {
       "en": "early",
       "hi": "शुरुआती",
       "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਸ਼ੁਰੂਆਤੀ",
+      "or": "ପ୍ରାରମ୍ଭିକ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "moderate": {
       "en": "moderate",
       "hi": "मध्यम",
       "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਦਰਮਿਆਨੀ",
+      "or": "ମଧ୍ୟମ",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     },
     "severe": {
       "en": "severe",
       "hi": "गंभीर",
       "source": "Descriptive Hindi phrase drafted by Claude (AI) on 2026-09-26; not a traditional name",
-      "needs_review": true
+      "needs_review": true,
+      "pa": "ਗੰਭੀਰ",
+      "or": "ଗମ୍ଭୀର",
+      "also_drafted": "pa and or drafted by Claude (AI) on 2026-10-29, not reviewed"
     }
   }
 }

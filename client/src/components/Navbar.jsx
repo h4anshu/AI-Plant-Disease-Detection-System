@@ -37,7 +37,7 @@ const Navbar = () => {
 
   return (
     <nav className="border-b border-ink/15 bg-parchment/95 backdrop-blur-sm sticky top-0 z-50">
-      <div className="max-w-[2000px] mx-auto flex items-center justify-between px-[clamp(1.25rem,4.2vw,5.5rem)] py-4">
+      <div className="max-w-[2000px] mx-auto flex flex-wrap items-center justify-between gap-y-2 px-[clamp(1.25rem,4.2vw,5.5rem)] py-4">
         {/* Logo */}
         <Link to="/" onClick={closeMenu} className="flex items-center gap-3">
           <LeafMark className="h-8 w-9 text-leaf-text" />
@@ -45,7 +45,7 @@ const Navbar = () => {
           <span className="hidden sm:inline border-l border-ink/25 pl-3 font-mono text-[11px] text-ink-2 tracking-[0.25em] uppercase">Field Clinic</span>
         </Link>
 
-        <div className="flex items-center gap-4 lg:gap-6">
+        <div className="ml-auto flex items-center gap-4 lg:gap-6">
         <LanguageSwitch />
         {/* Mobile Hamburger Button */}
         <button

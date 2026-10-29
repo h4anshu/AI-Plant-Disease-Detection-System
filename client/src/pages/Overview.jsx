@@ -7,7 +7,7 @@ import { ACCURACY } from '../data/accuracy';
 import { cropName } from '../locales/terms';
 import { useHistory } from '../components/workspace/useHistory';
 import { StatusPill, levelOf, needsAttention } from '../components/workspace/status';
-import { CropTag, DAY, Lbl, PageHead, hasLocation, locOf, shortDate, titleOf } from '../components/workspace/parts';
+import { CropTag, DAY, Lbl, PageHead, hasLocation, shortDate, titleOf } from '../components/workspace/parts';
 import { cropIcon } from '../components/workspace/cropIcon';
 import Icon from '../components/workspace/icons';
 import plant from '../assets/hero/plant-560.webp';
@@ -16,6 +16,7 @@ import WeatherAlerts from '../components/workspace/WeatherAlerts';
 import { useFieldAlerts } from '../components/workspace/useFieldAlerts';
 import { feedNotice, summarize } from '../components/workspace/alertsLib';
 
+import { formatDate } from '../locales/dates';
 const Tile = ({ label, value, note, tone }) => (
   <article className="ws-card flex flex-col gap-1.5 p-5">
     <Lbl>{label}</Lbl>
@@ -49,7 +50,7 @@ const Overview = () => {
   const now = Date.now();
   const hour = new Date().getHours();
   const hello = t(`ws.overview.hello.${hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'}`);
-  const today = new Date().toLocaleDateString(locOf(lang), { weekday: 'long', day: 'numeric', month: 'long' });
+  const today = formatDate(new Date(), lang, { weekday: 'long', day: 'numeric', month: 'long' });
 
   const last = items[0];
   // ponytail: "rechecked" = a newer checkup of the same crop exists; no field ids yet, so two plots of one crop count as one
