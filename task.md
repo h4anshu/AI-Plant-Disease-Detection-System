@@ -1336,3 +1336,19 @@ Asked: "login enable karo, phir uske according chije setup kar do pahle taki har
 
 **Not built:** password reset and email verification (no email sender; the screen says so; options in `docs/AUTH.md` §5), sign out everywhere, change password/email, "download my data". **Needs you:** the Hindi review of `auth.*`, a lawyer's look at "email and name are now personal data" (`docs/DPDP_CHECKLIST.md` row added), raise `GLOBAL_RATE_LIMIT`, deploy.
 **Cleanup:** e2e server and Vite stopped (ports 4010, 5190 free), `server/_e2e.mjs`, `client/dist`, `.playwright-mcp/` and the locale helper scripts removed.
+
+## Task 44 — Offline use and "add to home screen" (PWA) (29 Oct 2026)
+
+Asked: "pending karo, bade gap wale pahle". The biggest gap for a farmer was no signal in the field: the app showed an error or a blank page, and task.md itself said "no PWA / service worker yet". Design and limits in `docs/OFFLINE.md`.
+
+**Built**
+- `client/public/sw.js` (service worker, 40 lines, no library): keeps the app's own files only (page shell, `/assets/*`, Google Fonts), network first for pages; **never the API**, photos, tiles or POSTs (a shared cache would show the last user's alerts to the next).
+- `services/offlineCache.js`: the last good alerts and the first page of the log, kept **per owner** in `localStorage`, shown with a "No connection ... last checked on {date}" note when the server cannot be reached (no answer, or 502 to 504); erased on sign-out, expired session, account deletion and "Delete my data".
+- **"No alert" is never said from an old copy** (found while testing: the tab pill, the headline and the field card all said "No alert" from the stored copy). They say "Old copy" / "The last copy shows no alert, but it may be out of date" now.
+- Manifest, brand icons (192, 512, maskable, iOS), theme colour, two shortcuts; the tab icon was Vite's default purple logo and is the brand leaf now; `vercel.json` no-cache headers for the worker and manifest.
+- English and Hindi strings (Hindi AI-drafted).
+
+**Tested:** client **259 pass** (+29: worker 14, offline copy 5, hooks 8, Overview old-copy 2), lint 0 errors, build OK; server unchanged (766). **Real browser, production build:** the worker activated, the manifest loaded, with the network cut a reload opened the app from the saved shell with the field and the note, a deep link (`/history`) opened too, the note and pills went when the signal returned.
+**Not tested:** a real phone, "Add to home screen" on Android and iOS, Firefox/Safari. **Not built:** an offline upload queue, free web push (next), the offline copy of single checkups.
+**Needs you:** the Hindi of `alerts.offline`, `ws.offline`, `alerts.mode.old`, `alerts.title.old`, `alerts.calm.*Old`; try "Add to home screen" on your phone after deploying.
+**Cleanup:** e2e server and preview stopped (ports 4010, 5190 free), `server/_e2e.mjs`, `client/dist`, `.playwright-mcp/` and the locale helper scripts removed.
