@@ -1,5 +1,5 @@
 {
-  "banner": "Demo mode: sign-in is disabled. Your checkups are saved only in this browser.",
+  "banner": "Guest mode: your checkups are saved only in this browser.",
   "nav": {
     "home": "Home",
     "diagnose": "Diagnose",
@@ -9,12 +9,9 @@
     "map": "Map",
     "privacy": "Privacy",
     "start": "Start a check",
-    "myField": "My field"
-  },
-  "authDisabled": {
-    "eyebrow": "Unavailable",
-    "title": "Sign-in is temporarily disabled",
-    "body": "Check back soon."
+    "myField": "My field",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
   },
   "home": {
     "eyebrow": "Field clinic · open for checkups",
@@ -185,27 +182,29 @@
     "eyebrow": "Privacy",
     "title": "Your data",
     "storedTitle": "What we store",
-    "stored": "For each checkup: the leaf photo (made smaller, with hidden camera data such as GPS removed), the diagnosis and advice, the heatmap, your answer to \"Was this correct?\", and a random ID for this browser. Your location only if you chose to share it.",
+    "stored": "For each checkup: the leaf photo (made smaller, with hidden camera data such as GPS removed), the diagnosis and advice, the heatmap, your answer to \"Was this correct?\", and who it belongs to: your account if you are signed in, otherwise a random ID for this browser. Your location only if you chose to share it.",
     "publicTitle": "What is public",
     "public": "Nothing that identifies you. The public map only shows how many disease reports came from an area of about 5 km², and only when at least 3 different browsers reported there. Your exact location, photos and checkups are never shown to anyone else.",
     "locationTitle": "Your location",
     "location": "Taken only after you agree: from your phone's location or, if that isn't available, from the location saved in the photo. You can stop sharing any time with \"Change\" on the Diagnose page. For the weather risk of potato and rice, a point rounded to about 5 km is sent to the free weather service Open-Meteo, with nothing that identifies you. For a PDF report, our server loads the map around that rounded area from OpenStreetMap.",
     "deleteTitle": "Delete your data",
-    "delete": "This removes every checkup made in this browser, with its photos, and every saved field, from our servers. It cannot be undone. Do it before clearing your browser data: after that we can no longer tell which checkups and fields were yours.",
+    "delete": "This removes every checkup made in this browser (or in your account, when you are signed in), with its photos, and every saved field, from our servers. It cannot be undone. A guest should do it before clearing the browser data: after that we can no longer tell which checkups and fields were theirs.",
     "deleteButton": "Delete my data",
     "confirm": "Yes, delete everything",
     "cancel": "Cancel",
     "failed": "Could not delete your data. Please try again.",
-    "done_one": "Deleted 1 checkup from this browser.",
-    "done_other": "Deleted {{count}} checkups from this browser.",
+    "done_one": "Deleted 1 checkup.",
+    "done_other": "Deleted {{count}} checkups.",
     "fieldsTitle": "Saved fields",
-    "fields": "For each field you add for weather alerts: its crop, growth stage, an optional name and the place you chose, tied to a random ID for this browser. The exact place is kept private: it is never shown, never in the public map and never in our logs. Only a point rounded to about 5 km is sent to the free weather service Open-Meteo, with nothing that identifies you. \"Delete my data\" removes your fields too, and each field also has its own Delete button under Profile and privacy.",
+    "fields": "For each field you add for weather alerts: its crop, growth stage, an optional name and the place you chose, tied to your account, or to a random ID for this browser if you are a guest. The exact place is kept private: it is never shown, never in the public map and never in our logs. Only a point rounded to about 5 km is sent to the free weather service Open-Meteo, with nothing that identifies you. \"Delete my data\" removes your fields too, and each field also has its own Delete button under Profile and privacy.",
     "contextTitle": "Weather and soil for a checkup",
     "context": "The first time you open a checkup that has a location, our server looks up the weather around the photo date (Open-Meteo, the same point rounded to about 5 km), the rainfall compared with normal and a modelled soil map (through Google Earth Engine, which is sent only the centre of a square of about 250 m around your point, never the exact location). The result is saved with the checkup, without coordinates. Soil Health Card values you type in are saved with that checkup only. \"Delete my data\" removes all of it.",
     "alertsTitle": "Weather alerts: what leaves our server",
     "alerts": "The weather and the river forecast are asked for with a point rounded to about 5 km, never your field's exact place. Fires are asked for from NASA with the same rounded area (a box of about 22 km); the distance to a fire is worked out on our server. Official warnings (NDMA, IMD, the river gauges) news headlines and mandi prices are fetched by our server for everyone (for a state and a crop, never for a person), so nothing about you is sent for them. Saved fields stay until you delete them. Weather, river, fire and satellite answers are kept from half an hour to a few days and hold no personal data. The satellite flood check, which runs only when you press its button, is the one place where the exact point of your field goes to Google (Earth Engine): it reads a circle of 500 m around that point from public satellite images, and the answer is kept for 3 days under a code that does not show the place.",
     "reportsTitle": "Reports from other farmers, and your answers",
-    "reports": "\"Disease reports near you\" uses the same data as the public disease map: a disease counts only when at least 3 different browsers reported it, your own browser is never counted, and the alert shows a disease and a number, never a place. \"Did this help?\" stores the rule, the date, your answer and the field's crop and growth stage, with no place; it is kept for a year, and \"Delete my data\" removes it."
+    "reports": "\"Disease reports near you\" uses the same data as the public disease map: a disease counts only when at least 3 different browsers reported it, your own browser is never counted, and the alert shows a disease and a number, never a place. \"Did this help?\" stores the rule, the date, your answer and the field's crop and growth stage, with no place; it is kept for a year, and \"Delete my data\" removes it.",
+    "accountsTitle": "Accounts",
+    "accounts": "Signing in is optional. If you create an account we store your name, your email and a scrambled (hashed) form of your password; we never see the password itself. Your checkups and fields then belong to the account instead of the browser, so they follow you to other phones. The sign-in is a token kept in this browser for 7 days, until you sign out; we use no cookies. You can delete the account, with everything in it, under Profile › My data."
   },
   "field": {
     "show": "See this field from space",
@@ -525,9 +524,10 @@
       "tabMap": "Map",
       "tabMe": "Me",
       "guest": "Guest · this browser",
-      "guestNote": "Checkups are saved only on this device. Sign-in is switched off for now.",
+      "guestNote": "Checkups are saved only on this device.",
       "home": "PlantGuard home",
-      "back": "Back to the site"
+      "back": "Back to the site",
+      "account": "Your account"
     },
     "status": {
       "retake": "Retake"
@@ -586,8 +586,8 @@
       "firstNote": "Counts, the risk strip and crop bars appear here after your first results."
     },
     "log": {
-      "count_one": "{{count}} checkup saved on this browser, newest first.",
-      "count_other": "{{count}} checkups saved on this browser, newest first.",
+      "count_one": "{{count}} checkup saved, newest first.",
+      "count_other": "{{count}} checkups saved, newest first.",
       "tabsAria": "Filter by result",
       "tAll": "All",
       "tAttention": "Needs attention",
@@ -613,7 +613,7 @@
       "lModerate": "15 to 40%. Act this week.",
       "lSevere": "Over 40%. Act now.",
       "lRetake": "Photo or model not sure enough: no diagnosis.",
-      "stays": "Your log stays on this browser.",
+      "stays": "Your log stays with this browser, or with your account when you sign in.",
       "staysText": "Clearing the browser or switching phones starts a new log. You can delete everything, photos included, at any time.",
       "manage": "Manage my data",
       "approx": "Approximate area",
@@ -668,7 +668,7 @@
       "guestSince": "This browser · {{count}} checkups",
       "device": "Device {{id}}",
       "signIn": "Sign in",
-      "signInNote": "Sign-in is switched off for now. When it returns, your log can follow you across phones. Until then it lives on this browser.",
+      "signInNote": "Sign in to keep your checkups and fields on every phone. Without an account they stay in this browser.",
       "tabsAria": "Profile sections",
       "tPrefs": "Preferences",
       "tPriv": "Location & privacy",
@@ -684,7 +684,7 @@
       "locUse2": "Never public: your exact spot. Location data inside the photo is removed before it is stored.",
       "locUse3": "Shown on the map only as counts for areas of about 5 km², and only when 3 or more different people report there.",
       "privacyPage": "Read the full privacy page",
-      "dataTitle": "What is stored for this browser",
+      "dataTitle": "What is stored for you",
       "dCheckups": "checkups",
       "dPhotos": "leaf photos",
       "dLoc": "with a location",
@@ -695,7 +695,8 @@
       "can1": "It checks the photo first. A blurry, dark or leafless photo gets “please retake”.",
       "can2": "It says “not sure”. A photo that does not look like the chosen crop is never given a guessed disease.",
       "can3": "It shows what it saw. The heatmap shows which part of the leaf decided the answer.",
-      "can4": "It is an estimate, not a lab test. Confirm treatment with your local agriculture officer."
+      "can4": "It is an estimate, not a lab test. Confirm treatment with your local agriculture officer.",
+      "accountSince": "Your account · {{count}} checkups"
     },
     "check": {
       "step1": "Which crop?",
@@ -962,7 +963,7 @@
       "noPin": "No place chosen yet.",
       "nameLabel": "Name (optional)",
       "privateHead": "Your place stays private.",
-      "privateText": "It is saved only for this device and never shown to anyone. We ask for the weather of the 5 km square around it, not your exact spot.",
+      "privateText": "It is saved only for you (your account, or this device if you are a guest) and never shown to anyone. We ask for the weather of the 5 km square around it, not your exact spot.",
       "back": "Back",
       "next": "Next",
       "cancel": "Cancel",
@@ -976,7 +977,7 @@
     },
     "mine": {
       "title": "My fields",
-      "note": "Saved with your checkups on this device. The exact place is kept private and only used to ask for the weather of a 5 km square.",
+      "note": "Saved with your checkups. The exact place is kept private and only used to ask for the weather of a 5 km square.",
       "none": "No fields saved yet.",
       "failed": "Could not load your fields.",
       "deleteFailed": "Could not delete the field. Please try again.",
@@ -1172,5 +1173,45 @@
       "note": "These are prices that market committees reported (Agmarknet, through data.gov.in), in rupees per quintal. They are what was paid, not what you will get, and not advice to sell or to wait: the variety, the quality and the day change the price.",
       "source": "See the source"
     }
+  },
+  "auth": {
+    "loginEyebrow": "Welcome back",
+    "loginTitle": "Sign in",
+    "registerEyebrow": "New account",
+    "registerTitle": "Create your account",
+    "name": "Your name",
+    "email": "Email",
+    "password": "Password",
+    "passwordNote": "At least 8 characters. We cannot reset a forgotten password yet, so keep it safe.",
+    "loginButton": "Sign in",
+    "registerButton": "Create account",
+    "wait": "Please wait…",
+    "noAccount": "New here?",
+    "registerLink": "Create an account",
+    "haveAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "guestNote": "You can also use PlantGuard without an account.",
+    "guestLink": "Continue as a guest",
+    "show": "Show password",
+    "hide": "Hide password",
+    "badLogin": "The email or the password is not right.",
+    "exists": "An account with this email already exists. Please sign in.",
+    "tooMany": "Too many tries. Please wait a few minutes and try again.",
+    "failed": "Something went wrong. Please try again.",
+    "continue": "Continue",
+    "claimTitle": "Add this phone's records to your account?",
+    "claimBody": "From before you signed in, this browser holds: checkups {{predictions}}, saved fields {{fields}}. Add them to your account so they follow you to other phones?",
+    "claimAdd": "Add to my account",
+    "claimSkip": "Not now",
+    "claimDone": "Added to your account: checkups {{predictions}}, fields {{fields}}.",
+    "claimLeft": "Fields not added: {{count}}. An account holds up to 3 saved fields; delete one in My field and add the rest later.",
+    "claimFailed": "Could not add them. Please try again.",
+    "deleteAccountTitle": "Delete your account",
+    "deleteAccount": "This deletes your account and everything in it: every checkup with its photos, every saved field and your answers. It cannot be undone.",
+    "deleteAccountButton": "Delete my account",
+    "deleteAccountConfirm": "Yes, delete my account",
+    "passwordConfirm": "Type your password to confirm",
+    "wrongPassword": "That password is not right.",
+    "accountDeleted": "Your account and its data were deleted."
   }
 }

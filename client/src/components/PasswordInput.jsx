@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const EyeIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
@@ -13,24 +14,27 @@ const EyeOffIcon = () => (
   </svg>
 );
 
-const PasswordInput = ({ value, onChange, required, minLength }) => {
+const PasswordInput = ({ id, value, onChange, required, minLength, autoComplete }) => {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
   return (
     <div className="relative">
       <input
+        id={id}
+        autoComplete={autoComplete}
         type={visible ? 'text' : 'password'}
         value={value}
         onChange={onChange}
         required={required}
         minLength={minLength}
-        className="w-full border border-ink/25 bg-transparent px-3 py-2 pr-10 focus:outline-none focus:border-field"
+        className="min-h-[44px] w-full rounded-xl border border-ink/25 bg-white/60 px-3.5 py-2 pr-12 focus:border-pine focus:outline-none focus:ring-2 focus:ring-pine/25"
       />
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? 'Hide password' : 'Show password'}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-2 hover:text-field"
+        aria-label={visible ? t('auth.hide') : t('auth.show')}
+        className="absolute right-1 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center text-ink-2 hover:text-pine"
       >
         {visible ? <EyeOffIcon /> : <EyeIcon />}
       </button>

@@ -26,6 +26,7 @@ vi.mock('../components/workspace/LocationPicker', () => ({ default: ({ onPick })
 import Overview from '../pages/Overview';
 import FieldNew from '../pages/FieldNew';
 import Privacy from '../pages/Privacy';
+import Auth from '../pages/Auth';
 import WorkspaceLayout from '../components/workspace/WorkspaceLayout';
 
 // An automated accessibility check (axe-core: names, roles, labels, headings, landmarks, duplicate ids, link purpose, tap targets that it can
@@ -114,6 +115,13 @@ describe.each([['en'], ['hi']])('accessibility (axe) of the other screens of the
     await i18n.changeLanguage(lang);
     const { container } = render(<MemoryRouter initialEntries={['/fields/new']}><FieldNew /></MemoryRouter>);
     await screen.findAllByRole('heading');                    // the first step of the form (the crop); the map step is the library's
+    expect(await check(container)).toEqual([]);
+  });
+
+  test.each([['login'], ['register']])('the %s page', async (mode) => {
+    await i18n.changeLanguage(lang);
+    const { container } = render(<MemoryRouter><Auth mode={mode} /></MemoryRouter>);
+    await screen.findAllByRole('heading', { level: 1 });
     expect(await check(container)).toEqual([]);
   });
 

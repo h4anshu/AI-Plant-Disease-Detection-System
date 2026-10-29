@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LangButtons from '../components/LangButtons';
+import ClaimGuest from '../components/ClaimGuest';
+import DeleteAccount from '../components/DeleteAccount';
+import { AuthContext } from '../context/AuthContext';
 import { ACCURACY } from '../data/accuracy';
 import { cropName } from '../locales/terms';
 import { deleteMyData, getDeviceId } from '../services/api';
@@ -14,9 +17,11 @@ import { LeafMark } from '../components/heroIcons';
 
 const TABS = [['prefs', 'tPrefs'], ['privacy', 'tPriv'], ['data', 'tData'], ['about', 'tAbout']];
 
-// Profile & privacy (design "05"): sign-in is switched off, so the "profile" is this browser (a guest card); the slot for an account is drawn but disabled.
+// Profile & privacy (design "05"): the account when signed in (docs/AUTH.md), otherwise this browser as a guest, with the way to sign in.
 const Profile = () => {
   const { t, i18n } = useTranslation();
+  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const [accountGone, setAccountGone] = useState(false);
   const lang = i18n.language;
   const [params, setParams] = useSearchParams();
   const tab = TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'prefs';
@@ -50,13 +55,32 @@ const Profile = () => {
       <section className="ws-card flex flex-wrap items-center gap-5 px-7 py-6">
         <span className="grid h-[72px] w-[72px] place-items-center rounded-full bg-sage-wash text-pine"><LeafMark className="h-[34px] w-[38px]" /></span>
         <div className="min-w-[220px] flex-1">
-          <p className="font-display text-3xl">{t('ws.me.guest')}</p>
-          <p className="mt-0.5 text-sm text-ink-2">{t('ws.me.guestSince', { count: del === 'done' ? 0 : items.length })}</p>
-          <p className="mt-2 font-mono text-[11px] tracking-[0.1em] text-ink-2">{t('ws.me.device', { id: device })}</p>
+          {isAuthenticated ? (
+            <>
+              <p className="break-words font-display text-3xl">{user.name}</p>
+              <p className="mt-0.5 break-all text-sm text-ink-2">{user.email}</p>
+              <p className="mt-2 text-sm text-ink-2">{t('ws.me.accountSince', { count: del === 'done' ? 0 : items.length })}</p>
+            </>
+          ) : (
+            <>
+              <p className="font-display text-3xl">{t('ws.me.guest')}</p>
+              <p className="mt-0.5 text-sm text-ink-2">{t('ws.me.guestSince', { count: del === 'done' ? 0 : items.length })}</p>
+              <p className="mt-2 font-mono text-[11px] tracking-[0.1em] text-ink-2">{t('ws.me.device', { id: device })}</p>
+            </>
+          )}
         </div>
         <div className="flex max-w-[340px] flex-col items-start gap-2">
-          <button type="button" className="ws-btn" disabled>{t('ws.me.signIn')}</button>
-          <p className="text-[13px] text-ink-2">{t('ws.me.signInNote')}</p>
+          {isAuthenticated ? (
+            <button type="button" className="ws-btn ws-btn-ghost" onClick={logout}>{t('nav.signOut')}</button>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2.5">
+                <Link to="/login" className="ws-btn">{t('ws.me.signIn')}</Link>
+                <Link to="/register" className="ws-btn ws-btn-ghost">{t('auth.registerLink')}</Link>
+              </div>
+              <p className="text-[13px] text-ink-2">{t('ws.me.signInNote')}</p>
+            </>
+          )}
         </div>
       </section>
 
@@ -121,6 +145,10 @@ const Profile = () => {
             {del === 'failed' && <p role="alert" className="ws-note ws-note-bad">{t('privacy.failed')}</p>}
           </article>
           <MyFields key={del === 'done'} />   {/* remounts, so it reloads, once the data is deleted */}
+          {isAuthenticated && <ClaimGuest />}
+          {(isAuthenticated || accountGone) && (accountGone
+            ? <p role="status" className="ws-note !bg-[#E4F0D8]">{t('auth.accountDeleted')}</p>
+            : <DeleteAccount onDeleted={() => setAccountGone(true)} />)}
         </div>
       )}
 

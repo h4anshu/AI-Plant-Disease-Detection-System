@@ -30,7 +30,7 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     setIsOpen(false);
-    navigate('/login');
+    navigate('/');
   };
 
   const closeMenu = () => setIsOpen(false);
@@ -76,7 +76,6 @@ const Navbar = () => {
             {t('nav.home')}
           </Link>
 
-          {/* ponytail: login temporarily disabled, always show the signed-in links. Restore the isAuthenticated ternary once login is back on. */}
           <Link to="/overview" className="text-ink-2 hover:text-ink transition-colors">
             {t('nav.myField')}
           </Link>
@@ -92,6 +91,14 @@ const Navbar = () => {
           <Link to="/privacy" className="text-ink-2 hover:text-ink transition-colors">
             {t('nav.privacy')}
           </Link>
+          {isAuthenticated ? (
+            <>
+              <Link to="/me" className="max-w-[10rem] truncate text-ink-2 hover:text-ink transition-colors" title={user?.email}>{user?.name}</Link>
+              <button type="button" onClick={handleLogout} className="text-ink-2 hover:text-ink transition-colors">{t('nav.signOut')}</button>
+            </>
+          ) : (
+            <Link to="/login" className="text-ink-2 hover:text-ink transition-colors">{t('nav.signIn')}</Link>
+          )}
           <Link to="/predict" className="inline-flex items-center gap-2 rounded-lg bg-pine px-5 py-2.5 text-parchment transition-colors hover:bg-pine-hover">
             {t('nav.start')}<ArrowUpRight className="h-4 w-4" />
           </Link>
@@ -106,7 +113,6 @@ const Navbar = () => {
             {t('nav.home')}
           </Link>
 
-          {/* ponytail: login temporarily disabled, always show the signed-in links */}
           <Link to="/overview" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
             {t('nav.myField')}
           </Link>
@@ -122,6 +128,14 @@ const Navbar = () => {
           <Link to="/privacy" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">
             {t('nav.privacy')}
           </Link>
+          {isAuthenticated ? (
+            <>
+              <Link to="/me" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">{user?.name}</Link>
+              <button type="button" onClick={handleLogout} className="py-2.5 text-left text-ink-2 hover:text-ink transition-colors">{t('nav.signOut')}</button>
+            </>
+          ) : (
+            <Link to="/login" onClick={closeMenu} className="text-ink-2 hover:text-ink transition-colors py-2.5">{t('nav.signIn')}</Link>
+          )}
           <Link to="/predict" onClick={closeMenu} className="mt-1 inline-flex items-center justify-center gap-2 rounded-lg bg-pine px-5 py-3 text-parchment">
             {t('nav.start')}<ArrowUpRight className="h-4 w-4" />
           </Link>

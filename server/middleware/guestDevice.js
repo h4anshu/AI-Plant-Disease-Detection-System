@@ -1,9 +1,10 @@
-// Login is disabled, so every visitor is the same guest user (middleware/auth.js). Without this, the
+// A visitor who has not signed in is the shared guest user (middleware/auth.js). Without this, the
 // history endpoint would show every guest's photos to everyone. Each browser sends a random UUID it
-// keeps in localStorage (client/src/services/api.js), and guest records are scoped to it.
-// TODO(auth): when login returns, drop this and scope history by the real user id only.
-export const GUEST_ID = '000000000000000000000000'; // same placeholder as middleware/auth.js
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// keeps in localStorage (client/src/services/api.js), and guest records are scoped to it. A signed-in
+// user is scoped by their account instead (ownerFilter), and can move this browser's records into it
+// (POST /api/auth/claim-guest).
+export const GUEST_ID = '000000000000000000000000'; // the guest placeholder; no account can have this id
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const guestDevice = (req, res, next) => {
   req.deviceId = null;

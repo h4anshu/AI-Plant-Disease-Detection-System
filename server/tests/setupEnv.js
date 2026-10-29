@@ -23,3 +23,6 @@ process.env.FLOOD_EXTENT_RATE_LIMIT = '1000';
 process.env.MANDI_GAP_MS = '0'; // no pause between data.gov.in requests in tests
 process.env.NEWS_HINDU_URL = 'https://www.thehindu.com/sci-tech/agriculture/feeder/default.rss';
 process.env.NEWS_PIB_URL = 'https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=3';
+process.env.LOGIN_RATE_LIMIT = '1000'; // tests/auth.test.js loads the app with low limits
+process.env.REGISTER_RATE_LIMIT = '1000';
+process.env.ACCOUNT_RATE_LIMIT = '1000';

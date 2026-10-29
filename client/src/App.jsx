@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import Navbar from "./components/Navbar";
 import DemoBanner from "./components/DemoBanner";
 import WorkspaceLayout from "./components/workspace/WorkspaceLayout";
@@ -13,20 +12,10 @@ import History from "./pages/History";
 import Checkup from "./pages/Checkup";
 import Profile from "./pages/Profile";
 import Privacy from "./pages/Privacy";
+import Auth from "./pages/Auth";
 
 // Leaflet and the map code load only when someone opens the map
 const MapPage = lazy(() => import("./pages/MapPage"));
-
-const AuthDisabled = () => {
-  const { t } = useTranslation();
-  return (
-    <div className="max-w-sm mx-auto px-6 pt-20 text-center">
-      <span className="font-mono text-xs text-clay uppercase tracking-widest">{t('authDisabled.eyebrow')}</span>
-      <h2 className="font-display text-3xl text-ink mt-2">{t('authDisabled.title')}</h2>
-      <p className="font-mono text-xs text-ink-2 mt-4">{t('authDisabled.body')}</p>
-    </div>
-  );
-};
 
 // The landing page and the public pages: the top navbar
 const SiteLayout = () => {
@@ -40,14 +29,13 @@ const SiteLayout = () => {
   );
 };
 
-// ponytail: login (and its pages) are switched off, so every route is open to everyone for now.
-// To bring login back: restore the Login / Register routes and guard the WorkspaceLayout routes with AuthContext.
+// Signing in is optional (docs/AUTH.md): every route is open to guests, whose records stay in their browser; an account's follow it.
 const App = () => (
   <Routes>
     <Route element={<SiteLayout />}>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<AuthDisabled />} />
-      <Route path="/register" element={<AuthDisabled />} />
+      <Route path="/login" element={<Auth mode="login" />} />
+      <Route path="/register" element={<Auth mode="register" />} />
       <Route path="/map" element={<Suspense fallback={null}><MapPage /></Suspense>} />
       <Route path="/privacy" element={<Privacy />} />
     </Route>

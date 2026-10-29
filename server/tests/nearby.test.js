@@ -58,26 +58,26 @@ afterAll(async () => {
 
 describe('nearbyDisease', () => {
   test('nothing reported, or fewer than 3 different browsers: no alert (the map rule)', async () => {
-    expect(await nearbyDisease(field, MINE, NOW)).toBeNull();
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toBeNull();
     await seed(2);
-    expect(await nearbyDisease(field, MINE, NOW)).toBeNull();
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toBeNull();
     await seed(1, {}, 3);                                               // a third browser
-    expect(await nearbyDisease(field, MINE, NOW)).toMatchObject({ values: { value: 3 } });
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toMatchObject({ values: { value: 3 } });
   });
 
   test('one browser sending many photos is one report; three browsers make an info alert, six a watch', async () => {
     await Prediction.insertMany(Array.from({ length: 20 }, () => report(dev(1))));
     await Prediction.insertMany([report(dev(2)), report(dev(2))]);
-    expect(await nearbyDisease(field, MINE, NOW)).toBeNull();          // 2 browsers
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toBeNull();          // 2 browsers
     await seed(1, {}, 3);
-    expect(await nearbyDisease(field, MINE, NOW)).toMatchObject({ level: 'info', values: { value: 3 } });
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toMatchObject({ level: 'info', values: { value: 3 } });
     await seed(3, {}, 4);
-    expect(await nearbyDisease(field, MINE, NOW)).toMatchObject({ level: 'watch', values: { value: 6 } });
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toMatchObject({ level: 'watch', values: { value: 6 } });
   });
 
   test('the alert says which disease, for which crop, and holds no place', async () => {
     await seed(3, { disease: 'Late_blight' });
-    const a = await nearbyDisease(field, MINE, NOW);
+    const a = await nearbyDisease(field, { deviceId: MINE }, NOW);
     expect(a).toMatchObject({ rule: 'DISEASE-NEAR-1', hazard: 'disease_near', disease: 'Late_blight', crop: 'potato', stage: 'vegetative', confidence: 'low', reviewStatus: 'draft',
       values: { metric: 'reports', value: 3, window: 14, radiusKm: 5 }, offset: 0 });
     expect(a.id).toMatch(/^DISEASE-NEAR-1\|\d{4}-\d\d-\d\d$/);
@@ -90,25 +90,25 @@ describe('nearbyDisease', () => {
     await seed(3, { disease: 'Healthy', severity: 'healthy' }, 20);
     await seed(3, { demo: true }, 30);
     await seed(3, { createdAt: new Date(NOW.getTime() - 15 * DAY) }, 40);
-    expect(await nearbyDisease(field, MINE, NOW)).toBeNull();
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toBeNull();
     await seed(3, { createdAt: new Date(NOW.getTime() - 13 * DAY) }, 50);
-    expect(await nearbyDisease(field, MINE, NOW)).toMatchObject({ values: { value: 3 } });
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toMatchObject({ values: { value: 3 } });
   });
 
   test('the field\'s own browser does not count; reports around the field do, far away ones do not', async () => {
     await seed(2);                                                      // dev 1, 2
     await Prediction.insertMany([report(MINE)]);                        // the farmer\'s own photo would be the third
-    expect(await nearbyDisease(field, MINE, NOW)).toBeNull();
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toBeNull();
     expect(await nearbyDisease(field, null, NOW)).toMatchObject({ values: { value: 3 } }); // a caller without a device id: nothing to leave out
     await Prediction.deleteMany({});
     await seed(3, { geoCell: FAR });
-    expect(await nearbyDisease(field, MINE, NOW)).toBeNull();
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toBeNull();
   });
 
   test('the commonest disease wins; two diseases do not make two alerts', async () => {
     await seed(3, { disease: 'Early_blight' });
     await seed(4, { disease: 'Late_blight' }, 10);
-    expect(await nearbyDisease(field, MINE, NOW)).toMatchObject({ disease: 'Late_blight', values: { value: 4 } });
+    expect(await nearbyDisease(field, { deviceId: MINE }, NOW)).toMatchObject({ disease: 'Late_blight', values: { value: 4 } });
   });
 });
 

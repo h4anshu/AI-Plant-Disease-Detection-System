@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { gridDisk, latLngToCell } from "h3-js";
 import PredictionModel from "../models/Prediction.js";
 import { H3_RESOLUTION, MIN_DEVICES } from "../utils/geo.js";
@@ -13,12 +14,15 @@ const WATCH_DEVICES = 6;   // ours; fewer is "good to know"
 const DAY = 86_400_000;
 
 // -> an alert shaped like the weather rules' (client/src/components/workspace/alertParts.jsx), or null
-export async function nearbyDisease(field, deviceId, now = new Date()) {
+// `owner` is the asker's ownerFilter: { userId, deviceId } for a guest browser, { userId } for an account. Their own reports are left out.
+export async function nearbyDisease(field, owner, now = new Date()) {
+  const own = owner?.deviceId ? { deviceId: { $ne: owner.deviceId } }
+    : owner?.userId ? { userId: { $ne: new mongoose.Types.ObjectId(owner.userId) } } : {};   // an aggregation does not cast the id for us
   const [lon, lat] = field.location.coordinates;
   const cells = gridDisk(latLngToCell(lat, lon, H3_RESOLUTION), RING);
   const [top] = await PredictionModel.aggregate([
     { $match: { geoCell: { $in: cells }, crop: field.crop, status: 'ok', demo: { $ne: true }, disease: { $not: /healthy/i },
-      createdAt: { $gte: new Date(now.getTime() - WINDOW_DAYS * DAY) }, ...(deviceId && { deviceId: { $ne: deviceId } }) } },
+      createdAt: { $gte: new Date(now.getTime() - WINDOW_DAYS * DAY) }, ...own } },
     { $group: { _id: '$disease', devices: { $addToSet: { $ifNull: ['$deviceId', { $toString: '$userId' }] } } } },
     { $project: { devices: { $size: '$devices' } } },
     { $match: { devices: { $gte: MIN_DEVICES } } },

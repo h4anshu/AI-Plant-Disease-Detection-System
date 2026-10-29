@@ -7,8 +7,9 @@ const api = axios.create({
   baseURL: API_URL
 })
 
-// Login is disabled, so all visitors are one guest user; this random per-browser id keeps each
-// browser's history private (server/middleware/guestDevice.js). TODO(auth): remove when login returns.
+// A visitor who has not signed in is a guest; this random per-browser id keeps each browser's records private
+// (server/middleware/guestDevice.js). It is sent with every request, also when signed in (the account ignores it,
+// and it lets "add this browser's records to my account" find them).
 export const getDeviceId = () => {
   let id = localStorage.getItem('deviceId');
   if (!id) {
@@ -22,7 +23,7 @@ export const getDeviceId = () => {
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
-    config.headers.authorization = token;
+    config.headers.authorization = `Bearer ${token}`;
   }
   config.headers['x-device-id'] = getDeviceId();
   // one id per request, logged by the server and the ML service (docs/MONITORING.md)
@@ -32,9 +33,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// --- Auth ---
+// A token the server no longer accepts (expired, or the account was deleted): forget it and tell the app, which signs out
+// (context/AuthContext.jsx). Other 401s (a wrong password) leave the session alone.
+api.interceptors.response.use((res) => res, (error) => {
+  if (error.response?.status === 401 && error.response.data?.code === 'invalid_token') {
+    try { localStorage.removeItem('token'); localStorage.removeItem('user'); } catch { /* private mode */ }
+    window.dispatchEvent(new Event('auth:expired'));
+  }
+  return Promise.reject(error);
+});
+
+// --- Auth (docs/AUTH.md) ---
 export const registerUser = (data) => api.post('/auth/register', data);
 export const loginUser = (data) => api.post('/auth/login', data);
+export const getMe = () => api.get('/auth/me');
+// asks for the password again; erases the account and everything of it
+export const deleteAccount = (password) => api.delete('/auth/me', { data: { password } });
+// what this browser holds as a guest ({ predictions, fields }), and moving it into the signed-in account
+export const getGuestData = () => api.get('/auth/guest-data');
+export const claimGuestData = () => api.post('/auth/claim-guest');
 
 
 // --- Predictions ---

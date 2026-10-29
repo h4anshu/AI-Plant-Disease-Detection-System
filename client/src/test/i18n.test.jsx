@@ -88,7 +88,7 @@ test('Hindi "one" plural forms print the count: Hindi uses the "one" form for 0 
   const { default: i18n } = await import('../i18n');
   await i18n.changeLanguage('hi');
   try {
-    expect(i18n.t('privacy.done', { count: 0 })).toBe('इस ब्राउज़र की 0 जाँच मिटा दी गई।');
+    expect(i18n.t('privacy.done', { count: 0 })).toBe('0 जाँच मिटा दी गई।');
     expect(i18n.t('context.wetDays', { count: 0 })).toMatch(/^0 दिन/);
     const hi = JSON.parse(JSON.stringify(i18n.getResourceBundle('hi', 'translation')));
     const ones = [];

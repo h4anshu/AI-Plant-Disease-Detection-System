@@ -1,8 +1,7 @@
-# Security (public deployment with login disabled)
+# Security (public deployment, optional sign-in)
 
-Login is switched off for now. `server/middleware/auth.js` lets every request through as one shared
-guest user. This page covers what protects the public deployment until login returns, and what is
-waiting for it.
+Signing in is optional (`docs/AUTH.md`). A visitor with no token is a guest, scoped by the browser's device id;
+a signed-in user is scoped by their account. This page covers what protects the public deployment.
 
 ## Covered
 
@@ -25,8 +24,11 @@ waiting for it.
 ## Known limits
 
 - **The device id is not authentication.** It's a random 122-bit secret held by the browser. Anyone
-  who gets it (for example, someone using the same browser) sees that history. Clearing site data
-  loses the history.
+  who gets it (for example, someone using the same browser) sees that guest history. Clearing site data
+  loses the history. Signing in and adding the guest records to the account removes this limit.
+- **A token lives in the browser's storage for 7 days** (not in a cookie): a script injected into the page could read it, so the
+  page must stay free of third-party scripts. Signing out only forgets it in that browser; there is no "sign out everywhere" and
+  no password reset yet (`docs/AUTH.md`, "Not built"). Deleting the account invalidates its tokens at once.
 - **Rate limits count per Cloud Run instance** (in memory). With `max-instances 3`, a determined
   client gets at most 3× the limit. Use a shared store (Redis) if that ever matters.
 - **The ML token is a shared secret.** A stronger setup is to make the ML service private:
@@ -36,15 +38,14 @@ waiting for it.
 - **The ML service fails open when `ML_SERVICE_TOKEN` isn't set** (so local dev and tests work). It
   logs a warning at startup. Always set it on Cloud Run.
 
-## Waiting for login to return
+## Sign-in (done, `docs/AUTH.md`)
 
-- Restore the two `401` responses in `server/middleware/auth.js`.
-- Scope history by the real user id and delete `guestDevice.js`, the `X-Device-Id` header and
-  `Prediction.deviceId` (search for `TODO(auth)`). To keep a guest's history, reassign the records
-  with their device id to their new account on first login.
-- Rate-limit `/api/auth/login` and `/api/auth/register` more strictly (brute force), and consider
-  per-user limits instead of per-IP.
-- Decide what happens to anonymous guest records (retention or deletion policy).
+- A bad, expired or deleted-account token is a 401 (no silent fallback to guest).
+- `/api/auth/login` counts only failed attempts per IP; `/api/auth/register` and account deletion are limited too.
+- Passwords: 8 to 72 bytes, bcrypt cost 10; a wrong email and a wrong password look the same (message and time).
+- Only strings are accepted for email and password (an object such as `{"$ne": null}` is refused, not run as a query).
+- `JWT_SECRET` of at least 32 characters is required in production (the server refuses to start otherwise).
+- Still open: what happens to anonymous guest records (retention or deletion policy).
 
 ## GPS hook
 

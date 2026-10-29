@@ -173,7 +173,7 @@ const predict = async (req, res) => {
 
 const PAGE_SIZE = 50;
 
-// guests only reach their own browser's records (middleware/guestDevice.js); null = nothing of theirs
+// a signed-in user reaches their account's records; a guest only their own browser's (middleware/guestDevice.js); null = nothing of theirs
 export const ownerFilter = (req) => {
   if (req.user.id !== GUEST_ID) return { userId: req.user.id };
   return req.deviceId ? { userId: GUEST_ID, deviceId: req.deviceId } : null;
@@ -253,33 +253,39 @@ const giveFeedback = async (req, res) => {
   }
 };
 
+// Removes everything of one owner (a guest browser or an account): checkups with their photos and heatmaps in Cloudinary, saved fields,
+// answers to "Did this help?", and the caches keyed by their places. Used by "Delete my data" and by "Delete my account".
+export const wipeOwner = async (owner, requestId) => {
+  const docs = await PredictionModel.find(owner).select('imageUrl gradcam location crop createdAt').lean();
+  const images = docs.flatMap((d) => [d.imageUrl, d.gradcam]).map(publicIdFromUrl).filter(Boolean);
+  const results = await Promise.allSettled(images.map((id) => cloudinary.uploader.destroy(id)));
+  const imagesFailed = results.filter((r) => r.status === 'rejected').length;
+  const { deletedCount } = await PredictionModel.deleteMany(owner);
+  // radar answers cached for the fields' places (3 days; the key is a hash of the place rounded to about 100 m, which can be tried out) go with them
+  const fields = await FieldModel.find(owner).select('location').lean();
+  const days = [0, 1, 2, 3].map((n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10));
+  await FloodExtentCache.deleteMany({ key: { $in: fields.flatMap((f) => days.map((d) => extentKey(f.location.coordinates[1], f.location.coordinates[0], d))) } });
+  await FieldModel.deleteMany(owner); // saved fields hold a private location too
+  await AlertFeedback.deleteMany(owner); // answers to "Did this help?"
+  // cached satellite answers for those fields go too (their keys are hashes of the location)
+  await FieldHealthCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map(keyForPrediction) } });
+  // and the soil answers cached for those cells (a hash of a ~250 m cell can be reversed by trying them all)
+  await SoilCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map((d) => soilCacheKey(d.location.coordinates[1], d.location.coordinates[0])) } });
+  // and their reports: the verify link then answers 404
+  await Report.deleteMany({ predictionId: { $in: docs.map((d) => d._id) } });
+  // a failed image delete leaves an orphan file, never a record: logged so it can be removed by hand
+  (imagesFailed ? logger.warn : logger.info).call(logger, { requestId, deleted: deletedCount,
+    images: images.length, imagesFailed }, 'records deleted');
+  return deletedCount;
+};
+
 // @route  DELETE /api/predict -> removes every record of this browser (guest) or user, with their photos
 // and heatmaps in Cloudinary; the public map loses them on its next request.
 const deleteMine = async (req, res) => {
   try {
     const owner = ownerFilter(req);
     if (!owner) return res.status(400).json({ message: 'Missing device id' });
-    const docs = await PredictionModel.find(owner).select('imageUrl gradcam location crop createdAt').lean();
-    const images = docs.flatMap((d) => [d.imageUrl, d.gradcam]).map(publicIdFromUrl).filter(Boolean);
-    const results = await Promise.allSettled(images.map((id) => cloudinary.uploader.destroy(id)));
-    const imagesFailed = results.filter((r) => r.status === 'rejected').length;
-    const { deletedCount } = await PredictionModel.deleteMany(owner);
-    // radar answers cached for the fields' places (3 days; the key is a hash of the place rounded to about 100 m, which can be tried out) go with them
-    const fields = await FieldModel.find(owner).select('location').lean();
-    const days = [0, 1, 2, 3].map((n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10));
-    await FloodExtentCache.deleteMany({ key: { $in: fields.flatMap((f) => days.map((d) => extentKey(f.location.coordinates[1], f.location.coordinates[0], d))) } });
-    await FieldModel.deleteMany(owner); // saved fields hold a private location too
-    await AlertFeedback.deleteMany(owner); // answers to "Did this help?"
-    // cached satellite answers for those fields go too (their keys are hashes of the location)
-    await FieldHealthCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map(keyForPrediction) } });
-    // and the soil answers cached for those cells (a hash of a ~250 m cell can be reversed by trying them all)
-    await SoilCache.deleteMany({ key: { $in: docs.filter((d) => d.location).map((d) => soilCacheKey(d.location.coordinates[1], d.location.coordinates[0])) } });
-    // and their reports: the verify link then answers 404
-    await Report.deleteMany({ predictionId: { $in: docs.map((d) => d._id) } });
-    // a failed image delete leaves an orphan file, never a record: logged so it can be removed by hand
-    (imagesFailed ? logger.warn : logger.info).call(logger, { requestId: req.id, deleted: deletedCount,
-      images: images.length, imagesFailed }, 'records deleted');
-    res.json({ deleted: deletedCount });
+    res.json({ deleted: await wipeOwner(owner, req.id) });
   } catch (error) {
     logError(req, 'Delete failed', error);
     res.status(500).json({ message: 'Server error' });

@@ -8,14 +8,28 @@ import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 // and the global limiter (per IP, GLOBAL_RATE_LIMIT) is still the backstop for everything.
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const deviceKey = (req) => { const id = req.get('x-device-id'); return id && UUID.test(id) ? `device:${id.toLowerCase()}` : ipKeyGenerator(req.ip); };
-const limiter = (limit, windowMinutes, message, { byDevice = false } = {}) => rateLimit({
+const limiter = (limit, windowMinutes, message, { byDevice = false, ...more } = {}) => rateLimit({
   windowMs: windowMinutes * 60 * 1000,
   limit,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { message },
   ...(byDevice && { keyGenerator: deviceKey }),
+  ...more,
 });
+
+// Password guessing: only the FAILED sign-ins count, per IP (a farmer who signs in correctly is never blocked by this). bcrypt makes each
+// guess cost the attacker too. Behind mobile-network NAT many people share an IP, hence the generous default.
+export const loginLimiter = limiter(Number(process.env.LOGIN_RATE_LIMIT) || 20, 15,
+  'Too many failed sign-in attempts. Please wait a few minutes and try again.', { skipSuccessfulRequests: true });
+
+// Each new account costs a bcrypt hash and a database row
+export const registerLimiter = limiter(Number(process.env.REGISTER_RATE_LIMIT) || 10, 60,
+  'Too many accounts created from this network. Please try again later.');
+
+// Deleting an account asks for the password again, so it is guessable like a sign-in is
+export const accountLimiter = limiter(Number(process.env.ACCOUNT_RATE_LIMIT) || 20, 15,
+  'Too many requests. Please wait a few minutes and try again.', { skipSuccessfulRequests: true });
 
 // Every prediction costs an ML call, a Cloudinary upload and a MongoDB write
 export const predictLimiter = limiter(Number(process.env.PREDICT_RATE_LIMIT) || 20, 10,

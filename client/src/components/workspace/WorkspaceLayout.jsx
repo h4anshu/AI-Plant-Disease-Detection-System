@@ -1,6 +1,8 @@
+import { useContext } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../../i18n';
+import { AuthContext } from '../../context/AuthContext';
 import { LeafMark } from '../heroIcons';
 import DemoBanner from '../DemoBanner';
 import Icon from './icons';
@@ -30,6 +32,7 @@ const LangSeg = () => {
 const WorkspaceLayout = () => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
+  const { user, isAuthenticated } = useContext(AuthContext);
   const back = readReturn()?.path || '/';
   const on = (routes) => routes.some((r) => pathname === r || pathname.startsWith(`${r}/`));
 
@@ -54,8 +57,10 @@ const WorkspaceLayout = () => {
           </nav>
           <div className="flex-1" />
           <div className="rounded-2xl border border-ink/10 bg-white/55 p-3.5">
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-leaf-text">{t('ws.menu.guest')}</p>
-            <p className="mt-1.5 text-[13px] leading-snug text-ink-2">{t('ws.menu.guestNote')}</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-leaf-text">{isAuthenticated ? t('ws.menu.account') : t('ws.menu.guest')}</p>
+            {isAuthenticated
+              ? <p className="mt-1.5 break-words text-[13px] leading-snug text-ink-2"><b className="text-ink">{user.name}</b><br />{user.email}</p>
+              : <p className="mt-1.5 text-[13px] leading-snug text-ink-2">{t('ws.menu.guestNote')} <Link to="/login" className="font-semibold text-pine underline underline-offset-2">{t('nav.signIn')}</Link></p>}
           </div>
           <LangSeg />
         </aside>

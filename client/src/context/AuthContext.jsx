@@ -1,47 +1,52 @@
-import { createContext , useState , useEffect} from "react";
-import { loginUser, registerUser } from "../services/api";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { deleteAccount, getMe, loginUser, registerUser } from "../services/api";
 
-export const AuthContext = createContext();
+// The default lets pages render without a provider (tests, previews): a guest.
+export const AuthContext = createContext({ user: null, isAuthenticated: false, loading: false });
 
+const read = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    return localStorage.getItem('token') && user?.id ? user : null;
+  } catch { return null; }
+};
+const store = (data) => {
+  try { localStorage.setItem('token', data.token); localStorage.setItem('user', JSON.stringify(data.user)); } catch { /* private mode: signed in until the page closes */ }
+};
+const forget = () => {
+  try { localStorage.removeItem('token'); localStorage.removeItem('user'); } catch { /* private mode */ }
+};
+
+// Who is signed in (docs/AUTH.md). Signing in is optional: without it the browser is a guest.
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(read);
 
   useEffect(() => {
-    // On app load, check if we already have a saved session
-    const savedUser = localStorage.getItem('user');
-    const savedToken = localStorage.getItem('token');
-    if (savedUser && savedToken) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    // the server says a token is no longer good (api.js): sign out
+    const expired = () => setUser(null);
+    window.addEventListener('auth:expired', expired);
+    // a saved session is checked once per visit; offline or a server error keeps it (only a 401 'invalid_token' signs out, in api.js)
+    if (read()) getMe().catch(() => {});
+    return () => window.removeEventListener('auth:expired', expired);
   }, []);
 
-  const login = async (email, password) => {
-    const res = await loginUser({ email, password });
-    localStorage.setItem('token', res.data.token);
-    localStorage.setItem('user', JSON.stringify(res.data.user));
+  const start = useCallback(async (request) => {
+    const res = await request;
+    store(res.data);
     setUser(res.data.user);
     return res.data;
-  };
+  }, []);
 
-  const register = async (name, email, password) => {
-    const res = await registerUser({ name, email, password });
-    localStorage.setItem('token', res.data.token);
-    localStorage.setItem('user', JSON.stringify(res.data.user));
-    setUser(res.data.user);
-    return res.data;
-  };
+  const value = useMemo(() => ({
+    user,
+    isAuthenticated: !!user,
+    loading: false,
+    login: (email, password) => start(loginUser({ email, password })),
+    register: (name, email, password) => start(registerUser({ name, email, password })),
+    logout: () => { forget(); setUser(null); },
+    // erases the account and everything of it on the server, then signs out
+    removeAccount: async (password) => { const res = await deleteAccount(password); forget(); setUser(null); return res.data; },
+  }), [user, start]);
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, isAuthenticated: !!user }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

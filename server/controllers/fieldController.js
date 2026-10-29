@@ -183,7 +183,7 @@ async function floodFor(f, now, sources, requestId) {
 async function observedAlerts(f, req, now) {
   const out = { alerts: [], fire: { status: 'disabled' } };
   if (isEnabled('community')) {
-    try { const a = await nearbyDisease(f, req.deviceId, now); if (a) out.alerts.push(a); } catch (err) { logger.warn({ requestId: req.id, message: err.message }, 'Disease reports nearby failed'); }
+    try { const a = await nearbyDisease(f, ownerFilter(req), now); if (a) out.alerts.push(a); } catch (err) { logger.warn({ requestId: req.id, message: err.message }, 'Disease reports nearby failed'); }
   }
   if (process.env.FIRMS_MAP_KEY && isEnabled('fire')) {
     try { const a = await fireFor(f, now); out.fire = { status: 'ok' }; if (a) out.alerts.push(a); } catch (err) {
@@ -260,7 +260,8 @@ export const giveAlertFeedback = async (req, res) => {
     const field = await FieldModel.findOne({ _id: req.params.id, ...owner }).select('crop stage').lean();
     if (!field) return res.status(404).json({ message: 'Field not found' });
     const date = rest.find((p) => /^\d{4}-\d{2}-\d{2}$/.test(p)) ?? istDate(new Date()); // SACHET ids carry no date: today's
-    await AlertFeedback.updateOne({ deviceId: owner.deviceId, alertKey: `${rule}|${date}` },
+    // the unique key is (deviceId, alertKey): an account has no device id, so its own stands in
+    await AlertFeedback.updateOne({ deviceId: owner.deviceId ?? `user:${owner.userId}`, alertKey: `${rule}|${date}` },
       { $set: { userId: owner.userId, rule, level, answer, crop: field.crop, stage: field.stage, createdAt: new Date() } }, { upsert: true });
     res.json({ saved: 1 });
   } catch (error) {

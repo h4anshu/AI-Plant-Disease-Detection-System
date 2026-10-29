@@ -73,7 +73,7 @@ describe('Privacy page', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     fireEvent.click(screen.getByRole('button', { name: 'Delete my data' }));
     fireEvent.click(screen.getByRole('button', { name: 'Yes, delete everything' }));
-    expect(await screen.findByText('Deleted 4 checkups from this browser.')).toBeInTheDocument();
+    expect(await screen.findByText('Deleted 4 checkups.')).toBeInTheDocument();
     expect(api.calls).toBe(1);
   });
 
