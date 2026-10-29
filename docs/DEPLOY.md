@@ -312,3 +312,24 @@ steps in your project. When wanted, add `.github/workflows/deploy.yml` (`workflo
 The service account needs `roles/run.admin`, `roles/artifactregistry.writer`,
 `roles/iam.serviceAccountUser` and `roles/cloudbuild.builds.editor`. Setup guide:
 https://github.com/google-github-actions/auth#workload-identity-federation-through-a-service-account
+
+## Part F — where each key goes (fire, prices, sign-in)
+
+**Vercel holds only the website.** Its variables named `VITE_...` are copied into the page every visitor downloads, so a secret there is public. Vercel needs `VITE_API_URL` (and `VITE_SENTRY_DSN` if used), nothing else. **Every key below goes to the Cloud Run `server` service**, through Secret Manager like `jwt-secret`:
+
+| Key | Cloud Run name | What it switches on |
+|---|---|---|
+| NASA FIRMS map key | `FIRMS_MAP_KEY` | "fire near the field" (without it the card says it is off) |
+| data.gov.in key | `DATA_GOV_API_KEY` | the mandi price card (without it the card is off) |
+| the existing `jwt-secret` | `JWT_SECRET` | sign-in tokens (at least 32 characters; the live one has 43) |
+
+```powershell
+# the Add-Secret helper of A7 (prompts for the value, stores it without a newline), then:
+Add-Secret firms-map-key
+Add-Secret data-gov-api-key
+gcloud run services update server --region asia-south1 --update-secrets "FIRMS_MAP_KEY=firms-map-key:latest,DATA_GOV_API_KEY=data-gov-api-key:latest"
+# also raise the global limit: many farmers share one mobile-network address
+gcloud run services update server --region asia-south1 --update-env-vars GLOBAL_RATE_LIMIT=1500
+```
+
+The project-wide `secretmanager.secretAccessor` grant of A7 already lets the server read new secrets. Check afterwards: `GET /api/alerts/health` with the `x-alerts-token` header shows `configured` for both keys. A key that appeared in a chat or a screenshot should be regenerated on its provider's site and added as a new secret version.
